@@ -93,7 +93,7 @@ function captcha_user($type, &$edit, &$newuser, $category = NULL) {
     break;
     case t("validate"):
     // The user has filled out the form and checked the "accept" box.
-    if (strtolower($edit['captchaword']) == strtolower(sess_read('captcha'))) {
+    if (strtolower($edit['captchaword']) == strtolower($_SESSION['captcha'])) {
       // on success return the values you want to store
       return array("captcha_correct" => 1);
     }
@@ -111,9 +111,8 @@ function captcha_user($type, &$edit, &$newuser, $category = NULL) {
 * NOTE: This will work ONLY if the patch at http://drupal.org/node/14708 has been applied. Let's hope the patch makes HEAD!
 */
 function captcha_comment($op,$edit) {
-    
   global $user;
-  return;
+  
   // check if captcha is enabled for form type
   if ($user->uid == 0 && !_captcha_istrue("captcha_comment_anonymous")) return;
   if ($user->uid != 0 && !_captcha_istrue("captcha_comment_registered")) return;
@@ -123,9 +122,9 @@ function captcha_comment($op,$edit) {
       // only validate captcha once for a comment.
       // this implementation basically sets a flag when you've successfully validated a captcha;
       // any successive comment inserted uses and invalidates the set flag.
-      if (sess_read('captcha_comment_correct')!='ok') {
-        if (strtolower($edit['captchaword']) != '' && strtolower($edit['captchaword']) == strtolower(sess_read('captcha'))) {
-          sess_write('captcha_comment_correct','ok');
+      if ($_SESSION['captcha_comment_correct']!='ok') {
+        if (strtolower($edit['captchaword']) != '' && strtolower($edit['captchaword']) == strtolower($_SESSION['captcha'])) {
+          $_SESSION['captcha_comment_correct'] = 'ok';
         }
         else {
           form_set_error('captcha', t('The user verification code you entered is not correct.'));
@@ -134,15 +133,17 @@ function captcha_comment($op,$edit) {
       break;
     case 'insert':
       //invalidate captcha after one comment insert
-      sess_write('captcha_comment_correct','');
+      $_SESSION['captcha_comment_correct'] = '';
       break;
       
     case 'form':
-      if (sess_read('captcha_comment_correct')!='ok') {
+      $form_html = "";
+      if ($_SESSION['captcha_comment_correct']!='ok') {
         $output .= form_item("", '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
         $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
-        return form_group(t('Verify comment authorship'), $output);
-      } else return NULL;
+        $form_html = form_group(t('Verify comment authorship'), $output);
+      }
+      return $form_html;
   }
 } 
 
@@ -164,7 +165,7 @@ function _captcha_code() {
     $string = substr($string,0,rand(5,8));
     
     //everytime we create a new code, we write it to session
-    sess_write('captcha',$string);
+    $_SESSION['captcha'] = $string;
     
     return $string;
 
