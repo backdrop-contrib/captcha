@@ -1,0 +1,113 @@
+<?php
+// $Id$
+
+function captcha_help($section = "admin/help#captcha") {
+  $output = "";
+
+  switch ($section) {
+    case 'admin/help#captcha':
+      $output .= "<p>Adds a Captcha to the registration form.</p>";
+      $output .= "<p>More help needed here.</p>";
+      break;
+    case 'admin/system/modules#description':
+      $output = t("Adds a Captcha to the registration form.");
+      break;
+    case 'admin/system/modules/captcha':
+      $output = t("Adds a Captcha to the registration form.");
+      break;
+    case 'admin/captcha':
+      $output = t("Adds a Captcha to the registration form.");
+      break;
+  }
+  return $output;
+}
+
+
+function captcha_settings() {
+
+  $output .= form_textfield(t('Image Path'), 'captcha_image_path', variable_get("captcha_image_path", ""), 30, 255, 'Path where to store the images');
+
+  return $output;
+}
+
+function captcha_user($type, $edit, &$user) {
+    // What type of registration action are we taking?
+	//make sure this is a registration
+	if (!$user->uid)
+	switch ($type) {
+      case t("form"):
+        // Add two items to the resigtration form.
+
+		//create captcha
+		$consts='bcdgjxvmnprst';
+		$vowels='aeiou';
+
+		for ($x=0; $x < 6; $x++) {
+			mt_srand ((double) microtime() * 1000000);
+			$const[$x] = substr($consts,mt_rand(0,strlen($consts)-1),1);
+			$vow[$x] = substr($vowels,mt_rand(0,strlen($vowels)-1),1);
+		}
+		$string = $const[0] . $vow[0] .$const[2] . $const[1] . $vow[1] . $const[3] . $vow[3] . $const[4];
+		$string = substr($string,0,rand(5,8));
+
+		//write to session
+		sess_write('captcha',$string);
+
+		$filename=variable_get("captcha_image_path", "")."/".session_id().".jpg";
+
+		/* set up image, the first number is the width and the second is the height*/
+		$im = imagecreatetruecolor(120, 20);
+
+		/*creates two variables to store color*/
+		$background = imagecolorallocate($im, rand(180, 250), rand(180, 250), rand(180, 250));
+		$foreground = imagecolorallocate($im, rand(0, 80), rand(0, 80), rand(0, 80));
+		$middleground = imagecolorallocate($im, rand(200, 160), rand(200, 160), rand(200, 160));
+
+		/*fill image with bgcolor*/
+		imagefill($im, 0, 0, $background);
+
+		/*writes string */
+		imagestring($im, 5, 10, 0, $string, $foreground);
+
+		//strikethrough
+		imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $foreground);
+
+		//rotate
+		$im2 = imagerotate($im,rand(-20,45),$background);
+		imagedestroy($im);
+		$im = $im2;
+
+		$middleground = imagecolorallocatealpha($im, rand(160, 200), rand(160, 200), rand(160, 200), 80);
+		//random shapes
+		for ($x=0; $x<50;$x++) {
+			imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
+			imageellipse($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
+		}
+
+		/* output to browser*/
+		imagejpeg($im, $filename);
+		ImageDestroy($im);
+
+        $output .= form_item("",
+                             "<img src=\"$filename\" alt=\"Captcha Image: $string\"/>");
+
+		$output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above');
+
+        return array('Captcha Image'=>$output);
+		break;
+      case t("validate"):
+        // The user has filled out the form and checked the "accept" box.
+        if ($edit['captchaword'] == sess_read('captcha')) {
+          // on success return the values you want to store
+          return array("captcha_correct" => 1);
+        }
+        else {
+          // on error return an error message
+		  form_set_error('captchaword', t("Please re-recognize the word provided:".sess_read('captcha')));
+          return $edit;
+        }
+		break;
+    }
+  }
+
+  ?>

@@ -1,0 +1,11 @@
+Captcha Readme
+
+- works with HEAD. Does not work with 4.4.1 due to missing hooks.
+
+Captcha Todo - arnabdotorg
+
+- clean up code. it looks shameful atm.
+- add more customizability, like image dirs, etc.
+- add cron hook to clean images
+- add TTF font capability
+- make captcha distortion more spiffy
