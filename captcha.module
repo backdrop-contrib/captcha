@@ -22,17 +22,29 @@ function captcha_help($section = "admin/help#captcha") {
   return $output;
 }
 
-function captcha_cron() {
-  //Clean up old images
-  $files = glob(variable_get("captcha_image_path", "")."/captcha*.png");
-  if(is_array($files)) {
-    foreach ($files as $filename) {
-	  unlink($filename);
-    } 
-  }
-}
+/**
+* Implementation of hook_menu().
+*/
+function captcha_menu($may_cache) {
+  $items = array();
+  
+  $suffix = '';
+  if (arg(2)!=null) $suffix='/'.arg(2);
+  
+  $items[] = array('path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
+    'callback' => '_captcha_image', 'access' => user_access('access content'),
+    'type' => MENU_CALLBACK);
+  
+  return $items;
+} 
 
 function captcha_settings() {
+
+  //check for GD
+  if (!function_exists(imagecreate)) 
+    form_set_error('No GD', t('Image library not available. Captcha needs the GD library extension to be installed. Please install GD.'));
+
+  if (!is_writable(variable_get("captcha_image_path", ""))) form_set_error('Write Error', t('Can\'t write to image path. Please make sure the path exists, and is writable.'));
 
   $output .= form_textfield(t('Files Path'), 'captcha_image_path', variable_get("captcha_image_path", ""), 30, 255, 'Path where to store the images. Do NOT add a trailing slash.');
   $output .= form_textfield(t('Relative URL Path'), 'captcha_url_path', variable_get("captcha_url_path", ""), 30, 255, 'Relative path to the Captcha image. Usually same as files path. Do NOT add a trailing slash.');
@@ -40,6 +52,9 @@ function captcha_settings() {
   return $output;
 }
 
+/**
+* Implementation of hook_menu(), for adding form elements & validation.
+*/
 function captcha_user($type, &$edit, &$user, $category = NULL) {
 
   // What type of registration action are we taking?
@@ -49,7 +64,35 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
     case t("register"):
     // Add two items to the resigtration form.
 
-    //create captcha
+    $output .= form_item("",
+               '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
+
+    $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
+
+    return array(array('title' => t('Verify Registration'), 'data'=>$output));
+
+    break;
+    case t("validate"):
+    // The user has filled out the form and checked the "accept" box.
+    if (strtolower($edit['captchaword']) == strtolower(sess_read('captcha'))) {
+      // on success return the values you want to store
+      return array("captcha_correct" => 1);
+    }
+    else {
+      // on error return an error message
+      form_set_error('captchaword', t("Please re-recognize the word shown in the image."));
+      return $edit;
+    }
+    break;
+  }
+}
+
+
+/**
+* Returns a random string for use in a captcha
+*/
+function _captcha_code() {
+    
     $consts='bcdgjxvmnprst';
     $vowels='aeiou';
 
@@ -58,16 +101,32 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
       $const[$x] = substr($consts,mt_rand(0,strlen($consts)-1),1);
       $vow[$x] = substr($vowels,mt_rand(0,strlen($vowels)-1),1);
     }
+    
     $string = $const[0] . $vow[0] .$const[2] . $const[1] . $vow[1] . $const[3] . $vow[3] . $const[4];
     $string = substr($string,0,rand(5,8));
-
-    //write to session
+    
+    //everytime we create a new code, we write it to session
     sess_write('captcha',$string);
+    
+    return $string;
 
-    $filename = "/captcha".md5(session_id()).".png";
-    $filepath = variable_get("captcha_image_path", "").$filename;
-    $fileurl = variable_get("captcha_url_path", "").$filename;
+}
 
+/**
+* Prints an image containing a captcha code.
+*/
+function _captcha_image() {
+  
+    // Set headers
+    header('Expires: Mon, 01 Jan 1997 05:00:00 GMT');
+    header('Cache-Control: no-store, no-cache, must-revalidate');
+    header('Cache-Control: post-check=0, pre-check=0', false);
+    header('Pragma: no-cache');
+    
+    header('Content-type: image/png');
+
+    $string = _captcha_code();
+    
     //set up image, the first number is the width and the second is the height
     $im = imagecreatetruecolor(120, 20);
 
@@ -100,30 +159,8 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
     }
 
     //output to browser
-    imagepng($im, $filepath);
-    ImageDestroy($im);
+    imagepng($im);
+    imagedestroy($im);
 
-    $output .= form_item("",
-               "<img src=\"$fileurl\" alt=\"Captcha Image: you will need to recognize the text in it.\"/>");
-
-    $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
-
-    return array(array('title' => t('Verify Registration'), 'data'=>$output));
-
-    break;
-    case t("validate"):
-    // The user has filled out the form and checked the "accept" box.
-    if ($edit['captchaword'] == sess_read('captcha')) {
-      // on success return the values you want to store
-      return array("captcha_correct" => 1);
-    }
-    else {
-      // on error return an error message
-      form_set_error('captchaword', t("Please re-recognize the word shown in the image."));
-      return $edit;
-    }
-    break;
-  }
-}
-
+} 
 ?>
