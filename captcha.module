@@ -75,6 +75,7 @@ function captcha_settings() {
 * Implementation of hook_menu(), for adding form elements & validation.
 */
 function captcha_user($type, &$edit, &$user, $category = NULL) {
+  global $user;
 
   // What type of registration action are we taking?
   //make sure this is a registration, and captcha is enabled for registration
