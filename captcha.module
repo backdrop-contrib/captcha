@@ -36,7 +36,7 @@ function captcha_menu($may_cache) {
     'type' => MENU_CALLBACK);
   
   return $items;
-} 
+}
 
 function captcha_settings() {
 
@@ -44,11 +44,30 @@ function captcha_settings() {
   if (!function_exists(imagecreate)) 
     form_set_error('No GD', t('Image library not available. Captcha needs the GD library extension to be installed. Please install GD.'));
 
-  if (!is_writable(variable_get("captcha_image_path", ""))) form_set_error('Write Error', t('Can\'t write to image path. Please make sure the path exists, and is writable.'));
-
-  $output .= form_textfield(t('Files Path'), 'captcha_image_path', variable_get("captcha_image_path", ""), 30, 255, 'Path where to store the images. Do NOT add a trailing slash.');
-  $output .= form_textfield(t('Relative URL Path'), 'captcha_url_path', variable_get("captcha_url_path", ""), 30, 255, 'Relative path to the Captcha image. Usually same as files path. Do NOT add a trailing slash.');
+  else {
   
+    $fonts_path = variable_get("captcha_fonts_path", "");
+    
+    //check for TTF support
+    if (!function_exists(imagettftext) || !function_exists(imagettfbox)) 
+      form_set_error('No TTF support', t('Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font.'));
+      
+    else {
+
+      //check for valid font path
+      if ($fonts_path!="" && !is_dir($fonts_path))
+        form_set_error('Invalid font path', t('The current font path is invalid. The default font will be used.'));
+    }
+  
+  }
+    
+  $output .= form_checkbox(t('Check during user registration'), 'captcha_user_register', 'true', _captcha_istrue("captcha_user_register", "true"), 'If enabled, users will be asked to recognize an image during user registration.');
+  
+  $output .= form_checkbox(t('Check during anonymous comments'), 'captcha_comment_anonymous', 'true', _captcha_istrue("captcha_comment_anonymous"), 'If enabled, anonymous users will be asked to recognize an image while posting .');
+  
+  $output .= form_checkbox(t('Check during registered user comments'), 'captcha_comment_registered', 'true', _captcha_istrue("captcha_comment_registered"), 'If enabled, registered users will be asked to recognize an image while posting .');
+  
+  $output .= form_textfield(t('TrueType Fonts Path'), 'captcha_fonts_path', $fonts_path, 30, 255, 'Location of the directory where the Truetype (.ttf) fonts are stored. If you do not provide any fonts, the module will use the default font for text.');  
   return $output;
 }
 
@@ -58,15 +77,13 @@ function captcha_settings() {
 function captcha_user($type, &$edit, &$user, $category = NULL) {
 
   // What type of registration action are we taking?
-  //make sure this is a registration
-  if (!$user->uid)
+  //make sure this is a registration, and captcha is enabled for registration
+  if (_captcha_istrue("captcha_user_register") && !$user->uid)
   switch ($type) {
     case t("register"):
     // Add two items to the resigtration form.
-
-    $output .= form_item("",
-               '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
-
+    
+    $output .= form_item("", '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
     $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
 
     return array(array('title' => t('Verify Registration'), 'data'=>$output));
@@ -87,6 +104,42 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
   }
 }
 
+/**
+* Comment callback; adds captcha field to new comment form.
+* NOTE: This will work ONLY if the patch at http://drupal.org/node/14708 has been applied. Let's hope the patch makes HEAD!
+*/
+function captcha_comment($op,$edit) {
+  global $user;
+  
+  // check if captcha is enabled for form type
+  if (!isset($user->uid) && !_captcha_istrue("captcha_comment_anonymous")) return;
+  if (isset($user->uid) && !_captcha_istrue("captcha_comment_registered")) return;
+
+  switch ($op) {
+    case 'validate':
+      // only validate captcha once for a comment
+      if (sess_read('captcha_comment_correct')!='ok') {
+        if (strtolower($edit['captchaword']) != '' && strtolower($edit['captchaword']) == strtolower(sess_read('captcha'))) {
+          sess_write('captcha_comment_correct','ok');
+        }
+        else {
+          form_set_error('captcha', t('The user verification code you entered is not correct.'));
+        }
+      }
+      break;
+    case 'insert':
+      //invalidate captcha after one comment insert
+      sess_write('captcha_comment_correct','');
+      break;
+      
+    case 'form':
+      if (sess_read('captcha_comment_correct')!='ok') {
+        $output .= form_item("", '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
+        $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
+        return form_group(t('Verify comment authorship'), $output);
+      }
+  }
+} 
 
 /**
 * Returns a random string for use in a captcha
@@ -113,6 +166,31 @@ function _captcha_code() {
 }
 
 /**
+* Returns a random string for use in a captcha
+*/
+function _captcha_istrue($variable, $default="true") {
+    return (variable_get($variable, "")=="true");
+}
+
+/**
+* Returns an array of files with TTF extensions in the specified directory.
+*/
+function _captcha_font_list() {
+  $fontdir = variable_get("captcha_fonts_path", "");
+  
+  $filelist = array();
+  if ($handle = opendir($fontdir)) {
+    while ($file = readdir($handle)) {
+      if (preg_match("/\.ttf$/i",$file) == 1)
+        $filelist[] = $fontdir.'/'.$file;
+    }
+    closedir($handle);
+  }
+
+  return $filelist;
+}  
+
+/**
 * Prints an image containing a captcha code.
 */
 function _captcha_image() {
@@ -129,7 +207,7 @@ function _captcha_image() {
     
     //set up image, the first number is the width and the second is the height
     $im = imagecreatetruecolor(120, 20);
-
+  
     //creates two variables to store color
     $background = imagecolorallocate($im, rand(180, 250), rand(180, 250), rand(180, 250));
     $foreground = imagecolorallocate($im, rand(0, 80), rand(0, 80), rand(0, 80));
@@ -139,7 +217,58 @@ function _captcha_image() {
     imagefill($im, 0, 0, $background);
 
     //writes string
-    imagestring($im, 5, 10, 0, $string, $foreground);
+    if (function_exists(imagettftext) && function_exists(imagettfbox) && is_dir($fonts_path)) {
+      
+      // Get truetype font list
+      $fonts = _captcha_font_list();
+  
+      if (count($fonts) > 0) {
+      
+        // write text using a truetype font
+        $charSize = 20;        // font size
+        $charWidth = 0;        // width of previous character
+        $x = 20;               // initial x position
+  
+        // iterate over characters
+        for ($i=0;$i<strlen($string);$i++) {
+  
+          // define angle and position of character based on previous character dimension
+          $x += $charWidth * rand(1.6,1.8);
+          $y = rand(30,50);
+          $charAngle = rand(-25,25);
+          $char = substr($code,$i,1);
+    
+          // select random font
+          $font = $fonts[rand(0,count($fonts)-1)];
+    
+          // draw character
+          imagettftext($im,$charSize,$charAngle,$x,$y,$textColor,$font,$char);
+          print $font;
+    
+          // capture character dimensions to increment x position
+          //$bbox = imagettfbbox($charSize,$charAngle,$font,$char);
+          $charWidth = max($bbox[0],$bbox[2],$bbox[4],$bbox[6]) - min($bbox[0],$bbox[2],$bbox[4],$bbox[6]);
+        }
+      }
+      
+      else {
+      
+        // write text using a built-in font
+        $x = 40;
+        $y = 25;
+    
+        for ($i=0;$i<strlen($code);$i++) {
+          imagestring($img,5,$x,$y,substr($code,$i,1),$textColor);
+          $x += 30;
+        }
+      
+      }
+      
+    }
+    
+    else {
+      imagestring($im, 5, 10, 0, $string, $foreground);
+    }
 
     //strikethrough
     imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $foreground);
@@ -162,5 +291,6 @@ function _captcha_image() {
     imagepng($im);
     imagedestroy($im);
 
-} 
+}
+
 ?>
