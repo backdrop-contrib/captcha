@@ -85,10 +85,12 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
     //strikethrough
     imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $foreground);
 
-    //rotate
-    $im2 = imagerotate($im,rand(-20,45),$background);
-    imagedestroy($im);
-    $im = $im2;
+    //rotate only if function is defined (many PHP installations have this function missing)
+    if (function_exists('imagerotate')) {
+      $im2 = imagerotate($im,rand(-20,45),$background);
+      imagedestroy($im);
+      $im = $im2;
+    }
 
     $middleground = imagecolorallocatealpha($im, rand(160, 200), rand(160, 200), rand(160, 200), 80);
     //random shapes
