@@ -74,12 +74,13 @@ function captcha_settings() {
 /**
 * Implementation of hook_menu(), for adding form elements & validation.
 */
-function captcha_user($type, &$edit, &$user, $category = NULL) {
+function captcha_user($type, &$edit, &$newuser, $category = NULL) {
+
   global $user;
 
   // What type of registration action are we taking?
-  //make sure this is a registration, and captcha is enabled for registration
-  if (_captcha_istrue("captcha_user_register") && !$user->uid)
+  // make sure this is a registration, and captcha is enabled for registration
+  if (_captcha_istrue("captcha_user_register") && !$newuser->uid && !$user->uid)
   switch ($type) {
     case t("register"):
     // Add two items to the resigtration form.
@@ -110,6 +111,7 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
 * NOTE: This will work ONLY if the patch at http://drupal.org/node/14708 has been applied. Let's hope the patch makes HEAD!
 */
 function captcha_comment($op,$edit) {
+    
   global $user;
   
   // check if captcha is enabled for form type
@@ -138,7 +140,7 @@ function captcha_comment($op,$edit) {
         $output .= form_item("", '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
         $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
         return form_group(t('Verify comment authorship'), $output);
-      }
+      } else return NULL;
   }
 } 
 
