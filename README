@@ -4,8 +4,13 @@ Captcha Readme
 
 Captcha Todo - arnabdotorg
 
+- we have to check for GD
 - clean up code. it looks shameful atm.
 - add more customizability, like image dirs, etc.
 - add cron hook to clean images
 - add TTF font capability
 - make captcha distortion more spiffy
+
+Captcha Screenshot
+
+http://lab.arnab.org/drupal/captcha/screenshot.png
