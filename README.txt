@@ -1,15 +1,16 @@
 Captcha Readme
 
-- works with HEAD. Does not work with 4.4.1 due to missing hooks.
+Notes
+- Uses GD to draw stuff, emits in PNG
+- Uses the _cron hook to clean up old image files - make sure you have the
+  drupal cron setup, or you'll have to manually reclaim diskspace.
 
 Captcha Todo - arnabdotorg
-
-- we have to check for GD
-- clean up code. it looks shameful atm.
+- have to check for GD.
+- clean up image generation code.
 - add more customizability, like image dirs, etc.
-- add cron hook to clean images
-- add TTF font capability
-- make captcha distortion more spiffy
+- add TTF font capability.
+- make captcha distortion more spiffy.
 
 Captcha Screenshot
 
