@@ -113,14 +113,16 @@ function captcha_user($type, &$edit, &$newuser, $category = NULL) {
 function captcha_comment($op,$edit) {
     
   global $user;
-  
+  return;
   // check if captcha is enabled for form type
-  if (!isset($user->uid) && !_captcha_istrue("captcha_comment_anonymous")) return;
-  if (isset($user->uid) && !_captcha_istrue("captcha_comment_registered")) return;
+  if ($user->uid == 0 && !_captcha_istrue("captcha_comment_anonymous")) return;
+  if ($user->uid != 0 && !_captcha_istrue("captcha_comment_registered")) return;
 
   switch ($op) {
     case 'validate':
-      // only validate captcha once for a comment
+      // only validate captcha once for a comment.
+      // this implementation basically sets a flag when you've successfully validated a captcha;
+      // any successive comment inserted uses and invalidates the set flag.
       if (sess_read('captcha_comment_correct')!='ok') {
         if (strtolower($edit['captchaword']) != '' && strtolower($edit['captchaword']) == strtolower(sess_read('captcha'))) {
           sess_write('captcha_comment_correct','ok');
@@ -197,7 +199,10 @@ function _captcha_font_list() {
 * Prints an image containing a captcha code.
 */
 function _captcha_image() {
-  
+    
+    //if we don't have GD functions, we can't generate the image
+    if (!function_exists('imagecreatetruecolor')) return;
+    
     // Set headers
     header('Expires: Mon, 01 Jan 1997 05:00:00 GMT');
     header('Cache-Control: no-store, no-cache, must-revalidate');

@@ -1,10 +1,4 @@
-Captcha Readme
---
-Hi, 
-Just to keep track of usage, it would be really cool if you can 
-send an email to [drupal AT arnab DOT org] telling me you're using it.
--arnab
---
+##Captcha Readme##
 
 To Install:
 Enable the module, and then go to admin/settings/captcha to enable captchas for various actions.
