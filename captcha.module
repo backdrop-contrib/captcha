@@ -23,18 +23,20 @@ function captcha_help($section = "admin/help#captcha") {
 }
 
 function captcha_cron() {
-
   //Clean up old images
-  foreach (glob(variable_get("captcha_image_path", "")."/captcha*.png") as $filename) {
-     unlink($filename);
+  $files = glob(variable_get("captcha_image_path", "")."/captcha*.png");
+  if(is_array($files)) {
+    foreach ($files as $filename) {
+	  unlink($filename);
+    } 
   }
-
 }
 
 function captcha_settings() {
 
-  $output .= form_textfield(t('Image Path'), 'captcha_image_path', variable_get("captcha_image_path", ""), 30, 255, 'Path where to store the images.');
-
+  $output .= form_textfield(t('Files Path'), 'captcha_image_path', variable_get("captcha_image_path", ""), 30, 255, 'Path where to store the images. Do NOT add a trailing slash.');
+  $output .= form_textfield(t('Relative URL Path'), 'captcha_url_path', variable_get("captcha_url_path", ""), 30, 255, 'Relative path to the Captcha image. Usually same as files path. Do NOT add a trailing slash.');
+  
   return $output;
 }
 
@@ -62,20 +64,22 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
     //write to session
     sess_write('captcha',$string);
 
-    $filename = variable_get("captcha_image_path", "")."/captcha".md5(session_id()).".png";
+    $filename = "/captcha".md5(session_id()).".png";
+    $filepath = variable_get("captcha_image_path", "").$filename;
+    $fileurl = variable_get("captcha_url_path", "").$filename;
 
-    /* set up image, the first number is the width and the second is the height*/
+    //set up image, the first number is the width and the second is the height
     $im = imagecreatetruecolor(120, 20);
 
-    /*creates two variables to store color*/
+    //creates two variables to store color
     $background = imagecolorallocate($im, rand(180, 250), rand(180, 250), rand(180, 250));
     $foreground = imagecolorallocate($im, rand(0, 80), rand(0, 80), rand(0, 80));
     $middleground = imagecolorallocate($im, rand(200, 160), rand(200, 160), rand(200, 160));
 
-    /*fill image with bgcolor*/
+    //fill image with bgcolor
     imagefill($im, 0, 0, $background);
 
-    /*writes string */
+    //writes string
     imagestring($im, 5, 10, 0, $string, $foreground);
 
     //strikethrough
@@ -93,18 +97,16 @@ function captcha_user($type, &$edit, &$user, $category = NULL) {
       imageellipse($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
     }
 
-    /* output to browser*/
-    imagepng($im, $filename);
+    //output to browser
+    imagepng($im, $filepath);
     ImageDestroy($im);
 
     $output .= form_item("",
-               "<img src=\"$filename\" alt=\"Captcha Image: you will need to recognize the text in it.\"/>");
+               "<img src=\"$fileurl\" alt=\"Captcha Image: you will need to recognize the text in it.\"/>");
 
     $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
 
     return array(array('title' => t('Verify Registration'), 'data'=>$output));
-
-      //form_group(t('Account information'), "fdsf", "")
 
     break;
     case t("validate"):
