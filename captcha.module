@@ -82,16 +82,16 @@ function captcha_user($type, &$edit, &$newuser, $category = NULL) {
   // make sure this is a registration, and captcha is enabled for registration
   if (_captcha_istrue("captcha_user_register") && !$newuser->uid && !$user->uid)
   switch ($type) {
-    case t("register"):
+    case 'register':
     // Add two items to the resigtration form.
     
     $output .= form_item("", '<img src="'.url('captcha/image/'.time()).'" alt="Captcha Image: you will need to recognize the text in it."/>');
-    $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, 'Please type in the letters/numbers that are shown in the image above.', NULL, TRUE);
+    $output .= form_textfield(t('Word'), 'captchaword', NULL, 15, 15, t('Please type in the letters/numbers that are shown in the image above.'), NULL, TRUE);
 
     return array(array('title' => t('Verify Registration'), 'data'=>$output));
 
     break;
-    case t("validate"):
+    case 'validate':
     // The user has filled out the form and checked the "accept" box.
     if (strtolower($edit['captchaword']) == strtolower($_SESSION['captcha'])) {
       // on success return the values you want to store
