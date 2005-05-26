@@ -32,10 +32,18 @@ function captcha_menu($may_cache) {
   if (arg(2)!=null) $suffix='/'.arg(2);
   
   $items[] = array('path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
-    'callback' => '_captcha_image', 'access' => user_access('access content'),
+    'callback' => '_captcha_image', 'access' => user_access('access captchas'),
     'type' => MENU_CALLBACK);
-  
+    
   return $items;
+}
+
+/**
+* Implementation of hook_perm, in response to issue #19254
+* This adds yet another value to configure, but it's a safer option.
+*/
+function captcha_perm() {
+  return array('access captchas');
 }
 
 function captcha_settings() {
