@@ -236,7 +236,6 @@ function _captcha_image() {
     // creates two variables to store color
     $background = imagecolorallocate($im, rand(180, 250), rand(180, 250), rand(180, 250));
     $foreground = imagecolorallocate($im, rand(0, 80), rand(0, 80), rand(0, 80));
-    $middleground = imagecolorallocate($im, rand(200, 160), rand(200, 160), rand(200, 160));
 
     // fill image with bgcolor
     imagefill($im, 0, 0, $background);
@@ -296,15 +295,18 @@ function _captcha_image() {
       imagedestroy($im);
       $im = $im2;
     }
+    
+    // add cloud only if function is defined (many PHP installations have this function missing)
+    if (function_exists('imagecolorallocatealpha')) {
+      $middleground = imagecolorallocatealpha($im, rand(160, 200), rand(160, 200), rand(160, 200), 80);
 
-    $middleground = imagecolorallocatealpha($im, rand(160, 200), rand(160, 200), rand(160, 200), 80);
-
-    // random shapes
-    for ($x=0; $x<50;$x++) {
-      imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
-      imageellipse($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
+      // random shapes
+      for ($x=0; $x<50;$x++) {
+        imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
+        imageellipse($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
+      }
     }
-
+    
     //output to browser
     imagepng($im);
     imagedestroy($im);

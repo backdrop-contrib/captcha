@@ -5,11 +5,9 @@ Enable the module, and then go to admin/settings/captcha to enable captchas for 
 
 Notes:
 - Uses GD to draw stuff, emits in PNG
-- Captcha for comments is contingent upon a patch(#14708) for now. 
-
-Captcha Todo:
-- clean up image generation code.
-- make captcha distortion more spiffy.
+- Captcha for comments is contingent upon a patch(#14708) for now. One day, this will reach core.
+- I've added function_exists checks for it to degrade gracefully across multiple versions of GD,
+  please file issues with the exact GD, PHP information if you have problems.
 
 Captcha Demo:
 http://arnab.drupaldevs.org
