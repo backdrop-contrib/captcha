@@ -146,6 +146,8 @@ function captcha_comment($op,$edit) {
       if ($_SESSION['captcha_comment_correct']!='ok') {
         if (strtolower($edit['captchaword']) != '' && strtolower($edit['captchaword']) == strtolower($_SESSION['captcha'])) {
           $_SESSION['captcha_comment_correct'] = 'ok';
+          //reset captcha variable to prevent session highjacking vulnerability #26741	  
+          $_SESSION['captcha']='';
         }
         else {
           form_set_error('captcha', t('The user verification code you entered is not correct.'));
