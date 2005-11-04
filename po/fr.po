@@ -1,0 +1,97 @@
+# LANGUAGE translation of Drupal (captcha.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: captcha.module,v 1.15 2005/07/15 06:49:24 arnabdotorg
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Drupal 4.6 - Module Captcha\n"
+"POT-Creation-Date: 2005-10-08 18:22+0200\n"
+"PO-Revision-Date: 2005-11-04 14:22+0100\n"
+"Last-Translator: Erik de Zeeuw <erik@syllance.fr>\n"
+"Language-Team: French <drupal@syllance.fr>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: French\n"
+
+#: captcha.module:13;16;19
+msgid "Adds a Captcha to the registration form."
+msgstr "Ajoute une image de vérification au formulaire d'enregistrement."
+
+#: captcha.module:34
+msgid "captcha image"
+msgstr "image de vérification"
+
+#: captcha.module:53
+msgid "Image library not available. Captcha needs the GD library extension to be installed. Please install GD."
+msgstr "La librairie de gestion d'images n'est pas disponible. La librairie et l'extension php GD sont nécessaires au fonctionnement du module Captcha. Merci d'installer GD."
+
+#: captcha.module:61
+msgid "Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font."
+msgstr "La librairie d'image installée semble ne pas supporter les polices  TrueType. Le module Captcha fonctionnera en utilisant les fontes intégrées par défaut."
+
+#: captcha.module:67
+msgid "The current font path is invalid. The default font will be used."
+msgstr "Le chemin des polices est invalide. Les polices par défaut vont être utilisées."
+
+#: captcha.module:72
+msgid "Check during user registration"
+msgstr "Vérification lors de l'enregistrement des utilisateurs"
+
+#: captcha.module:74
+msgid "Check during anonymous comments"
+msgstr "Vérification lors de l'envoi de commentaires anonymes"
+
+#: captcha.module:76
+msgid "Check during registered user comments"
+msgstr "Vérification pour l'envoi de commentaires par les utilisateurs enregistrés"
+
+#: captcha.module:78
+msgid "TrueType Fonts Path"
+msgstr "Chemin des polices True Type"
+
+#: captcha.module:81
+msgid "Number of fonts found: "
+msgstr "Nombre de polices trouvées : "
+
+#: captcha.module:85
+msgid "GD Version: "
+msgstr "Version librairie GD : "
+
+#: captcha.module:86
+msgid " FreeType Support: "
+msgstr "Support FreeType : "
+
+#: captcha.module:110;166
+msgid "Word"
+msgstr "Mot affiché "
+
+#: captcha.module:110
+msgid "Please type in the letters/numbers that are shown in the image above."
+msgstr "Merci d'indiquer quelle est l'expression (lettres/chiffres) affichée par l'image ci-dessus."
+
+#: captcha.module:112
+msgid "Verify Registration"
+msgstr "Vérification de votre enregistrement"
+
+#: captcha.module:123
+msgid "Please re-recognize the word shown in the image."
+msgstr "Merci de bien vouloir reconnaître à nouveau le mot affiché par l'image."
+
+#: captcha.module:153
+msgid "The user verification code you entered is not correct."
+msgstr "Le code de vérification utilisateur saisi est incorrect."
+
+#: captcha.module:167
+msgid "Verify comment authorship"
+msgstr "Vérification d'envoi du commentaire"
+
+#: captcha.module:46
+msgid "access captchas"
+msgstr "accès aux images de vérification"
+
+#: captcha.module:0
+msgid "captcha"
+msgstr "captcha"
+
