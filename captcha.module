@@ -69,20 +69,20 @@ function captcha_settings() {
                                           '#type' => 'checkbox',
                                           '#title' => t('Check during user registration'),
                                           '#default_value' => _captcha_istrue("captcha_user_register", "true"),
-                                          '#description' =>  'If enabled, users will be asked to recognize an image during user registration.',
+                                          '#description' =>  t('If enabled, users will be asked to recognize an image during user registration.'),
                                         );
   $form['captcha_comment_anonymous'] = array(
                                           '#type' => 'checkbox',
                                           '#title' => t('Check during anonymous comments.'),
                                           '#default_value' => _captcha_istrue("captcha_comment_anonymous", "true"),
-                                          '#description' =>   'If enabled, anonymous users will be asked to recognize an image while posting .',
+                                          '#description' =>   t('If enabled, anonymous users will be asked to recognize an image while posting .'),
                                         );
 
   $form['captcha_comment_registered'] = array(
                                           '#type' => 'checkbox',
                                           '#title' => t('Check during registered user comments.'),
                                           '#default_value' => _captcha_istrue("captcha_comment_registered", "true"),
-                                          '#description' =>   'If enabled, registered users will be asked to recognize an image while posting .',
+                                          '#description' =>   t('If enabled, registered users will be asked to recognize an image while posting .'),
                                         );
 
 
