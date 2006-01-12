@@ -54,7 +54,8 @@ function captcha_settings() {
 
     //check for TTF support
     if (!function_exists(imagettftext))
-      form_set_error('No TTF support', t('Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font.'));
+
+      drupal_set_message(t('Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font.'),'status');
 
     else {
 
@@ -152,11 +153,7 @@ function captcha_user($type, &$edit, &$newuser, $category = NULL) {
 * Comment callback; adds captcha field to new comment form.
 */
 function captcha_comment($edit, $op) {
-  global $user;
 
-  // check if captcha is enabled for form type
-  //if ($user->uid == 0 && !_captcha_istrue("captcha_comment_anonymous")) return;
-  //if ($user->uid != 0 && !_captcha_istrue("captcha_comment_registered")) return;
   switch ($op) {
     case 'validate': //this is redundant, not followed
       // only validate captcha once for a comment.
@@ -201,8 +198,16 @@ function _captcha_form() {
 
 
 function captcha_form_alter($formid, &$form) {
+
+  global $user;
+
   switch($formid) {
     case 'comment_form':
+
+      // check if captcha is enabled for form type
+      if ($user->uid == 0 && !_captcha_istrue("captcha_comment_anonymous")) return;
+      if ($user->uid != 0 && !_captcha_istrue("captcha_comment_registered")) return;
+
       // include logic to remove captcha if the current entry is a valid captcha
       if (!$_SESSION['captcha_comment_correct'] && !($_POST['edit']['captcha_word'] != '' && _captcha_validate($_POST['edit']['captcha_word']))) {
         $form['captcha'] = _captcha_form();
