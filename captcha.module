@@ -211,7 +211,8 @@ function captcha_form_alter($formid, &$form) {
       // include logic to remove captcha if the current entry is a valid captcha
       if (!$_SESSION['captcha_comment_correct'] && !($_POST['edit']['captcha_word'] != '' && _captcha_validate($_POST['edit']['captcha_word']))) {
         $form['captcha'] = _captcha_form();
-      } else {
+      }
+      else {
         $_SESSION['captcha']='';
         unset($form['captcha']);
       }
