@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "POT-Creation-Date: \n"
-"PO-Revision-Date: 2005-11-17 08:41+0100\n"
-"Last-Translator: MicheleF <michele@drupalitalia.org>\n"
+"PO-Revision-Date: 2006-01-17 13:24+0100\n"
+"Last-Translator: Uccio <ucciopan@aicomputer.it>\n"
 "Language-Team: Drupal Italia\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -24,88 +24,105 @@ msgid "captcha image"
 msgstr "immagine captcha"
 
 # d:\drmodule\captcha\captcha.module:45
-#: captcha.module:53
+#: captcha.module:49
 msgid "Image library not available. Captcha needs the GD library extension to be installed. Please install GD."
 msgstr "Libreria grafica non disponibile. Captcha necessita della libreria GD installata. Per favore installa la libreria GD"
 
 # d:\drmodule\captcha\captcha.module:53
-#: captcha.module:61
+#: captcha.module:58
 msgid "Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font."
 msgstr "La tua libreria grafica non ha il supporto per i TrueType font. Captcha lavorerà ma usera solo i font interni alla libreria."
 
 # d:\drmodule\captcha\captcha.module:59
-#: captcha.module:67
+#: captcha.module:64
 msgid "The current font path is invalid. The default font will be used."
 msgstr "La directory dei font corrente non è valida. I font di default verranno usati."
 
 # d:\drmodule\captcha\captcha.module:64
-#: captcha.module:72
+#: captcha.module:71
 msgid "Check during user registration"
 msgstr "Abilita durante la registrazione utente"
 
+#: captcha.module:73
+msgid "If enabled, users will be asked to recognize an image during user registration."
+msgstr "Se abilitato, all' utente verrà richiesto di riconoscere un immagine durate la fase di registrazione."
+
 # d:\drmodule\captcha\captcha.module:66
-#: captcha.module:74
-msgid "Check during anonymous comments"
+#: captcha.module:77
+#, fuzzy
+msgid "Check during anonymous comments."
 msgstr "Abilita nei commenti anonimi"
 
+#: captcha.module:79
+msgid "If enabled, anonymous users will be asked to recognize an image while posting ."
+msgstr "Se abilitato, all' utente anononimo verrà richiesto di riconoscere un immagine durate la fase di creazione di contenuti (post)."
+
 # d:\drmodule\captcha\captcha.module:68
-#: captcha.module:76
-msgid "Check during registered user comments"
+#: captcha.module:84
+#, fuzzy
+msgid "Check during registered user comments."
 msgstr "Abilita nei commenti non anonimi"
 
+#: captcha.module:86
+msgid "If enabled, registered users will be asked to recognize an image while posting ."
+msgstr "Se abilitato, all' utente registrato verrà richiesto di riconoscere un immagine durate la fase di creazione dei contenuti (post)."
+
 # d:\drmodule\captcha\captcha.module:70
-#: captcha.module:78
+#: captcha.module:92
 msgid "TrueType Fonts Path"
 msgstr "Directory dei font TrueType"
 
+#: captcha.module:96
+msgid "Location of the directory where the Truetype (.ttf) fonts are stored. If you do not provide any fonts, the module will use the default font for text."
+msgstr "Posizione della directory dove vengono tenuti i Truetype (.ttf) font. Se non fornirai nessun font il modulo userà i font di default per il testo."
+
 # d:\drmodule\captcha\captcha.module:73
-#: captcha.module:81
+#: captcha.module:101
 msgid "Number of fonts found: "
 msgstr "Numero di font trovati:"
 
 # d:\drmodule\captcha\captcha.module:77
-#: captcha.module:85
+#: captcha.module:105
 msgid "GD Version: "
 msgstr "Versione GD:"
 
 # d:\drmodule\captcha\captcha.module:78
-#: captcha.module:86
+#: captcha.module:106
 msgid " FreeType Support: "
 msgstr "Supporto free type:"
 
-# d:\drmodule\captcha\captcha.module:102;156
-#: captcha.module:110
-#: ;166
-msgid "Word"
-msgstr "Parola"
-
-# d:\drmodule\captcha\captcha.module:102
-#: captcha.module:110
-msgid "Please type in the letters/numbers that are shown in the image above."
-msgstr "Per favore inserisci le lettere/numeri che vedi nell'immagine sopra."
+#: captcha.module:112
+msgid "Image and font information"
+msgstr "Informazioni su immagini e font"
 
 # d:\drmodule\captcha\captcha.module:104
-#: captcha.module:112
+#: captcha.module:132
 msgid "Verify Registration"
 msgstr "Verifica Registrazione"
 
 # d:\drmodule\captcha\captcha.module:115
-#: captcha.module:123
+#: captcha.module:144
 msgid "Please re-recognize the word shown in the image."
 msgstr "Per favore, ri-digita la parola visualizzata nell'immagine."
 
 # d:\drmodule\captcha\captcha.module:143
-#: captcha.module:153
-msgid "The user verification code you entered is not correct."
+#: captcha.module:169
+#, fuzzy
+msgid "The captcha verification code you entered is not correct."
 msgstr "Il codice di verifica che hai inserito non è corretto."
 
-# d:\drmodule\captcha\captcha.module:157
-#: captcha.module:167
-msgid "Verify comment authorship"
-msgstr "Verifica la proprietà dei commenti"
+# d:\drmodule\captcha\captcha.module:102;156
+#: captcha.module:191
+msgid "Word"
+msgstr "Parola"
+
+# d:\drmodule\captcha\captcha.module:102
+#: captcha.module:193
+msgid "Please type in the letters/numbers that are shown in the image above."
+msgstr "Per favore inserisci le lettere/numeri che vedi nell'immagine sopra."
 
 # d:\drmodule\captcha\captcha.module:0
-#: captcha.module:46
+#: captcha.module:42
 msgid "access captchas"
 msgstr "accedi a captcha"
 
