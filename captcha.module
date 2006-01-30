@@ -30,9 +30,9 @@ function captcha_menu($may_cache) {
 
   $suffix = '';
   if (arg(2)!=null) $suffix='/'.arg(2);
-
+  
   $items[] = array('path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
-    'callback' => '_captcha_image', 'access' => user_access('access captchas'),
+    'callback' => _captcha_call('_captcha_image'), 'access' => user_access('access captchas'),
     'type' => MENU_CALLBACK);
 
   return $items;
@@ -66,26 +66,41 @@ function captcha_settings() {
 
   }
 
-  $form['captcha_user_register'] = array(
-                                          '#type' => 'checkbox',
-                                          '#title' => t('Check during user registration'),
-                                          '#default_value' => _captcha_istrue("captcha_user_register", "true"),
-                                          '#description' =>  t('If enabled, users will be asked to recognize an image during user registration.'),
-                                        );
-  $form['captcha_comment_anonymous'] = array(
-                                          '#type' => 'checkbox',
-                                          '#title' => t('Check during anonymous comments.'),
-                                          '#default_value' => _captcha_istrue("captcha_comment_anonymous", "true"),
-                                          '#description' =>   t('If enabled, anonymous users will be asked to recognize an image while posting .'),
-                                        );
+  //this is where you can add more captcha points
+  $captcha_points = array(
+                      'comment_form' => t('Comment Form'),
+                      'user_login' => t('User Login Form'),
+                      'user_login_block' => t('User Login Form Block'),
+                      'user_edit' => t('User Edit Form'),
+                      'user_register' => t('User Registration Form'),
+                      'user_pass' => t('User Forgot Password Form'),
+                      'contact_mail_user' => t('User Contact Form'),
+                      'contact_mail_page' => t('Sitewide Contact Form'),
+                      'node_form' => t('Create a node'),
+                    );
 
-  $form['captcha_comment_registered'] = array(
-                                          '#type' => 'checkbox',
-                                          '#title' => t('Check during registered user comments.'),
-                                          '#default_value' => _captcha_istrue("captcha_comment_registered", "true"),
-                                          '#description' =>   t('If enabled, registered users will be asked to recognize an image while posting .'),
-                                        );
+  $roles = user_roles();
 
+  foreach($roles as $role) {
+    $varsuffix = strtr($role,' ','_') .'_captcha';
+    $form[$varsuffix] = array('#type' => 'fieldset', '#title' => t('Captcha Points for the role '. $role), '#collapsible' => TRUE, '#collapsed' => TRUE);
+    foreach($captcha_points as $captcha_point=>$captcha_point_description) {
+      $varname = $captcha_point .'_'. $varsuffix;
+      $form[$varsuffix][$varname] = array(
+                                     '#type' => 'checkbox',
+                                     '#title' => $captcha_point_description,
+                                     '#default_value' => variable_get($varname, NULL)
+                                    );
+    }
+  }
+
+  $form['captcha_type'] = array(
+                            '#type' => 'select',
+                            '#title' => t('Type of captcha to use'),
+                            '#default_value' => variable_get('captcha_type','image'),
+                            '#options' => _captcha_types(),
+                            '#description' => t('Select what kind of challenge you want to pose to the user')
+                          );
 
   $form['captcha_fonts_path'] = array(
                                   '#type' => 'textfield',
@@ -95,7 +110,6 @@ function captcha_settings() {
                                   '#maxlength' => 255,
                                   '#description' => t('Location of the directory where the Truetype (.ttf) fonts are stored. If you do not provide any fonts, the module will use the default font for text.'),
                                 );
-
 
   if (isset($fonts_path)) {
     $imagefontinfo .= t('Number of fonts found: ').count(_captcha_font_list());
@@ -116,150 +130,66 @@ function captcha_settings() {
   return $form;
 }
 
-/**
-* Implementation of hook_menu(), for adding form elements & validation.
-*/
-function captcha_user($type, &$edit, &$newuser, $category = NULL) {
-
-  global $user;
-
-  // What type of registration action are we taking?
-  // make sure this is a registration, and captcha is enabled for registration
-  if (_captcha_istrue("captcha_user_register") && !$newuser->uid && !$user->uid) {
-    switch ($type) {
-      case 'register':
-        // Add two items to the resigtration form.
-        return array( t('Verify Registration') => _captcha_form());
-        break;
-
-      case 'validate':
-        // The user has filled out the form and checked the "accept" box.
-        if (_captcha_validate($edit['captcha_word']))   {
-          $_SESSION['captcha']='';
-          // on success return the values you want to store
-          return array("captcha_correct" => 1);
-        }
-        else {
-          // on error return an error message
-          form_set_error('captcha_word', t("Please re-recognize the word shown in the image."));
-          return $edit;
-        }
-        break;
-    }
-  }
-}
-
-/**
-* Comment callback; adds captcha field to new comment form.
-*/
-function captcha_comment($edit, $op) {
-
-  switch ($op) {
-    case 'validate': //this is redundant, not followed
-      // only validate captcha once for a comment.
-      // this implementation basically sets a flag when you've successfully validated a captcha;
-      // any successive comment inserted uses and invalidates the set flag.
-      if (!$_SESSION['captcha_comment_correct']) {
-        if (_captcha_validate($edit['captcha_word'])) {
-          $_SESSION['captcha_comment_correct'] =  true;
-          //reset captcha variable to prevent session highjacking vulnerability #26741
-          $_SESSION['captcha']='';
-        }
-        else {
-          form_set_error('captcha_word', t('The captcha verification code you entered is not correct.'));
-        }
-      }
-      break;
-    case 'insert':
-      //invalidate captcha after one comment insert
-      $_SESSION['captcha_comment_correct'] = false;
-      $_SESSION['captcha']='';
-      break;
-  }
-}
-
-function _captcha_form() {
-
-  $form['captcha_image'] = array (
-    '#type' => 'item',
-    '#title' =>  'captcha image',
-    '#value' => '<img src="' . url('captcha/image/'.time()) . '"  alt="Captcha Image: you will need to recognize the text in it."/>',
-  );
-
-  $form['captcha_word'] = array (
-    '#type' => 'textfield',
-    '#title' => t('Word'),
-    '#defaultvalue' => '',
-    '#description' => t('Please type in the letters/numbers that are shown in the image above.'),
-  );
-
-  return $form;
-}
 
 
 function captcha_form_alter($formid, &$form) {
 
   global $user;
+  $captcha_type = variable_get("captcha_type", NULL);
 
-  switch($formid) {
-    case 'comment_form':
+  if (!$captcha_type) return;
 
-      // check if captcha is enabled for form type
-      if ($user->uid == 0 && !_captcha_istrue("captcha_comment_anonymous")) return;
-      if ($user->uid != 0 && !_captcha_istrue("captcha_comment_registered")) return;
+  $flag = true;
+  $trigger = NULL;
 
-      // include logic to remove captcha if the current entry is a valid captcha
-      if (!$_SESSION['captcha_comment_correct'] && !($_POST['edit']['captcha_word'] != '' && _captcha_validate($_POST['edit']['captcha_word']))) {
-        $form['captcha'] = _captcha_form();
-      }
-      else {
-        $_SESSION['captcha']='';
-        unset($form['captcha']);
-      }
-      break;
-  }
-}
-
-function _captcha_validate($string) {
-
-  $captcha_word = drupal_strtolower($string);
-  if ($captcha_word != $_SESSION['captcha']) {
-    return false;
-  }
-
-  return true;
-}
-
-/**
-* Returns a random string for use in a captcha
-*/
-function _captcha_code() {
-
-    $consts='bcdgjxvmnprst';
-    $vowels='aeiou';
-
-    for ($x=0; $x < 6; $x++) {
-      mt_srand ((double) microtime() * 1000000);
-      $const[$x] = drupal_substr($consts,mt_rand(0,drupal_strlen($consts)-1),1);
-      $vow[$x] = drupal_substr($vowels,mt_rand(0,drupal_strlen($vowels)-1),1);
+  foreach($user->roles as $role) {
+    $candidate_trigger = $formid .'_'. strtr($role,' ','_') .'_captcha';
+    if (variable_get($candidate_trigger, NULL)) {
+      $trigger = $candidate_trigger;
     }
-
-    $string = $const[0] . $vow[0] .$const[2] . $const[1] . $vow[1] . $const[3] . $vow[3] . $const[4];
-    $string = drupal_substr($string,0,rand(5,8));
-
-    //everytime we create a new code, we write it to session
-    $_SESSION['captcha'] = drupal_strtolower($string);
-
-    return $string;
-
+    else {
+      $flag = false;
+      break;
+    }
+  }
+  
+  if ($flag && isset($trigger)) {
+    if ($captcha_type = _captcha_load()) {
+      $form['#submit'] = array('captcha_submit' => array()) + $form['#submit'];
+      if (!_captcha_validate($_POST['edit']['captcha_response'])) {
+        call_user_func_array('_captcha_'. $captcha_type .'_challenge', array(&$form, &$_SESSION['captcha']));
+      }
+    }
+  }
 }
+
 
 /**
-* Returns a random string for use in a captcha
+* On submit, captcha is reset
 */
-function _captcha_istrue($variable, $default="true") {
-    return (variable_get($variable, "")== true);
+function captcha_submit() {
+  if($_SESSION['captcha_correct']) {
+    unset($_SESSION['captcha_correct']);
+    unset($_SESSION['captcha']);
+  }
 }
+
+
+function _captcha_validate($captcha_response) {
+
+  if ($_SESSION['captcha_correct']) return TRUE;
+  if (is_array($captcha_response)) $captcha_response = $captcha_response['#value'];
+  if (trim($captcha_response) == '') return FALSE;
+
+  global $user;
+  $trigger = NULL;
+  if ($captcha_type = _captcha_load()) {
+    call_user_func_array('_captcha_'. $captcha_type .'_validate', array(&$captcha_response, &$_SESSION['captcha_correct']));
+  }
+  
+  return $_SESSION['captcha_correct'];
+}
+
 
 /**
 * Returns an array of files with TTF extensions in the specified directory.
@@ -279,108 +209,54 @@ function _captcha_font_list() {
   return $filelist;
 }
 
+function _captcha_call($func) {
+  _captcha_load();
+  //if (function_exists($func)) call_user_func_array($func, array());
+}
+
 /**
-* Prints an image containing a captcha code.
+* Loads the current captcha system into memory
 */
-function _captcha_image() {
+function _captcha_load() {
+  
+  $captcha_type = variable_get("captcha_type", NULL);
+  $path = drupal_get_path('module', 'captcha');
+  include_once($path.'/captcha_'.$captcha_type.'.inc');
 
-    // there are a few hard coded functions I'd like to eliminate here,
-    // but for the time being we'll let them be.
+  $function_challenge = '_captcha_'. $captcha_type .'_challenge';
+  $function_validate  = '_captcha_'. $captcha_type .'_validate';
 
-    //if we don't have GD2 functions, we can't generate the image
-    if (!function_exists('imagecreatetruecolor')) return;
+  if(function_exists($function_challenge) && function_exists($function_validate)) {
+    return $captcha_type;
+  }
+  else return false;
 
-    // Set headers
-    header('Expires: Mon, 01 Jan 1997 05:00:00 GMT');
-    header('Cache-Control: no-store, no-cache, must-revalidate');
-    header('Cache-Control: post-check=0, pre-check=0', false);
-    header('Pragma: no-cache');
+}
 
-    header('Content-type: image/png');
+/**
+* Generates list of available captcha methods
+*/
+function _captcha_types() {
+  static $types;
 
-    $string = _captcha_code();
-
-    // set up image, the first number is the width and the second is the height
-    $im = imagecreatetruecolor(180, 80);
-
-    // creates two variables to store color
-    $background = imagecolorallocate($im, rand(180, 250), rand(180, 250), rand(180, 250));
-    $foreground = imagecolorallocate($im, rand(0, 80), rand(0, 80), rand(0, 80));
-
-    // fill image with bgcolor
-    imagefill($im, 0, 0, $background);
-
-    // Get truetype font list
-    $fonts = _captcha_font_list();
-
-    // writes string
-    if (function_exists(imagettftext) && count($fonts) > 0) {
-
-      // write text using a truetype font
-      $charSize = 24;        // font size
-      $charWidth = 0;        // width of previous character
-      $x = 10;               // initial x position
-      $y = 30;
-
-      // iterate over characters
-      for ($i=0;$i<drupal_strlen($string);$i++) {
-        // define angle and position of character based on previous character dimension
-        $x += ($charWidth * rand(1.0, 1.6));
-        $y += rand(-5,5);
-        $charAngle = rand(-5,5);
-        $charSize += rand(-2,2);
-        $char = drupal_substr($string,$i,1);
-
-        // select random font
-        $font = $fonts[rand(0,count($fonts)-1)];
-
-        // draw character
-        imagettftext($im,$charSize,$charAngle,$x,$y,$foreground,$font,$char);
-
-        // capture character dimensions to increment x position
-        $bbox = imagettfbbox($charSize,$charAngle,$font,$char);
-        $charWidth = max($bbox[0],$bbox[2],$bbox[4],$bbox[6]) - min($bbox[0],$bbox[2],$bbox[4],$bbox[6]);
+  if (!isset($types)) {
+    $types = array();
+    $path = drupal_get_path('module', 'captcha');
+    $files = file_scan_directory($path, '^captcha_.*\.inc$');
+    foreach ($files as $filename => $file) {
+      include_once($filename);
+      $function_challenge = '_'. $file->name .'_challenge';
+      $function_validate  = '_'. $file->name .'_validate';
+      if(function_exists($function_challenge) && function_exists($function_validate)) {
+        $types[] = substr($file->name, 8);
       }
     }
-
-    else {
-      // write text using a built-in font
-      $x = 10;
-      $y = 0;
-
-      for ($i=0;$i<drupal_strlen($string);$i++) {
-        imagestring($im,5,$x,$y,drupal_substr($string,$i,1),$foreground);
-        $x += rand(10,15);
-        $y += rand(-4,4);
-      }
-
-    }
-
-    // strikethrough
-    imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $foreground);
-
-    // rotate only if function is defined (many PHP installations have this function missing)
-    if (function_exists('imagerotate')) {
-      $im2 = imagerotate($im,rand(-20,45),$background);
-      imagedestroy($im);
-      $im = $im2;
-    }
-
-    // add cloud only if function is defined (many PHP installations have this function missing)
-    if (function_exists('imagecolorallocatealpha')) {
-      $middleground = imagecolorallocatealpha($im, rand(160, 200), rand(160, 200), rand(160, 200), 80);
-
-      // random shapes
-      for ($x=0; $x<50;$x++) {
-        imageline($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
-        imageellipse($im, rand(0, 120), rand(0, 120), rand(0, 120), rand(0, 120), $middleground);
-      }
-    }
-
-    //output to browser
-    imagepng($im);
-    imagedestroy($im);
-
+  }
+  //post process types
+  foreach($types as $type) {
+    $r_types[$type] = $type;
+  }
+  return $r_types;
 }
 
 ?>
