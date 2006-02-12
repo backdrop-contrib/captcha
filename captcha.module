@@ -97,7 +97,7 @@ function captcha_settings() {
   $form['captcha_type'] = array(
                             '#type' => 'select',
                             '#title' => t('Type of captcha to use'),
-                            '#default_value' => variable_get('captcha_type','image'),
+                            '#default_value' => variable_get('captcha_type','math'),
                             '#options' => _captcha_types(),
                             '#description' => t('Select what kind of challenge you want to pose to the user')
                           );
@@ -219,7 +219,7 @@ function _captcha_call($func) {
 */
 function _captcha_load() {
   
-  $captcha_type = variable_get("captcha_type", NULL);
+  $captcha_type = variable_get("captcha_type", 'math');
   $path = drupal_get_path('module', 'captcha');
   include_once($path.'/captcha_'.$captcha_type.'.inc');
 
