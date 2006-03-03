@@ -1,22 +1,14 @@
 <?
 
 function _captcha_image_challenge(&$form) {
-
-  $form['captcha_image'] = array (
-    '#type' => 'item',
-    '#title' =>  'captcha image',
-    '#weight' => 0,
-    '#value' => '<img src="' . url('captcha/image/'.time()) . '"  alt="Captcha Image: you will need to recognize the text in it."/>',
-  );
-
   $form['captcha_response'] = array (
     '#type' => 'textfield',
-    '#title' => t('Word'),
+    '#title' => t('Captcha Validation'),
     '#defaultvalue' => '',
-    '#weight' => 0,
     '#required' => TRUE,
     '#validate' => array('_captcha_validate' => array()),
-    '#description' => t('Please type in the letters/numbers that are shown in the image above.')
+    '#description' => t('Please type in the letters/numbers that are shown in the image above.'),
+    '#prefix' => '<img src="' . url('captcha/image/'.time()) . '"  alt="Captcha Image: you will need to recognize the text in it."/>',
   );
 
   return $form;

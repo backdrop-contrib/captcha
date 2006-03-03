@@ -1,5 +1,4 @@
 <?
-
 function _captcha_math_challenge(&$form, &$captcha) {
 
   $x = rand(1,10);

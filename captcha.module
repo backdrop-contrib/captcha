@@ -29,11 +29,17 @@ function captcha_menu($may_cache) {
   $items = array();
 
   $suffix = '';
-  if (arg(2)!=null) $suffix='/'.arg(2);
-  
-  $items[] = array('path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
-    'callback' => _captcha_call('_captcha_image'), 'access' => user_access('access captchas'),
-    'type' => MENU_CALLBACK);
+
+  if ($may_cache) {
+    if (arg(2)!=null) $suffix='/'.arg(2);
+    $items[] = array(
+      'path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
+      'callback' => '_captcha_call', 
+      'callback arguments' => array('_captcha_image'), 
+      'access' => user_access('access captchas'),
+      'type' => MENU_CALLBACK
+    );
+  }
 
   return $items;
 }
@@ -211,7 +217,7 @@ function _captcha_font_list() {
 
 function _captcha_call($func) {
   _captcha_load();
-  //if (function_exists($func)) call_user_func_array($func, array());
+  if (function_exists($func)) call_user_func_array($func, array());
 }
 
 /**
