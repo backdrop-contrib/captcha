@@ -10,11 +10,7 @@ function captcha_help($section = "admin/help#captcha") {
     $output .= "<p>More help needed here.</p>";
     break;
   case 'admin/modules#description':
-    $output = t("Adds a Captcha to the registration form.");
-    break;
   case 'admin/modules/captcha':
-    $output = t("Adds a Captcha to the registration form.");
-    break;
   case 'admin/captcha':
     $output = t("Adds a Captcha to the registration form.");
     break;
@@ -22,55 +18,8 @@ function captcha_help($section = "admin/help#captcha") {
   return $output;
 }
 
-/**
-* Implementation of hook_menu().
-*/
-function captcha_menu($may_cache) {
-  $items = array();
-
-  $suffix = '';
-
-  if ($may_cache) {
-    if (arg(2)!=null) $suffix='/'.arg(2);
-    $items[] = array(
-      'path' => 'captcha/image'.$suffix, 'title' => t('captcha image'),
-      'callback' => '_captcha_call', 
-      'callback arguments' => array('_captcha_image'), 
-      'access' => user_access('access captchas'),
-      'type' => MENU_CALLBACK
-    );
-  }
-
-  return $items;
-}
-
-function captcha_perm() {
-  return array('access captchas');
-}
 
 function captcha_settings() {
-
-  //check for GD
-  if (!function_exists(imagecreate))
-    form_set_error('No GD', t('Image library not available. Captcha needs the GD library extension to be installed. Please install GD.'));
-
-  else {
-
-    $fonts_path = variable_get("captcha_fonts_path", "");
-
-    //check for TTF support
-    if (!function_exists(imagettftext))
-
-      drupal_set_message(t('Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font.'),'status');
-
-    else {
-
-      //check for valid font path
-      if ($fonts_path!="" && !is_dir($fonts_path))
-        form_set_error('Invalid font path', t('The current font path is invalid. The default font will be used.'));
-    }
-
-  }
 
   //this is where you can add more captcha points
   $captcha_points = array(
@@ -100,37 +49,17 @@ function captcha_settings() {
     }
   }
 
+  // preprocess array into a map
+  foreach(module_implements('captchachallenge') as $module) {
+    $captchamodules[$module] = $module;
+  }
+  
   $form['captcha_type'] = array(
                             '#type' => 'select',
                             '#title' => t('Type of captcha to use'),
-                            '#default_value' => variable_get('captcha_type','math'),
-                            '#options' => _captcha_types(),
+                            '#default_value' => variable_get('captcha_type','captcha'),
+                            '#options' => $captchamodules,
                             '#description' => t('Select what kind of challenge you want to pose to the user')
-                          );
-
-  $form['captcha_fonts_path'] = array(
-                                  '#type' => 'textfield',
-                                  '#title' => t('TrueType Fonts Path'),
-                                  '#default_value' =>  $fonts_path,
-                                  '#size' => 30,
-                                  '#maxlength' => 255,
-                                  '#description' => t('Location of the directory where the Truetype (.ttf) fonts are stored. If you do not provide any fonts, the module will use the default font for text.'),
-                                );
-
-  if (isset($fonts_path)) {
-    $imagefontinfo .= t('Number of fonts found: ').count(_captcha_font_list());
-  }
-
-  $gdinfo = gd_info();
-  $imagefontinfo .= '<br />'.t('GD Version: ').$gdinfo["GD Version"];
-  $imagefontinfo .= '<br />'.t(' FreeType Support: ');
-  $imagefontinfo .= ($gdinfo["FreeType Support"]==true) ? 'True' : 'False';
-  $imagefontinfo .= '<br />';
-
-  $form['captcha_info'] = array (
-                           '#type' => 'item',
-                           '#title' => t('Image and font information'),
-                           '#value' => $imagefontinfo,
                           );
 
   return $form;
@@ -142,7 +71,7 @@ function captcha_form_alter($formid, &$form) {
 
   global $user;
   $captcha_type = variable_get("captcha_type", NULL);
-
+  
   if (!$captcha_type) return;
 
   $flag = true;
@@ -158,12 +87,12 @@ function captcha_form_alter($formid, &$form) {
       break;
     }
   }
-  
   if ($flag && isset($trigger)) {
-    if ($captcha_type = _captcha_load()) {
-      $form['#submit'] = array('captcha_submit' => array()) + $form['#submit'];
-      if (!_captcha_validate($_POST['edit']['captcha_response'])) {
-        call_user_func_array('_captcha_'. $captcha_type .'_challenge', array(&$form, &$_SESSION['captcha']));
+    $form['#submit'] = array('captcha_submit' => array()) + $form['#submit'];
+    if (!_captcha_validate($_POST['edit']['captcha_response'])) {
+      //use call_func because module_invoke does not allow call by reference.
+      if (module_hook($captcha_type, 'captchachallenge')) {
+        call_user_func_array($captcha_type.'_captchachallenge', array(&$form, &$_SESSION['captcha']));   
       }
     }
   }
@@ -176,7 +105,7 @@ function captcha_form_alter($formid, &$form) {
 function captcha_submit() {
   if($_SESSION['captcha_correct']) {
     unset($_SESSION['captcha_correct']);
-    unset($_SESSION['captcha']);
+    unset($_SESSION['captcha']);    
   }
 }
 
@@ -188,81 +117,46 @@ function _captcha_validate($captcha_response) {
   if (trim($captcha_response) == '') return FALSE;
 
   global $user;
+  $captcha_type = variable_get("captcha_type", NULL);
   $trigger = NULL;
-  if ($captcha_type = _captcha_load()) {
-    call_user_func_array('_captcha_'. $captcha_type .'_validate', array(&$captcha_response, &$_SESSION['captcha_correct']));
+
+  if (module_hook($captcha_type, 'captchavalidate')) {
+    call_user_func_array($captcha_type.'_captchavalidate', array(&$captcha_response, &$_SESSION['captcha_correct']));
   }
   
   return $_SESSION['captcha_correct'];
 }
 
+/*
+ * Default implementation of the captcha challenge & validation
+ */
+function captcha_captchachallenge(&$form, &$captcha) {
 
-/**
-* Returns an array of files with TTF extensions in the specified directory.
-*/
-function _captcha_font_list() {
-  $fontdir = variable_get("captcha_fonts_path", "");
+  $x = rand(1,10);
+  $y = rand(1,10);
 
-  $filelist = array();
-  if ($handle = opendir($fontdir)) {
-    while ($file = readdir($handle)) {
-      if (preg_match("/\.ttf$/i",$file) == 1)
-        $filelist[] = $fontdir.'/'.$file;
-    }
-    closedir($handle);
-  }
-
-  return $filelist;
-}
-
-function _captcha_call($func) {
-  _captcha_load();
-  if (function_exists($func)) call_user_func_array($func, array());
-}
-
-/**
-* Loads the current captcha system into memory
-*/
-function _captcha_load() {
-  
-  $captcha_type = variable_get("captcha_type", 'math');
-  $path = drupal_get_path('module', 'captcha');
-  include_once($path.'/captcha_'.$captcha_type.'.inc');
-
-  $function_challenge = '_captcha_'. $captcha_type .'_challenge';
-  $function_validate  = '_captcha_'. $captcha_type .'_validate';
-
-  if(function_exists($function_challenge) && function_exists($function_validate)) {
-    return $captcha_type;
-  }
-  else return false;
+  $captcha = ($x + $y) . '';
+  $form['captcha_response'] = array (
+    '#type' => 'textfield',
+    '#title' => t('Math Question: What is '. $x .' + '. $y .'?'),
+    '#defaultvalue' => '',
+    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2'),
+    '#weight' => 0,
+    '#required' => TRUE,
+    '#validate' => array('_captcha_validate' => array())
+  );
 
 }
 
-/**
-* Generates list of available captcha methods
-*/
-function _captcha_types() {
-  static $types;
-
-  if (!isset($types)) {
-    $types = array();
-    $path = drupal_get_path('module', 'captcha');
-    $files = file_scan_directory($path, '^captcha_.*\.inc$');
-    foreach ($files as $filename => $file) {
-      include_once($filename);
-      $function_challenge = '_'. $file->name .'_challenge';
-      $function_validate  = '_'. $file->name .'_validate';
-      if(function_exists($function_challenge) && function_exists($function_validate)) {
-        $types[] = substr($file->name, 8);
-      }
-    }
+function captcha_captchavalidate(&$captcha_word, &$correct) {
+  $captcha_word = drupal_strtolower($captcha_word);
+  if ($captcha_word == $_SESSION['captcha']) {
+    $correct = TRUE;
   }
-  //post process types
-  foreach($types as $type) {
-    $r_types[$type] = $type;
+  else {
+    $correct = FALSE;
+    form_set_error('captcha_response', t('The answer you entered to the math problem is incorrect.'));
   }
-  return $r_types;
 }
 
 ?>
