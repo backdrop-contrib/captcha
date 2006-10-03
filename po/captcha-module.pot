@@ -1,0 +1,85 @@
+# LANGUAGE translation of Drupal (captcha.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: captcha.module,v 1.25 2006/07/26 19:32:02 wundo
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2006-10-03 13:47-0300\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: captcha.module:15
+msgid "Adds a Captcha to the registration form."
+msgstr ""
+
+#: captcha.module:26
+msgid "Comment Form"
+msgstr ""
+
+#: captcha.module:27
+msgid "User Login Form"
+msgstr ""
+
+#: captcha.module:28
+msgid "User Login Form Block"
+msgstr ""
+
+#: captcha.module:29
+msgid "User Edit Form"
+msgstr ""
+
+#: captcha.module:30
+msgid "User Registration Form"
+msgstr ""
+
+#: captcha.module:31
+msgid "User Forgot Password Form"
+msgstr ""
+
+#: captcha.module:32
+msgid "User Contact Form"
+msgstr ""
+
+#: captcha.module:33
+msgid "Sitewide Contact Form"
+msgstr ""
+
+#: captcha.module:34
+msgid "Create a node"
+msgstr ""
+
+#: captcha.module:41
+msgid "Captcha Points for the role %role"
+msgstr ""
+
+#: captcha.module:59
+msgid "Type of captcha to use"
+msgstr ""
+
+#: captcha.module:62
+msgid "Select what kind of challenge you want to pose to the user"
+msgstr ""
+
+#: captcha.module:141
+msgid "Math Question: What is %problem?"
+msgstr ""
+
+#: captcha.module:143
+msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2"
+msgstr ""
+
+#: captcha.module:158
+msgid "The answer you entered to the math problem is incorrect."
+msgstr ""
+
+#: captcha.module:0
+msgid "captcha"
+msgstr ""
+
