@@ -1,0 +1,84 @@
+# LANGUAGE translation of Drupal (captcha.module)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from file: captcha.module,v 1.25 2006/07/26 19:32:02 wundo
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Captcha\n"
+"POT-Creation-Date: 2006-10-03 13:47-0300\n"
+"PO-Revision-Date: 2006-10-03 22:16+0100\n"
+"Last-Translator: Juan Diego Gutiérrez Gallardo <enreas@gmail.com>\n"
+"Language-Team: Castellano <drupal@wundo.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Country: SPAIN\n"
+
+#: captcha.module:15
+msgid "Adds a Captcha to the registration form."
+msgstr "Añade un control Captcha al formulario de registro."
+
+#: captcha.module:26
+msgid "Comment Form"
+msgstr "Formulario de comentarios"
+
+#: captcha.module:27
+msgid "User Login Form"
+msgstr "Formulario de identificación de usuarios"
+
+#: captcha.module:28
+msgid "User Login Form Block"
+msgstr "Formulario de bloqueo de usuarios"
+
+#: captcha.module:29
+msgid "User Edit Form"
+msgstr "Formulario de edición de usuarios"
+
+#: captcha.module:30
+msgid "User Registration Form"
+msgstr "Formulario de alta de usuarios"
+
+#: captcha.module:31
+msgid "User Forgot Password Form"
+msgstr "Formulario de recuperación de contraseñas"
+
+#: captcha.module:32
+msgid "User Contact Form"
+msgstr "Formulario de contacto con el usuario"
+
+#: captcha.module:33
+msgid "Sitewide Contact Form"
+msgstr "Formulario de contacto para todo el sitio"
+
+#: captcha.module:34
+msgid "Create a node"
+msgstr "Creación de nodos"
+
+#: captcha.module:41
+msgid "Captcha Points for the role %role"
+msgstr "Puntos de control Captcha para el rol %role"
+
+#: captcha.module:59
+msgid "Type of captcha to use"
+msgstr "Tipo de control Captcha"
+
+#: captcha.module:62
+msgid "Select what kind of challenge you want to pose to the user"
+msgstr "Indique qué tipo de reto quiere plantear al usuario"
+
+#: captcha.module:141
+msgid "Math Question: What is %problem?"
+msgstr "Problema matemático: ¿Cuál es el resultado de %problem?"
+
+#: captcha.module:143
+msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2"
+msgstr "Por favor, solucione el problema matemático anterior y escriba el resultado. Por ejemplo, si el problema es 1+1 escriba 2"
+
+#: captcha.module:158
+msgid "The answer you entered to the math problem is incorrect."
+msgstr "La solución que ha dado al problema matemático no es correcta."
+
+#: captcha.module:0
+msgid "captcha"
+msgstr "captcha"
+
