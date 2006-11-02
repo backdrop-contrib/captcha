@@ -138,9 +138,9 @@ function captcha_captchachallenge(&$form, &$captcha) {
   $captcha = ($x + $y) . '';
   $form['captcha_response'] = array (
     '#type' => 'textfield',
-    '#title' => 'Math Question',
+    '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
     '#defaultvalue' => '',
-    '#description' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
+    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2'),
     '#weight' => 0,
     '#required' => TRUE,
     '#validate' => array('_captcha_validate' => array())
