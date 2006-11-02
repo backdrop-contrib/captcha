@@ -53,7 +53,7 @@ function captcha_settings() {
   foreach(module_implements('captchachallenge') as $module) {
     $captchamodules[$module] = $module;
   }
-  
+
   $form['captcha_type'] = array(
                             '#type' => 'select',
                             '#title' => t('Type of captcha to use'),
@@ -71,7 +71,7 @@ function captcha_form_alter($formid, &$form) {
 
   global $user;
   $captcha_type = variable_get("captcha_type", NULL);
-  
+
   if (!$captcha_type) return;
 
   $flag = true;
@@ -92,7 +92,7 @@ function captcha_form_alter($formid, &$form) {
     if (!_captcha_validate($_POST['edit']['captcha_response'])) {
       //use call_func because module_invoke does not allow call by reference.
       if (module_hook($captcha_type, 'captchachallenge')) {
-        call_user_func_array($captcha_type.'_captchachallenge', array(&$form, &$_SESSION['captcha']));   
+        call_user_func_array($captcha_type.'_captchachallenge', array(&$form, &$_SESSION['captcha']));
       }
     }
   }
@@ -105,7 +105,7 @@ function captcha_form_alter($formid, &$form) {
 function captcha_submit() {
   if($_SESSION['captcha_correct']) {
     unset($_SESSION['captcha_correct']);
-    unset($_SESSION['captcha']);    
+    unset($_SESSION['captcha']);
   }
 }
 
@@ -123,7 +123,7 @@ function _captcha_validate($captcha_response) {
   if (module_hook($captcha_type, 'captchavalidate')) {
     call_user_func_array($captcha_type.'_captchavalidate', array(&$captcha_response, &$_SESSION['captcha_correct']));
   }
-  
+
   return $_SESSION['captcha_correct'];
 }
 
@@ -138,9 +138,9 @@ function captcha_captchachallenge(&$form, &$captcha) {
   $captcha = ($x + $y) . '';
   $form['captcha_response'] = array (
     '#type' => 'textfield',
-    '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
+    '#title' => 'Math Question',
     '#defaultvalue' => '',
-    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2'),
+    '#description' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
     '#weight' => 0,
     '#required' => TRUE,
     '#validate' => array('_captcha_validate' => array())
