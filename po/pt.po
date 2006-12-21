@@ -51,11 +51,11 @@ msgstr "Formulário de contato para todo o site"
 
 #: captcha.module:34
 msgid "Create a node"
-msgstr "Criação de nodos"
+msgstr "Criação de nodes"
 
 #: captcha.module:41
 msgid "Captcha Points for the role %role"
-msgstr "Pontos de controle Captcha para o rol %role"
+msgstr "Pontos de controle Captcha para regra %role"
 
 #: captcha.module:59
 msgid "Type of captcha to use"
@@ -63,19 +63,19 @@ msgstr "Tipo de controle Captcha"
 
 #: captcha.module:62
 msgid "Select what kind of challenge you want to pose to the user"
-msgstr "Indicar qual tipo de reto quere lhe apresentar ao usuário"
+msgstr "Indique qual tipo de Captcha você quer apresentar ao usuário"
 
 #: captcha.module:141
 msgid "Math Question: What is %problem?"
-msgstr "Problema matemático: Qual é o resultado de %problem?"
+msgstr "Problema de  matemática: Qual é o resultado de %problem?"
 
 #: captcha.module:143
 msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2"
-msgstr "Por gentileza, resolva o problema matemático anterior e preencha o resultado. Por exemplo, si o problema é 1+1, escreva 2"
+msgstr "Por favor, resolva o problema de matemática anterior e preencha o resultado. Por exemplo, se o problema é 1+1, escreva 2"
 
 #: captcha.module:158
 msgid "The answer you entered to the math problem is incorrect."
-msgstr "A solução que deu ao problema matemático não é certa."
+msgstr "A solução que deu ao problema matemático não está correta."
 
 #: captcha.module:0
 msgid "captcha"
