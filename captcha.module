@@ -42,10 +42,10 @@ function captcha_settings() {
     foreach($captcha_points as $captcha_point=>$captcha_point_description) {
       $varname = $captcha_point .'_'. $varsuffix;
       $form[$varsuffix][$varname] = array(
-                                     '#type' => 'checkbox',
-                                     '#title' => $captcha_point_description,
-                                     '#default_value' => variable_get($varname, NULL)
-                                    );
+        '#type' => 'checkbox',
+        '#title' => $captcha_point_description,
+        '#default_value' => variable_get($varname, NULL)
+      );
     }
   }
 
@@ -55,12 +55,27 @@ function captcha_settings() {
   }
 
   $form['captcha_type'] = array(
-                            '#type' => 'select',
-                            '#title' => t('Type of captcha to use'),
-                            '#default_value' => variable_get('captcha_type','captcha'),
-                            '#options' => $captchamodules,
-                            '#description' => t('Select what kind of challenge you want to pose to the user')
-                          );
+    '#type' => 'select',
+    '#title' => t('Type of captcha to use'),
+    '#default_value' => variable_get('captcha_type','captcha'),
+    '#options' => $captchamodules,
+    '#description' => t('Select what kind of challenge you want to pose to the user')
+  );
+
+  $form['captcha_description'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Additional response description text'),
+    '#default_value' => variable_get('captcha_description', ''),
+    '#description' => t('This text will be added below the captcha response field.'),
+  );
+
+  $form['captcha_override_module_description'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Override module&#39;s form item description?'),
+    '#default_value' => variable_get('captcha_override_module_description', 0),
+    '#description' => t('Override the captcha module&#39;s form item description to the one set above.'),
+  );
+
 
   return $form;
 }
@@ -93,6 +108,17 @@ function captcha_form_alter($formid, &$form) {
       //use call_func because module_invoke does not allow call by reference.
       if (module_hook($captcha_type, 'captchachallenge')) {
         call_user_func_array($captcha_type.'_captchachallenge', array(&$form, &$_SESSION['captcha']));
+        if(variable_get('captcha_override_module_description', 0)) {
+          unset($form['captcha_response']['#description']);
+        }
+        if (strlen(variable_get('captcha_description', '')) > 0) {
+          if (isset($form['captcha_response']['#description'])) {
+            $form['captcha_response']['#description'] .= ' '. variable_get('captcha_description', '');
+          }
+          else {
+            $form['captcha_response']['#description'] = variable_get('captcha_description', '');
+          }
+        }
       }
     }
   }
