@@ -166,7 +166,7 @@ function captcha_captchachallenge(&$form, &$captcha) {
     '#type' => 'textfield',
     '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
     '#defaultvalue' => '',
-    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2'),
+    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2.'),
     '#weight' => 0,
     '#required' => TRUE,
     '#validate' => array('_captcha_validate' => array())
