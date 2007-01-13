@@ -1,0 +1,5 @@
+; $Id $
+name = Captcha
+version = "$Name $"
+description = "Implements a captcha to registration, comment, contact and node entry forms."
+package = SPAM Control
