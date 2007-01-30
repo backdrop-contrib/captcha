@@ -175,6 +175,7 @@ function _captcha_validate($captcha_response) {
     return FALSE;
   }
 
+
   global $user;
   $captcha_type = variable_get("captcha_type", NULL);
   $trigger = NULL;
@@ -210,7 +211,8 @@ function captcha_captchachallenge(&$form, &$captcha) {
  */
 function captcha_captchavalidate(&$captcha_word, &$correct) {
   $captcha_word = drupal_strtolower($captcha_word);
-  if ($captcha_word == $_SESSION['captcha']) {
+  
+  if (($_SESSION['captcha'] != '') && ($captcha_word == $_SESSION['captcha'])) {
     $correct = TRUE;
   }
   else {
