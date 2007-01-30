@@ -171,10 +171,6 @@ function _captcha_validate($captcha_response) {
   if (is_array($captcha_response)) {
     $captcha_response = $captcha_response['#value'];
   }
-  if (trim($captcha_response) == '') {
-    return FALSE;
-  }
-
 
   global $user;
   $captcha_type = variable_get("captcha_type", NULL);
