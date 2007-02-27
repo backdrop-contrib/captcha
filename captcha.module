@@ -29,18 +29,45 @@ function captcha_menu($may_cache) {
       'callback' => 'drupal_get_form',
       'callback arguments' => array('captcha_admin_settings'),
       'access' => user_access('administer site configuration'),
-      'type' => MENU_NORMAL_ITEM,
+      'type' => MENU_DEFAULT_LOCAL_TASK,
     );
+    /*$items[] = array(
+      'path' => 'admin/settings/captcha/points',
+      'title' => t('Captcha'),
+      'description' => t('Administer in what forms Captchas are applied.'),
+      'callback' => 'drupal_get_form',
+      'callback arguments' => array('captcha_admin_points'),
+      'access' => user_access('administer site configuration'),
+      'type' => MENU_LOCAL_TASK,
+    );*/
   }
   return $items;
 }
 
-/**
- * Helper function generates admin settings page.
- */
-function captcha_admin_settings() {
 
-  // This is where you can add more captcha points.
+function _captcha_supported_challenges_types(){
+  static $captcha_challenges = NULL;
+  
+  if($captcha_challenges != NULL) {
+  	return $captcha_challenges; 
+  }	
+  
+  $captcha_challenges['none'] = 'none';
+  
+  foreach(module_implements('captcha') as $module) {
+    $result = call_user_func_array($module .'_captcha', 'list');
+    if (isset($result)) { //&& is_array($result)) {
+      foreach($result as $challenge) {
+      	$captcha_challenges[$module.'/'.$challenge] = $module.'/'.$challenge;
+      }
+    }
+  }
+  
+  
+  return $captcha_challenges;
+}
+
+function _captcha_basic_captcha_points() {
   $captcha_points = array(
     'comment_form' => t('Comment form'),
     'user_login' => t('User login form'),
@@ -52,54 +79,37 @@ function captcha_admin_settings() {
     'contact_mail_page' => t('Sitewide contact form'),
     'node_form' => t('Create a node'),
   );
+  return $captcha_points;  
+}
 
-  $roles = user_roles();
-
+/**
+ * Helper function generates admin settings page.
+ */
+function captcha_admin_settings() {  
+  $captcha_points = variable_get('captcha_points',_captcha_basic_captcha_points());
+  $roles = variable_get('captcha_roles',user_roles());
+  $captcha_challenges = _captcha_supported_challenges_types();
+  
   foreach($roles as $role) {
     $varsuffix = strtr($role, ' ', '_') .'_captcha';
     $form[$varsuffix] = array(
       '#type' => 'fieldset',
       '#title' => t('Captcha points for the role @role', array('@role' => $role)),
+      '#description' => t('Select what kind of challenge you want to pose to the user in each captcha point.'),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );
     foreach($captcha_points as $captcha_point => $captcha_point_description) {
       $varname = $captcha_point .'_'. $varsuffix;
       $form[$varsuffix][$varname] = array(
-        '#type' => 'checkbox',
-        '#title' => $captcha_point_description,
-        '#default_value' => variable_get($varname, NULL),
+        '#type' => 'select',
+        '#title' => t('@point', array('@point' => $captcha_point_description)),
+        '#default_value' => variable_get($varname, 'captcha/Math'),
+        '#options' => $captcha_challenges,
       );
     }
   }
-
-  // preprocess array into a map
-  foreach(module_implements('captchachallenge') as $module) {
-    $captchamodules[$module] = $module;
-  }
-
-  $form['captcha_type'] = array(
-    '#type' => 'select',
-    '#title' => t('Type of captcha to use'),
-    '#default_value' => variable_get('captcha_type', 'captcha'),
-    '#options' => $captchamodules,
-    '#description' => t('Select what kind of challenge you want to pose to the user.'),
-  );
-
-  $form['captcha_description'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Additional response description text'),
-    '#default_value' => variable_get('captcha_description', ''),
-    '#description' => t('This text will be added below the captcha response field.'),
-  );
-
-  $form['captcha_override_module_description'] = array(
-    '#type' => 'checkbox',
-    '#title' => t("Override module's form item description"),
-    '#default_value' => variable_get('captcha_override_module_description', 0),
-    '#description' => t("Override the captcha module's form item description to the one set above."),
-  );
-
+  
   return system_settings_form($form);
 }
 
@@ -107,112 +117,108 @@ function captcha_admin_settings() {
  * Implementation of hook_form_alter().
  */
 function captcha_form_alter($form_id, &$form) {
+  global $captcha;
   global $user;
-  $captcha_type = variable_get("captcha_type", NULL);
 
-  if (!$captcha_type) {
+  $seed = $form['form_token']['#default_value'];
+  if($_SESSION['captcha'][$seed]['success'] === TRUE)
+    return;
+
+  foreach($user->roles as $role) {	
+  	$candidate_trigger = $form_id .'_'. strtr($role, ' ', '_') .'_captcha';
+  	$captcha_type = variable_get($candidate_trigger,NULL);
+
+  	if($captcha_type != NULL) {
+  	  //Found one valid captcha challenge for this point.
+  	  break;
+  	}
+  }
+
+  if($captcha_type == 'none') {
+    //One of the user roles doesn't have captcha challenge for this point, aborting.
     return;
   }
-
-  $flag = TRUE;
-  $trigger = NULL;
-
-  foreach($user->roles as $role) {
-    $candidate_trigger = $form_id .'_'. strtr($role, ' ', '_') .'_captcha';
-    if (variable_get($candidate_trigger, NULL)) {
-      $trigger = $candidate_trigger;
-    }
-    else {
-      $flag = FALSE;
-      break;
-    }
+  elseif($captcha_type == NULL) {
+  	//captcha_type null;
+  	return;
   }
-  if ($flag && isset($trigger)) {
-    $form['#submit'] = array('captcha_submit' => array()) + $form['#submit'];
-    if (!_captcha_validate($_POST['captcha_response'])) {
-      if (module_hook($captcha_type, 'captchachallenge')) {
-        call_user_func_array($captcha_type .'_captchachallenge', array(&$form, &$_SESSION['captcha']));
-        if(variable_get('captcha_override_module_description', 0)) {
-          unset($form['captcha_response']['#description']);
-        }
-        if (strlen(variable_get('captcha_description', '')) > 0) {
-          if (isset($form['captcha_response']['#description'])) {
-            $form['captcha_response']['#description'] .= ' '. variable_get('captcha_description', '');
-          }
-          else {
-            $form['captcha_response']['#description'] = variable_get('captcha_description', '');
-          }
-        }
-      }
-    }
-  }
-}
-
-/**
- * Implementation of hook_submit().
- *
- * On submit, captcha is reset.
- */
-function captcha_submit() {
-  if($_SESSION['captcha_correct']) {
-    unset($_SESSION['captcha_correct']);
-    unset($_SESSION['captcha']);
-  }
-}
-
-/**
- * Helper function validates captchas.
- */
-function _captcha_validate($captcha_response) {
-
-  if ($_SESSION['captcha_correct']) {
-    return TRUE;
-  }
-  if (is_array($captcha_response)) {
-    $captcha_response = $captcha_response['#value'];
-  }
-
-  global $user;
-  $captcha_type = variable_get("captcha_type", NULL);
-  $trigger = NULL;
-
-  if (module_hook($captcha_type, 'captchavalidate')) {
-    call_user_func_array($captcha_type .'_captchavalidate', array(&$captcha_response, &$_SESSION['captcha_correct']));
-  }
-
-  return $_SESSION['captcha_correct'];
-}
-
-/**
- * Default implementation of the captcha challenge & validation
- */
-function captcha_captchachallenge(&$form, &$captcha) {
-
-  $x = rand(1,10);
-  $y = rand(1,10);
-
-  $captcha = (string)($x + $y);
-  $form['captcha_response'] = array (
-    '#type' => 'textfield',
-    '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
-    '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2.'),
-    '#weight' => 0,
-    '#required' => TRUE,
-    '#validate' => array('_captcha_validate' => array()),
-  );
-}
-
-/**
- * Default implementation of the captcha validation function.
- */
-function captcha_captchavalidate(&$captcha_word, &$correct) {
-  $captcha_word = drupal_strtolower($captcha_word);
+     
+  $challenge = explode('/',$captcha_type);
+   
+  $result = module_invoke($challenge[0], 'captcha', 'generate', $challenge[1]);
   
-  if (($_SESSION['captcha'] != '') && ($captcha_word == $_SESSION['captcha'])) {
-    $correct = TRUE;
+  $form = array_merge($form,$result['form']);
+  
+  $form['#validate'] += array('captcha_validate' => array());
+  $form['#pre_render'] = array('captcha_prerender');
+
+  $_SESSION['captcha'][$seed]['success'] = FALSE;
+  $_SESSION['captcha'][$seed]['form_id'] = $form_id;
+  $_SESSION['captcha'][$seed]['form'] = $result['form'];
+  $_SESSION['captcha'][$seed]['new_value'] = $result['value'];
+  $_SESSION['captcha'][$seed]['preprocess'] = isset($result['preprocess'])? $result['preprocess'] : FALSE;
+  $_SESSION['captcha'][$seed]['module'] = $challenge[0];
+  $_SESSION['captcha'][$seed]['type'] = $challenge[1];
+}
+
+function captcha_validate($form_id, $form_item) {
+  $seed = $form_item['form_token'];
+
+  if($_SESSION['captcha'][$seed]['preprocess']) {
+    $value = module_invoke($_SESSION['captcha'][$seed]['module'],'captcha','process',$_SESSION['captcha'][$seed]['type'],$form_item['captcha_challenge']);
   }
   else {
-    $correct = FALSE;
-    form_set_error('captcha_response', t('The answer you entered to the math problem is incorrect.'));
+  	$value = $form_item['captcha_challenge'];
+  } 
+
+  if($value == $_SESSION['captcha'][$seed]['value']) {
+  	$_SESSION['captcha'][$seed]['success'] = TRUE;
+    return;
+  }
+  form_set_error('captcha_response', t('The answer you entered to the captcha challenge is incorrect.'));  
+}
+
+/**
+ * Implementation of form #pre_render.
+ *
+ */
+function captcha_prerender($form_id, $form) {
+  $seed = $form['#post']['form_token'];
+  $_SESSION['captcha'][$seed]['value'] = $_SESSION['captcha'][$seed]['new_value'];
+  if($_SESSION['captcha'][$seed]['success']) {
+  	unset($form['captcha_challenge']);
+  	unset($_SESSION['captcha'][$seed]);
+  }
+}
+
+
+
+/**
+ * Default implementation of hook_captcha
+ */
+function captcha_captcha() {
+  $args = func_get_args();
+  $op = array_shift($args); 
+  switch($op) {
+  	case 'list':
+  	  return array("Math");
+  	case 'generate':
+  	  $captcha_type = array_shift($args);
+  	  $result = array();
+  	  if($captcha_type == "Math") {
+        $x = rand(1,10);
+        $y = rand(1,10);
+	
+        $result['value'] = (string)($x + $y);
+        $result['form']['captcha_challenge'] = array (
+          '#type' => 'textfield',
+          '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
+          '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2.'),
+          '#weight' => 0,
+          '#required' => TRUE,
+//          '#validate' => array('_captcha_validate' => array()),
+        );
+  	  }
+	  return $result;
   }
 }
