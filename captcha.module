@@ -67,26 +67,31 @@ function _captcha_supported_challenges_types(){
   return $captcha_challenges;
 }
 
-function _captcha_basic_captcha_points() {
-  $captcha_points = array(
-    'comment_form' => t('Comment form'),
-    'user_login' => t('User login form'),
-    'user_login_block' => t('User login form block'),
-    'user_edit' => t('User edit form'),
-    'user_register' => t('User registration form'),
-    'user_pass' => t('User forgot password form'),
-    'contact_mail_user' => t('User contact form'),
-    'contact_mail_page' => t('Sitewide contact form'),
-    'node_form' => t('Create a node'),
-  );
+function _captcha_points() {
+  $captcha_points = variable_get('captcha_points',NULL);
+  if($captcha_points == NULL) {
+    $captcha_points = array(
+      'comment_form' => t('Comment form'),
+      'contact_mail_user' => t('User contact form'),
+      'contact_mail_page' => t('Sitewide contact form'),
+    );
+  }
   return $captcha_points;  
+}
+
+
+function captcha_admin_points() {
+  $captcha_points = _captcha_points();
+  
+  
+  
 }
 
 /**
  * Helper function generates admin settings page.
  */
 function captcha_admin_settings() {  
-  $captcha_points = variable_get('captcha_points',_captcha_basic_captcha_points());
+  $captcha_points = _captcha_points();
   $roles = variable_get('captcha_roles',user_roles());
   $captcha_challenges = _captcha_supported_challenges_types();
   
