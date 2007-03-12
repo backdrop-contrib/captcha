@@ -29,17 +29,25 @@ function captcha_menu($may_cache) {
       'callback' => 'drupal_get_form',
       'callback arguments' => array('captcha_admin_settings'),
       'access' => user_access('administer site configuration'),
+      'type' => MENU_NORMAL_ITEM,
+    );
+    $items[] = array(
+      'path' => 'admin/settings/captcha/captcha',
+      'title' => t('Captcha'),
+      'description' => t('Administer how and where Captchas are used.'),
+      'access' => user_access('administer site configuration'),
       'type' => MENU_DEFAULT_LOCAL_TASK,
     );
-    /*$items[] = array(
+    $items[] = array(
       'path' => 'admin/settings/captcha/points',
-      'title' => t('Captcha'),
+      'title' => t('Captcha Points'),
       'description' => t('Administer in what forms Captchas are applied.'),
+     // 'callback' => 'captcha_admin_points',
       'callback' => 'drupal_get_form',
       'callback arguments' => array('captcha_admin_points'),
       'access' => user_access('administer site configuration'),
       'type' => MENU_LOCAL_TASK,
-    );*/
+    );
   }
   return $items;
 }
@@ -75,22 +83,52 @@ function _captcha_points() {
       'contact_mail_user' => t('User contact form'),
       'contact_mail_page' => t('Sitewide contact form'),
     );
+    variable_set('captcha_points',serialize($captcha_points));
   }
-  return $captcha_points;  
+  else {
+    $captcha_points = unserialize($captcha_points);
+  }
+  return $captcha_points;
 }
-
 
 function captcha_admin_points() {
   $captcha_points = _captcha_points();
+  $output = '';
   
-  
-  
+  if(function_exists('form_store_get_all')) {
+    $form = array('#description' => t('Enable/Disable captcha points.'));
+    $known_forms = form_store_get_all();
+    $form['captcha_points']['#tree'] = true;
+    foreach($known_forms as $item) {
+      $form['captcha_points'][$item->form_id] = array(
+        '#type' => 'checkbox',
+        '#title' => $item->form_id.' - '.$item->description,
+        '#default_value' => isset($captcha_points[$item->form_id]),
+      );
+    }
+    $output = system_settings_form($form);
+  }
+
+  return $output;
+}
+
+function captcha_admin_points_submit($form_id, $form_values) {
+  if($form_id == 'captcha_admin_points') {
+    $known_forms = form_store_get_all();
+    $captcha_points = array();
+    foreach($form_values['captcha_points'] as $key => $selected) {
+      if($selected)
+        $captcha_points[$key] = $known_forms[$key]->description;
+    }
+    variable_set('captcha_points',serialize($captcha_points));
+    drupal_set_message(t('Your captcha points were sucessful updated, please configure the challenge options in the other tab.'),'status');
+  }
 }
 
 /**
  * Helper function generates admin settings page.
  */
-function captcha_admin_settings() {  
+function captcha_admin_settings() {
   $captcha_points = _captcha_points();
   $roles = variable_get('captcha_roles',user_roles());
   $captcha_challenges = _captcha_supported_challenges_types();
