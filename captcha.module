@@ -42,7 +42,6 @@ function captcha_menu($may_cache) {
       'path' => 'admin/settings/captcha/points',
       'title' => t('Captcha Points'),
       'description' => t('Administer in what forms Captchas are applied.'),
-     // 'callback' => 'captcha_admin_points',
       'callback' => 'drupal_get_form',
       'callback arguments' => array('captcha_admin_points'),
       'access' => user_access('administer site configuration'),
@@ -259,7 +258,6 @@ function captcha_captcha() {
           '#description' => t('Please solve the math problem above and type in the result. e.g. for 1+1, type 2.'),
           '#weight' => 0,
           '#required' => TRUE,
-//          '#validate' => array('_captcha_validate' => array()),
         );
   	  }
 	  return $result;
