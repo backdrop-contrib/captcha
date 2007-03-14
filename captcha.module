@@ -242,16 +242,17 @@ function captcha_captcha() {
   $args = func_get_args();
   $op = array_shift($args); 
   switch($op) {
-  	case 'list':
-  	  return array("Math");
-  	case 'generate':
-  	  $captcha_type = array_shift($args);
-  	  $result = array();
-  	  if($captcha_type == "Math") {
-        $x = rand(1,10);
-        $y = rand(1,10);
-	
-        $result['value'] = (string)($x + $y);
+    case 'list':
+      return array("Math");
+    case 'generate':
+      $captcha_type = array_shift($args);
+      $result = array();
+      if($captcha_type == "Math") {
+        $answer = mt_rand(1, 20);
+        $x = mt_rand(1, $answer);
+        $y = $answer - $x;
+ 
+        $result['value'] = (string)($answer);
         $result['form']['captcha_challenge'] = array (
           '#type' => 'textfield',
           '#title' => t('Math Question: What is %problem?', array('%problem' => $x .' + '. $y)),
@@ -259,7 +260,7 @@ function captcha_captcha() {
           '#weight' => 0,
           '#required' => TRUE,
         );
-  	  }
-	  return $result;
+      }
+      return $result;
   }
 }
