@@ -5,93 +5,121 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Drupal 4.6 - Module Captcha\n"
-"POT-Creation-Date: 2005-10-08 18:22+0200\n"
-"PO-Revision-Date: 2005-11-04 14:22+0100\n"
+"POT-Creation-Date: 2007-03-16 22:01-0400\n"
+"PO-Revision-Date: 2007-03-17 02:12-0400\n"
 "Last-Translator: Erik de Zeeuw <erik@syllance.fr>\n"
 "Language-Team: French <drupal@syllance.fr>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Poedit-Language: French\n"
 
-#: captcha.module:13;16;19
-msgid "Adds a Captcha to the registration form."
-msgstr "Ajoute une image de vérification au formulaire d'enregistrement."
+#: captcha.info:0
+msgid "5.x-1.x-dev"
+msgstr ""
 
-#: captcha.module:34
-msgid "captcha image"
-msgstr "image de vérification"
+#: captcha.info:0 captcha.module:27
+msgid "Captcha"
+msgstr "Captcha"
 
-#: captcha.module:53
-msgid "Image library not available. Captcha needs the GD library extension to be installed. Please install GD."
-msgstr "La librairie de gestion d'images n'est pas disponible. La librairie et l'extension php GD sont nécessaires au fonctionnement du module Captcha. Merci d'installer GD."
+#: captcha.info:0
+msgid ""
+"Implements a captcha to registration, comment, contact and node entry forms."
+msgstr "Fournit un captcha pour l'inscription, l'ajout de commentaires, le formulaire de contact et l'édition de contenus."
 
-#: captcha.module:61
-msgid "Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font."
-msgstr "La librairie d'image installée semble ne pas supporter les polices  TrueType. Le module Captcha fonctionnera en utilisant les fontes intégrées par défaut."
+#: captcha.info:0
+msgid "SPAM Control"
+msgstr "Contrôle anti-spam"
 
-#: captcha.module:67
-msgid "The current font path is invalid. The default font will be used."
-msgstr "Le chemin des polices est invalide. Les polices par défaut vont être utilisées."
-
-#: captcha.module:72
-msgid "Check during user registration"
-msgstr "Vérification lors de l'enregistrement des utilisateurs"
-
-#: captcha.module:74
-msgid "Check during anonymous comments"
-msgstr "Vérification lors de l'envoi de commentaires anonymes"
-
-#: captcha.module:76
-msgid "Check during registered user comments"
-msgstr "Vérification pour l'envoi de commentaires par les utilisateurs enregistrés"
-
-#: captcha.module:78
-msgid "TrueType Fonts Path"
-msgstr "Chemin des polices True Type"
-
-#: captcha.module:81
-msgid "Number of fonts found: "
-msgstr "Nombre de polices trouvées : "
-
-#: captcha.module:85
-msgid "GD Version: "
-msgstr "Version librairie GD : "
-
-#: captcha.module:86
-msgid " FreeType Support: "
-msgstr "Support FreeType : "
-
-#: captcha.module:110;166
-msgid "Word"
-msgstr "Mot affiché "
-
-#: captcha.module:110
-msgid "Please type in the letters/numbers that are shown in the image above."
-msgstr "Merci d'indiquer quelle est l'expression (lettres/chiffres) affichée par l'image ci-dessus."
-
-#: captcha.module:112
-msgid "Verify Registration"
-msgstr "Vérification de votre enregistrement"
-
-#: captcha.module:123
-msgid "Please re-recognize the word shown in the image."
-msgstr "Merci de bien vouloir reconnaître à nouveau le mot affiché par l'image."
-
-#: captcha.module:153
-msgid "The user verification code you entered is not correct."
-msgstr "Le code de vérification utilisateur saisi est incorrect."
-
-#: captcha.module:167
-msgid "Verify comment authorship"
-msgstr "Vérification d'envoi du commentaire"
-
-#: captcha.module:46
-msgid "access captchas"
-msgstr "accès aux images de vérification"
-
-#: captcha.module:0
+#: captcha.info:0 captcha.module:0
 msgid "captcha"
 msgstr "captcha"
 
+#: captcha.module:12
+msgid "Adds a Captcha to various forms to help prevent spam submissions."
+msgstr "Ajoute un captcha à divers formulaires afin de prévenir le spam."
+
+#: captcha.module:28
+msgid "Administer how and where Captchas are used."
+msgstr "Gérer l'utilisation des captcha."
+
+#: captcha.module:45
+msgid "Comment form"
+msgstr "Formulaire de commentaire"
+
+#: captcha.module:46
+msgid "User login form"
+msgstr "Formulaire d'ouverture de session"
+
+#: captcha.module:47
+msgid "User login form block"
+msgstr "Bloc d'ouverture de session"
+
+#: captcha.module:48
+msgid "User edit form"
+msgstr "Formulaire d'édition d'utilisateur"
+
+#: captcha.module:49
+msgid "User registration form"
+msgstr "Formulaire d'inscription d'utilisateur"
+
+#: captcha.module:50
+msgid "User forgot password form"
+msgstr "Formulaire de demande de nouveau mot de passe"
+
+#: captcha.module:51
+msgid "User contact form"
+msgstr "Formulaire de contact personnel"
+
+#: captcha.module:52
+msgid "Sitewide contact form"
+msgstr "Formulaire de contact du site"
+
+#: captcha.module:53
+msgid "Create a node"
+msgstr "Créer un contenu"
+
+#: captcha.module:62
+msgid "Captcha points for the role @role"
+msgstr "Points de captcha pour le rôle @role"
+
+#: captcha.module:83
+msgid "Type of captcha to use"
+msgstr "Type de captcha à utiliser"
+
+#: captcha.module:86
+msgid "Select what kind of challenge you want to pose to the user."
+msgstr "Sélectionnez le type de question à poser à l'utilisateur."
+
+#: captcha.module:91
+msgid "Additional response description text"
+msgstr "Description supplémentaire"
+
+#: captcha.module:93
+msgid "This text will be added below the captcha response field."
+msgstr "Ce texte apparaîtra sous le champ de réponse du captcha."
+
+#: captcha.module:98
+msgid "Override module's form item description"
+msgstr "Modifier la description de captcha du module"
+
+#: captcha.module:100
+msgid ""
+"Override the captcha module's form item description to the one set above."
+msgstr "Utiliser la description ci-dessus plutôt que celle du module de captcha."
+
+#: captcha.module:200
+msgid "Math Question: What is %problem?"
+msgstr "Question mathématique: Combien font %problem ?"
+
+#: captcha.module:201
+msgid ""
+"Please solve the math problem above and type in the result. e.g. for 1+1, "
+"type 2."
+msgstr "Veuillez résoudre le problème mathématique ci-dessus et saisir le résultat. Exemple: pour 1+1, entrez 2."
+
+#: captcha.module:218
+msgid "The answer you entered to the math problem is incorrect."
+msgstr ""
+"La réponse au problème mathématique que vous avez donnée est incorrecte."
