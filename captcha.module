@@ -228,8 +228,8 @@ function captcha_prerender($form_id, $form) {
   $seed = $form['#post']['form_token'];
   $_SESSION['captcha'][$seed]['value'] = $_SESSION['captcha'][$seed]['new_value'];
   if($_SESSION['captcha'][$seed]['success']) {
-  	unset($form['captcha_challenge']);
-  	unset($_SESSION['captcha'][$seed]);
+    unset($form['captcha_challenge']);
+    unset($_SESSION['captcha'][$seed]);
   }
 }
 
