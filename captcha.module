@@ -107,6 +107,9 @@ function captcha_admin_points() {
     }
     $output = system_settings_form($form);
   }
+  else {
+    drupal_set_message(t('Unable to find Form Store module, Captcha needs it to allow you to change the capcha points.'),'error');
+  }
 
   return $output;
 }
