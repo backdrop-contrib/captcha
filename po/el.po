@@ -1,0 +1,102 @@
+# Greek translation of captcha module
+# $Id$
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  captcha.module,v 1.40 2007/05/09 16:49:42 wundo
+#  captcha.info,v 1.2 2007/04/17 23:57:43 wundo
+#
+# Vasileios Lourdas <lourdas_v@yahoo.gr>, 2007.
+msgid ""
+msgstr ""
+"Project-Id-Version: el\n"
+"POT-Creation-Date: 2007-05-17 19:36+0300\n"
+"PO-Revision-Date: 2007-05-17 19:44+0300\n"
+"Last-Translator: Vasileios Lourdas <lourdas_v@yahoo.gr>\n"
+"Language-Team: Ελληνικά <en@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"X-Generator: KBabel 1.11.4\n"
+
+#: captcha.module:12
+msgid "Adds a Captcha to various forms to help prevent spam submissions."
+msgstr "Προσθέτει ένα Captcha στις διάφορες φόρμες για να βοηθήσει στην πρόληψη από αποστολή ανεπιθύμητων μηνυμάτων (spam)."
+
+#: captcha.module:27;36 captcha.info:0
+msgid "Captcha"
+msgstr "Captcha"
+
+#: captcha.module:28;37
+msgid "Administer how and where Captchas are used."
+msgstr "Διαχείριση του πως και που θα χρησιμοποιείται το Captcha."
+
+#: captcha.module:43
+msgid "Captcha Points"
+msgstr "Πόντοι Captcha"
+
+#: captcha.module:44
+msgid "Administer in what forms Captchas are applied."
+msgstr "Διαχείριση του σε ποιες φόρμες θα εφαρμόζεται το Captcha."
+
+#: captcha.module:81
+msgid "Comment form"
+msgstr "Φόρμα σχολίων"
+
+#: captcha.module:82
+msgid "User contact form"
+msgstr "Φόρμα επικοινωνίας χρήστη"
+
+#: captcha.module:83
+msgid "Sitewide contact form"
+msgstr "Φόρμα επικοινωνίας ιστοχώρου"
+
+#: captcha.module:98
+msgid "Enable/Disable captcha points."
+msgstr "Ενεργοποίηση/απενεργοποίηση πόντων captcha."
+
+#: captcha.module:111
+msgid "Unable to find Form Store module, Captcha needs it to allow you to change the capcha points."
+msgstr "Δε βρέθηκε το άρθρωμα Form Store, το Captcha το απαιτεί προκειμένου να μπορείτε να αλλάζετε τους πόντους captcha."
+
+#: captcha.module:126
+msgid "Your captcha points were sucessful updated, please configure the challenge options in the other tab."
+msgstr "Οι captcha πόντοι σας ενημερώθηκαν με επιτυχία, παρακαλούμε ρυθμίστε τις επιλογές πρόκλησης στην άλλη καρτέλα."
+
+#: captcha.module:142
+msgid "Captcha points for the role @role"
+msgstr "Πόντοι captcha για το ρόλο @role"
+
+#: captcha.module:143
+msgid "Select what kind of challenge you want to pose to the user in each captcha point."
+msgstr "Επιλέξτε το είδος πρόκλησης που θέλετε να θέσετε στο χρήστη σε κάθε πόντο captcha."
+
+#: captcha.module:151
+msgid "@point"
+msgstr "@point"
+
+#: captcha.module:223
+msgid "The answer you entered to the captcha challenge is incorrect."
+msgstr "Η απάντηση που εισάγατε στην πρόκληση captcha είναι λάθος."
+
+#: captcha.module:261
+msgid "Math Question: What is %problem?"
+msgstr "Ερώτηση Μαθηματικών: Πόσο κάνει το %problem;"
+
+#: captcha.module:262
+msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2."
+msgstr "Παρακαλούμε απαντήστε στην παραπάνω ερώτηση Μαθηματικών και εισάγετε το αποτέλεσμα, πχ. για το 1+1, εισάγετε 2."
+
+#: captcha.module:0
+msgid "captcha"
+msgstr "captcha"
+
+#: captcha.info:0
+msgid "Implements a captcha to registration, comment, contact and node entry forms."
+msgstr "Υλοποιεί ένα captcha στις φόρμες εγγραφής, σχολίων, επικοινωνίας και δημιουργίας κόμβων."
+
+#: captcha.info:0
+msgid "SPAM Control"
+msgstr "Έλεγχος SPAM"
+
