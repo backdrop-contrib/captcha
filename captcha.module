@@ -194,6 +194,8 @@ function captcha_form_alter($form_id, &$form) {
   
   $form = array_merge($form,$result['form']);
   
+  if(!isset($form['#validate']))
+    $form['#validate'] = array();
   $form['#validate'] += array('captcha_validate' => array());
   $form['#pre_render'] = array('captcha_prerender');
 
