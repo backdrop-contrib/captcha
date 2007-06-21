@@ -191,6 +191,14 @@ function captcha_form_alter($form_id, &$form) {
   $challenge = explode('/',$captcha_type);
    
   $result = module_invoke($challenge[0], 'captcha', 'generate', $challenge[1]);
+  if (!$result) {
+     //The user selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and the quit.
+     watchdog('captcha',
+              t('Problems when trying to retrieve captcha %challenge challenge from %module',
+                array('%challenge' => $challenge[1], '%module' => $challenge[0])),
+              WATCHDOG_ERROR);
+     return;
+  }
   
   $form = array_merge($form,$result['form']);
   
