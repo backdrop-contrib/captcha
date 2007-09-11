@@ -1,0 +1,101 @@
+# Danish translation of Drupal (captcha.module)
+# Copyright 2007 Morten Wulff <wulff@ratatosk.net>
+msgid ""
+msgstr ""
+"Project-Id-Version: Danish translation of Drupal (captcha.module) $Id$\n"
+"POT-Creation-Date: 2007-09-11 15:26+0200\n"
+"PO-Revision-Date: 2007-09-11 15:37+0100\n"
+"Last-Translator: Morten Wulff <wulff@ratatosk.net>\n"
+"Language-Team: Danish <l10n@drupaldanmark.dk>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-Language: Danish\n"
+"X-Poedit-Country: DENMARK\n"
+
+#: captcha.module:12
+msgid "Adds a Captcha to various forms to help prevent spam submissions."
+msgstr "Tilføj en Captcha til bestemte formularer for at mindske mængden af spam."
+
+#: captcha.module:27;36
+#: captcha.info:0
+msgid "Captcha"
+msgstr "Captcha"
+
+#: captcha.module:28;37
+msgid "Administer how and where Captchas are used."
+msgstr "Bestem hvor og hvordan Captchas bruges."
+
+#: captcha.module:43
+msgid "Captcha Points"
+msgstr "Captcha point"
+
+#: captcha.module:44
+msgid "Administer in what forms Captchas are applied."
+msgstr "Bestem hvilke formularer, der skal bruge Captchas."
+
+#: captcha.module:81
+msgid "Comment form"
+msgstr "Kommentarformular"
+
+#: captcha.module:82
+msgid "User contact form"
+msgstr "Personlig kontaktformular"
+
+#: captcha.module:83
+msgid "Sitewide contact form"
+msgstr "Global kontaktformular"
+
+#: captcha.module:98
+msgid "Enable/Disable captcha points."
+msgstr "Aktiver/deaktiver captcha point."
+
+#: captcha.module:111
+msgid "Unable to find Form Store module, Captcha needs it to allow you to change the capcha points."
+msgstr "Kan ikke finde modulet 'Form Store'. Modulet er nødvendigt for at kunne ændre captcha point."
+
+#: captcha.module:126
+msgid "Your captcha points were sucessful updated, please configure the challenge options in the other tab."
+msgstr "Captcha point opdateret. Konfigurer udfordringer på næste faneblad."
+
+#: captcha.module:142
+msgid "Captcha points for the role @role"
+msgstr "Captcha point for rollen @role"
+
+#: captcha.module:143
+msgid "Select what kind of challenge you want to pose to the user in each captcha point."
+msgstr "Vælg hvilken opgave brugeren skal løse i hver Captcha."
+
+#: captcha.module:151
+msgid "@point"
+msgstr "@point"
+
+#: captcha.module:197
+msgid "Problems when trying to retrieve captcha %challenge challenge from %module"
+msgstr "Kan ikke hente opgaven %challenge fra %module"
+
+#: captcha.module:233
+msgid "The answer you entered to the captcha challenge is incorrect."
+msgstr "Det indtastede svar er forkert."
+
+#: captcha.module:271
+msgid "Math Question: What is %problem?"
+msgstr "Matematik: Hvad er %problem?"
+
+#: captcha.module:272
+msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2."
+msgstr "Løs matematikopgaven ovenfor og indtast resultatet (hvis opgaven er 1+1 indtaster du 2)."
+
+#: captcha.module:196;0
+msgid "captcha"
+msgstr "captcha"
+
+#: captcha.info:0
+msgid "Implements a captcha to registration, comment, contact and node entry forms."
+msgstr "Implmenterer Captchas for kommentar-, kontakt- og indholds-formularer."
+
+#: captcha.info:0
+msgid "SPAM Control"
+msgstr "SPAM kontrol"
+
