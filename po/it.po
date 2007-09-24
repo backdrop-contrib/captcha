@@ -1,133 +1,100 @@
+# $Id$
+# 
+# LANGUAGE translation of Drupal (general)
+# Copyright 2007 Davide Mirtillo <davide.mirtillo@gmail.com>
+# Generated from files:
+# captcha.module,v 1.41 2007/06/19 01:00:22 wundo
+# captcha.info,v 1.3 2007/06/18 22:53:32 dww
+# 
 msgid ""
-msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: 2006-01-17 13:24+0100\n"
-"Last-Translator: Uccio <ucciopan@aicomputer.it>\n"
-"Language-Team: Drupal Italia\n"
+""
+msgstr "Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2007-07-08 16:01+0200\n"
+"PO-Revision-Date: 2007-07-08 17:28+0100\n"
+"Last-Translator: Alberto G. <alby115@tiscali.it>\n"
+"Language-Team: Italian <EMAIL@ADDRESS>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms:  nplurals=2; plural=n != 1;\n"
-"X-Poedit-Language: Italian\n"
-"X-Poedit-Country: ITALY\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-# d:\drmodule\captcha\captcha.module:13;16;19
-#: captcha.module:13
-#: ;16;19
-msgid "Adds a Captcha to the registration form."
-msgstr "Aggiungi captcha al modulo di registrazione"
+#: captcha.module:12
+msgid "Adds a Captcha to various forms to help prevent spam submissions."
+msgstr "Aggiunge un Captcha ai moduli per aiutare a prevenire lo spam."
 
-# d:\drmodule\captcha\captcha.module:34
-#: captcha.module:34
-msgid "captcha image"
-msgstr "immagine captcha"
+#: captcha.module:27
+#: captcha.info:0
+msgid "Captcha"
+msgstr "Captcha"
 
-# d:\drmodule\captcha\captcha.module:45
-#: captcha.module:49
-msgid "Image library not available. Captcha needs the GD library extension to be installed. Please install GD."
-msgstr "Libreria grafica non disponibile. Captcha necessita della libreria GD installata. Per favore installa la libreria GD"
+#: captcha.module:28
+msgid "Administer how and where Captchas are used."
+msgstr "Gestisce come e dove i Captcha vengono usati."
 
-# d:\drmodule\captcha\captcha.module:53
-#: captcha.module:58
-msgid "Your image library does not seem to have TrueType font support. Captcha will work, but will use the default inbuilt font."
-msgstr "La tua libreria grafica non ha il supporto per i TrueType font. Captcha lavorerà ma usera solo i font interni alla libreria."
+#: captcha.module:43
+msgid "Captcha Points"
+msgstr "Test Captcha"
 
-# d:\drmodule\captcha\captcha.module:59
-#: captcha.module:64
-msgid "The current font path is invalid. The default font will be used."
-msgstr "La directory dei font corrente non è valida. I font di default verranno usati."
+#: captcha.module:44
+msgid "Administer in what forms Captchas are applied."
+msgstr "Gestisce in quali moduli i test Captcha vengono applicati."
 
-# d:\drmodule\captcha\captcha.module:64
-#: captcha.module:71
-msgid "Check during user registration"
-msgstr "Abilita durante la registrazione utente"
+#: captcha.module:81
+msgid "Comment form"
+msgstr "Modulo dei commenti"
 
-#: captcha.module:73
-msgid "If enabled, users will be asked to recognize an image during user registration."
-msgstr "Se abilitato, all' utente verrà richiesto di riconoscere un immagine durate la fase di registrazione."
+#: captcha.module:82
+msgid "User contact form"
+msgstr "Modulo dei contatti dell'utente"
 
-# d:\drmodule\captcha\captcha.module:66
-#: captcha.module:77
-#, fuzzy
-msgid "Check during anonymous comments."
-msgstr "Abilita nei commenti anonimi"
+#: captcha.module:83
+msgid "Sitewide contact form"
+msgstr "Modulo dei contatti del sito"
 
-#: captcha.module:79
-msgid "If enabled, anonymous users will be asked to recognize an image while posting ."
-msgstr "Se abilitato, all' utente anononimo verrà richiesto di riconoscere un immagine durate la fase di creazione di contenuti (post)."
+#: captcha.module:98
+msgid "Enable/Disable captcha points."
+msgstr "Abilita/Disabilita i test Captcha."
 
-# d:\drmodule\captcha\captcha.module:68
-#: captcha.module:84
-#, fuzzy
-msgid "Check during registered user comments."
-msgstr "Abilita nei commenti non anonimi"
+#: captcha.module:111
+msgid "Unable to find Form Store module, Captcha needs it to allow you to change the capcha points."
+msgstr "Impossibile trovare il modulo Raccoglitore Form, esso è necessario per cambiare i test Captcha."
 
-#: captcha.module:86
-msgid "If enabled, registered users will be asked to recognize an image while posting ."
-msgstr "Se abilitato, all' utente registrato verrà richiesto di riconoscere un immagine durate la fase di creazione dei contenuti (post)."
+#: captcha.module:126
+msgid "Your captcha points were sucessful updated, please configure the challenge options in the other tab."
+msgstr "I test Captcha sono stati aggiornati con successo, puoi configurarne le opzioni nell'altra scheda."
 
-# d:\drmodule\captcha\captcha.module:70
-#: captcha.module:92
-msgid "TrueType Fonts Path"
-msgstr "Directory dei font TrueType"
+#: captcha.module:142
+msgid "Captcha points for the role @role"
+msgstr "Test Captcha per la regola @role"
 
-#: captcha.module:96
-msgid "Location of the directory where the Truetype (.ttf) fonts are stored. If you do not provide any fonts, the module will use the default font for text."
-msgstr "Posizione della directory dove vengono tenuti i Truetype (.ttf) font. Se non fornirai nessun font il modulo userà i font di default per il testo."
+#: captcha.module:143
+msgid "Select what kind of challenge you want to pose to the user in each captcha point."
+msgstr "Seleziona a quale tipo di test sottoporre l'utente in ogni modulo con controllo Captcha."
 
-# d:\drmodule\captcha\captcha.module:73
-#: captcha.module:101
-msgid "Number of fonts found: "
-msgstr "Numero di font trovati:"
+#: captcha.module:151
+msgid "@point"
+msgstr "@point"
 
-# d:\drmodule\captcha\captcha.module:77
-#: captcha.module:105
-msgid "GD Version: "
-msgstr "Versione GD:"
+#: captcha.module:225
+msgid "The answer you entered to the captcha challenge is incorrect."
+msgstr "La risposta data nel test Captcha è incorretta."
 
-# d:\drmodule\captcha\captcha.module:78
-#: captcha.module:106
-msgid " FreeType Support: "
-msgstr "Supporto free type:"
+#: captcha.module:263
+msgid "Math Question: What is %problem?"
+msgstr "Domanda algebrica: quanto fa %problem?"
 
-#: captcha.module:112
-msgid "Image and font information"
-msgstr "Informazioni su immagini e font"
+#: captcha.module:264
+msgid "Please solve the math problem above and type in the result. e.g. for 1+1, type 2."
+msgstr "Svolgi il quesito algebrico soprastante e scrivi qui il risultato. es. per 1+1, scrivi 2."
 
-# d:\drmodule\captcha\captcha.module:104
-#: captcha.module:132
-msgid "Verify Registration"
-msgstr "Verifica Registrazione"
-
-# d:\drmodule\captcha\captcha.module:115
-#: captcha.module:144
-msgid "Please re-recognize the word shown in the image."
-msgstr "Per favore, ri-digita la parola visualizzata nell'immagine."
-
-# d:\drmodule\captcha\captcha.module:143
-#: captcha.module:169
-#, fuzzy
-msgid "The captcha verification code you entered is not correct."
-msgstr "Il codice di verifica che hai inserito non è corretto."
-
-# d:\drmodule\captcha\captcha.module:102;156
-#: captcha.module:191
-msgid "Word"
-msgstr "Parola"
-
-# d:\drmodule\captcha\captcha.module:102
-#: captcha.module:193
-msgid "Please type in the letters/numbers that are shown in the image above."
-msgstr "Per favore inserisci le lettere/numeri che vedi nell'immagine sopra."
-
-# d:\drmodule\captcha\captcha.module:0
-#: captcha.module:42
-msgid "access captchas"
-msgstr "accedi a captcha"
-
-# d:\drmodule\captcha\captcha.module:0
 #: captcha.module:0
 msgid "captcha"
 msgstr "captcha"
 
+#: captcha.info:0
+msgid "Implements a captcha to registration, comment, contact and node entry forms."
+msgstr "Aggiunge un test Captcha alla registrazione, ai commenti, ai contatti ed ai moduli delle richieste."
+
+#: captcha.info:0
+msgid "SPAM Control"
+msgstr "Controllo SPAM"
