@@ -65,6 +65,7 @@ name = "Foo CAPTCHA"
 description = "The foo CAPTCHA requires the user to enter the word 'foo'."
 package = "Spam control"
 dependencies = captcha
+core = 6.x
 """
 
 
@@ -85,11 +86,10 @@ For our simple foo CAPTCHA module this would mean:
 function foo_captcha_menu($may_cache) {
   $items = array();
   if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/user/captcha/foo_captcha',
+    $items['admin/user/captcha/foo_captcha'] = array(
       'title' => t('Foo CAPTCHA'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('foo_captcha_settings_form'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('foo_captcha_settings_form'),
       'type' => MENU_LOCAL_TASK,
     );
   }
@@ -113,8 +113,8 @@ For our simple foo CAPTCHA module this would mean:
 /**
  * Implementation of hook_help().
  */
-function foo_captcha_help($section) {
-  switch ($section) {
+function foo_captcha_help($path, $arg) {
+  switch ($path) {
     case 'admin/user/captcha/foo_captcha':
       return '<p>'. t('This is a very simple challenge, which requires users to enter "foo" in a textfield.') .'</p>';
   }

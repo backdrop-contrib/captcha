@@ -2,47 +2,53 @@
 // $Id$
 
 /**
- * Create tables on install
+ * Implementation of hook_schema().
+ */ 
+function captcha_schema() {
+  $schema['captcha_points'] = array(
+    'fields' => array(
+      'form_id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE
+      ),
+      'module' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'default' => NULL
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 64,
+        'default' => NULL
+      ),
+    ),
+    'primary key' => array('form_id'),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
  */
 function captcha_install() {
-  switch ($GLOBALS['db_type']) {
-    case 'mysql':
-    case 'mysqli':
-      db_query("CREATE TABLE {captcha_points} (
-        form_id varchar(128) NOT NULL,
-        module varchar(64) default NULL,
-        type varchar(64) default NULL,
-        PRIMARY KEY (form_id)
-        ) /*!40100 DEFAULT CHARACTER SET utf8 */;"
-      );
-      $succes = TRUE;
-      break;
-    case 'pgsql':
-      db_query("CREATE TABLE {captcha_points} (
-        form_id varchar(128) NOT NULL,
-        module varchar(64) default NULL,
-        type varchar(64) default NULL,
-        PRIMARY KEY (form_id)
-        );"
-      );
-      $succes = TRUE;
-      break;
-    default:
-      drupal_set_message(t('Unsupported database.'), 'error');
-      $succes = FALSE;
+  drupal_install_schema('captcha');
+  
+  // insert some defaults
+  $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
+    'user_register', 'user_pass', 'user_login', 'user_login_block');
+  foreach ($form_ids as $form_id) {
+    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
   }
-  if ($succes) {
-    // insert some defaults
-    $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
-      'user_register', 'user_pass', 'user_login', 'user_login_block');
-    foreach ($form_ids as $form_id) {
-      db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
-    }
-    drupal_set_message(t('The installation of the captcha_points table and some default entries was successful'), 'status');
-  }
-  else {
-    drupal_set_message(t('The installation of the CAPTCHA module failed'), 'error');
-  }
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function captcha_uninstall() {
+  drupal_uninstall_schema('captcha');
+  db_query("DELETE FROM {variable} WHERE name LIKE 'captcha_%'");
+  cache_clear_all('variables', 'cache');
 }
 
 /**
@@ -99,13 +105,4 @@ function captcha_update_2() {
     $items[] = update_sql("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('$form_id', NULL, NULL)");
   }
   return $items;
-}
-
-/**
- * Remove tables on uninstall.
- */
-function captcha_uninstall() {
-  db_query("DROP TABLE {captcha_points}");
-  db_query("DELETE FROM {variable} WHERE name LIKE 'captcha_%'");
-  cache_clear_all('variables', 'cache');
 }
