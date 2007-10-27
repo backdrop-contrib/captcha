@@ -1,0 +1,5 @@
+; $Id$
+name = "Image CAPTCHA"
+description = "Provides an image based CAPTCHA."
+package = "Spam control"
+dependencies = captcha

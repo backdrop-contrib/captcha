@@ -1,4 +1,4 @@
 ; $Id$
-name = Captcha
-description = "Implements a captcha to registration, comment, contact and node entry forms."
-package = SPAM Control
+name = CAPTCHA
+description = "Base CAPTCHA module for adding challenges to arbitrary forms."
+package = "Spam control"
