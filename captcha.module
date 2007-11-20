@@ -54,7 +54,7 @@ function captcha_menu() {
   $items['admin/user/captcha'] = array(
     'title' => t('CAPTCHA'),
     'description' => t('Administer how and where CAPTCHAs are used.'),
-    'callback' => 'captcha_admin',
+    'page callback' => 'captcha_admin',
     'access' => user_access('administer CAPTCHA settings'),
     'type' => MENU_NORMAL_ITEM,
   );
@@ -73,7 +73,7 @@ function captcha_menu() {
   $items['admin/user/captcha/captcha/examples'] = array(
     'title' => t('Examples'),
     'description' => t('An overview of the available challenge types with examples.'),
-    'callback' => 'captcha_examples',
+    'page callback' => 'captcha_examples',
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
   );
@@ -211,7 +211,6 @@ function captcha_admin_settings() {
   $captcha_types = _captcha_available_challenge_types();
   $result = db_query("SELECT * FROM {captcha_points} ORDER BY form_id");
   while ($captcha_point = db_fetch_object($result)) {
-    dvm($captcha_point);
     $form['captcha_types'][$captcha_point->form_id]['form_id'] = array(
       '#value' => $captcha_point->form_id,
     );
@@ -231,13 +230,13 @@ function captcha_admin_settings() {
   // field(s) for setting the additional CAPTCHA description
   if (module_exists('locale')) {
     global $locale;
-    $langs = locale_supported_languages();
+    $langs = locale_language_list();
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
       '#title' => t('Challenge description'),
       '#description' => t('With this description you can explain the purpose of the challenge to the user.'),
     );
-    foreach ($langs['name'] as $lang_code => $lang_name) {
+    foreach ($langs as $lang_code => $lang_name) {
       $form['captcha_descriptions']["captcha_description_$lang_code"] = array(
         '#type' => 'textfield',
         '#title' => t('For language %lang_name (code %lang_code)', array('%lang_name' => $lang_name, '%lang_code' => $lang_code)),
@@ -691,7 +690,7 @@ function captcha_examples($module=NULL, $challenge=NULL) {
             '#value' => l(t('10 more examples of this challenge.'), "admin/user/captcha/captcha/examples/$module/$challenge"),
           );
           // return rendered form
-          $id = "captcha_examples_$module_$challenge";
+          $id = "captcha_examples_${module}_${challenge}";
           drupal_process_form($id, $form);
           $output .= drupal_render_form($id, $form);
         }
