@@ -133,8 +133,8 @@ function _captcha_available_challenge_types() {
 function _captcha_get_description($lang_code=NULL) {
   if (module_exists('locale')) {
     if ($lang_code == NULL) {
-      global $locale;
-      $lang_code = $locale;
+      global $language;
+      $lang_code = $language->language;
     }
     $description = variable_get("captcha_description_$lang_code", t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.'));
   }
@@ -201,7 +201,7 @@ function captcha_admin_settings() {
   $form['captcha_types'] = array(
     '#type' => 'fieldset',
     '#title' => t('Challenge type per form'),
-    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with the help of the \'%CAPTCHA_admin_links\' option.', array('%CAPTCHA_admin_links'=>t('Add CAPTCHA adminstration links to forms'))),
+    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with the help of the \'%CAPTCHA_admin_links\' option.', array('%CAPTCHA_admin_links' => t('Add CAPTCHA adminstration links to forms'))),
     '#tree' => TRUE,
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
@@ -229,7 +229,6 @@ function captcha_admin_settings() {
   }
   // field(s) for setting the additional CAPTCHA description
   if (module_exists('locale')) {
-    global $locale;
     $langs = locale_language_list();
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
@@ -517,8 +516,8 @@ function captcha_form_alter($form_id, &$form) {
         '#description' => t('The challenge "@type" (by module "@module") is enabled here for untrusted users: !edit, !disable or !general.', array(
           '@type' => $captcha_point->type,
           '@module' => $captcha_point->module,
-          '!edit' => l(t('edit challenge type'), "admin/user/captcha/$form_id", array('query' => 'destination='. drupal_get_destination())),
-          '!disable' => l(t('disable challenge'), "admin/user/captcha/$form_id/disable", array('query' => 'destination='. drupal_get_destination())),
+          '!edit' => l(t('edit challenge type'), "admin/user/captcha/$form_id", array('query' => array('destination' => drupal_get_destination()))),
+          '!disable' => l(t('disable challenge'), "admin/user/captcha/$form_id/disable", array('query' => array('destination' => drupal_get_destination()))),
           '!general' => l(t('edit general challenge settings'), 'admin/user/captcha'),
         ))
       );
@@ -527,7 +526,7 @@ function captcha_form_alter($form_id, &$form) {
       $form['captcha'] = array(
         '#type' => 'item',
         '#title' => t('CAPTCHA administration'),
-        '#description' => l(t('Place a challenge here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => 'destination='. drupal_get_destination())),
+        '#description' => l(t('Place a challenge here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => array('destination' => drupal_get_destination()))),
       );
     }
     // Add pre_render function for placing the CAPTCHA just above the submit button
@@ -566,7 +565,7 @@ function captcha_validate($form_values) {
       watchdog('CAPTCHA',
         t('%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
           array('%form_id' => $form_id,
-            '%response' => $captcha_response, '%solution'=> $_SESSION['captcha'][$form_id][$captcha_token],
+            '%response' => $captcha_response, '%solution' => $_SESSION['captcha'][$form_id][$captcha_token],
             '%challenge' => $validationdata['type'], '%module' => $validationdata['module'],
           )
         ),
