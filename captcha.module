@@ -48,31 +48,31 @@ function captcha_help($path, $arg) {
  * Implementation of hook_menu().
  */
 function captcha_menu() {
-  /* TODO - Update Menu and Form system */
   $items = array();
   // main configuration page of the basic CAPTCHA module
   $items['admin/user/captcha'] = array(
-    'title' => t('CAPTCHA'),
-    'description' => t('Administer how and where CAPTCHAs are used.'),
+    'title' => 'CAPTCHA',
+    'description' => 'Administer how and where CAPTCHAs are used.',
     'page callback' => 'captcha_admin',
-    'access' => user_access('administer CAPTCHA settings'),
+    'page arguments' => array(3, 4),
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_NORMAL_ITEM,
   );
   // the default local task (needed when other modules want to offer
   // alternative CAPTCHA types and their own configuration page as local task)
   $items['admin/user/captcha/captcha'] = array(
-    'title' => t('CAPTCHA'),
+    'title' => 'CAPTCHA',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -20,
   );
   $items['admin/user/captcha/captcha/settings'] = array(
-    'title' => t('General settings'),
+    'title' => 'General settings',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
   $items['admin/user/captcha/captcha/examples'] = array(
-    'title' => t('Examples'),
-    'description' => t('An overview of the available challenge types with examples.'),
+    'title' => 'Examples',
+    'description' => 'An overview of the available challenge types with examples.',
     'page callback' => 'captcha_examples',
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
@@ -105,6 +105,16 @@ function captcha_requirements($phase) {
   return $requirements;
 }
 
+/**
+ * Implementation of hook_theme().
+ */
+function captcha_theme() {
+  return array(
+    'captcha_admin_settings_captcha_points' => array(
+      'arguments' => array('form' => NULL)
+    )
+  );
+}
 /**
  * Return an array with the available CAPTCHA types, for use as options array
  * for a select form elements.
@@ -299,10 +309,10 @@ function theme_captcha_admin_settings_captcha_points($form) {
 /**
  * Submission function for captcha_admin_settings form
  */
-function captcha_admin_settings_submit($form_id, $form_values) {
-  if ($form_id == 'captcha_admin_settings') {
-    variable_set('captcha_administration_mode', $form_values['captcha_administration_mode']);
-    foreach ($form_values['captcha_types'] as $captcha_point_form_id => $data) {
+function captcha_admin_settings_submit($form, &$form_state) {
+  if ($form['form_id']['#value'] == 'captcha_admin_settings') {
+    variable_set('captcha_administration_mode', $form_state['values']['captcha_administration_mode']);
+    foreach ($form_state['values']['captcha_types'] as $captcha_point_form_id => $data) {
       if ($data['captcha_type'] == 'none') {
         db_query("UPDATE {captcha_points} SET module = NULL, type = NULL WHERE form_id = '%s'", $captcha_point_form_id);
       }
@@ -313,16 +323,16 @@ function captcha_admin_settings_submit($form_id, $form_values) {
     }
     // description stuff
     if (module_exists('locale')) {
-      $langs = locale_supported_languages();
-      foreach ($langs['name'] as $lang_code => $lang_name) {
-        variable_set("captcha_description_$lang_code", $form_values["captcha_description_$lang_code"]);
+      $langs = locale_language_list();
+      foreach ($langs as $lang_code => $lang_name) {
+        variable_set("captcha_description_$lang_code", $form_state['values']["captcha_description_$lang_code"]);
       }
     }
     else {
-      variable_set('captcha_description', $form_values['captcha_description']);
+      variable_set('captcha_description', $form_state['values']['captcha_description']);
     }
-    variable_set('captcha_persistence', $form_values['captcha_persistence']);
-    variable_set('captcha_log_wrong_responses', $form_values['captcha_log_wrong_responses']);
+    variable_set('captcha_persistence', $form_state['values']['captcha_persistence']);
+    variable_set('captcha_log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
     drupal_set_message(t('The CAPTCHA settings were saved.'), 'status');
   }
 }
@@ -330,7 +340,7 @@ function captcha_admin_settings_submit($form_id, $form_values) {
 /**
  * form generating function for CAPTCHA point settings
  */
-function captcha_captcha_point_settings_form($form_id) {
+function captcha_captcha_point_settings_form($form_state, $form_id) {
   $result = db_query("SELECT * FROM {captcha_points} WHERE form_id = '%s'", $form_id);
   $captcha_point = db_fetch_object($result);
   if ($captcha_point) {
@@ -369,10 +379,10 @@ function captcha_captcha_point_settings_form($form_id) {
 /**
  * submit function for captcha_captcha_point_settings_form
  */
-function captcha_captcha_point_settings_form_submit($form_id, $form_values) {
-  if ($form_id == 'captcha_captcha_point_settings_form' && $form_values['op'] == t('Submit')) {
-    $captcha_point_form_id = $form_values['captcha_point_form_id'];
-    $captcha_type = $form_values['captcha_type'];
+function captcha_captcha_point_settings_form_submit($form, &$form_state) {
+  if ($form_state['clicked_button']['#value'] == t('Save')) {
+    $captcha_point_form_id = $form_state['values']['captcha_point_form_id'];
+    $captcha_type = $form_state['values']['captcha_type'];
     if ($captcha_type == 'none') {
       db_query("UPDATE {captcha_points} SET module = NULL, type = NULL WHERE form_id = '%s'", $captcha_point_form_id);
     }
@@ -401,7 +411,7 @@ function _captcha_persistence_skip($form_id) {
  * This function adds a CAPTCHA to forms for untrusted users if needed and adds
  * CAPTCHA adminstration links for site adminstrators if this option is enabled.
  */
-function captcha_form_alter($form_id, &$form) {
+function captcha_form_alter(&$form, $form_state, $form_id) {
 
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip the CAPTCHA
@@ -496,7 +506,8 @@ function captcha_form_alter($form_id, &$form) {
     );
 
     // handle the pre_render functions
-    $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render', 'captcha_pre_render_place_captcha');
+//TODO: enable this again
+//     $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render', 'captcha_pre_render_place_captcha');
 
     // Add a validation function for the CAPTCHA part of the form
     $form['captcha']['#validate'] = ((array) $form['captcha']['#validate']) + array('captcha_validate' => array());
@@ -516,8 +527,8 @@ function captcha_form_alter($form_id, &$form) {
         '#description' => t('The challenge "@type" (by module "@module") is enabled here for untrusted users: !edit, !disable or !general.', array(
           '@type' => $captcha_point->type,
           '@module' => $captcha_point->module,
-          '!edit' => l(t('edit challenge type'), "admin/user/captcha/$form_id", array('query' => array('destination' => drupal_get_destination()))),
-          '!disable' => l(t('disable challenge'), "admin/user/captcha/$form_id/disable", array('query' => array('destination' => drupal_get_destination()))),
+          '!edit' => l(t('edit challenge type'), "admin/user/captcha/$form_id", array('query' => drupal_get_destination())),
+          '!disable' => l(t('disable challenge'), "admin/user/captcha/$form_id/disable", array('query' => drupal_get_destination())),
           '!general' => l(t('edit general challenge settings'), 'admin/user/captcha'),
         ))
       );
@@ -526,11 +537,12 @@ function captcha_form_alter($form_id, &$form) {
       $form['captcha'] = array(
         '#type' => 'item',
         '#title' => t('CAPTCHA administration'),
-        '#description' => l(t('Place a challenge here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => array('destination' => drupal_get_destination()))),
+        '#description' => l(t('Place a challenge here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => drupal_get_destination())),
       );
     }
     // Add pre_render function for placing the CAPTCHA just above the submit button
-    $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render_place_captcha');
+    //TODO: enable this again
+//     $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render_place_captcha');
   }
 }
 
@@ -630,7 +642,7 @@ function captcha_pre_render($form_id, &$form) {
 /**
  * Pre_render function to place the CAPTCHA form element just above the last submit button
  */
-function captcha_pre_render_place_captcha($form_id, &$form) {
+function captcha_pre_render_place_captcha(&$form) {
   // search the weights of the buttons in the form
   $button_weights = array();
   foreach (element_children($form) as $key) {
@@ -690,7 +702,8 @@ function captcha_examples($module=NULL, $challenge=NULL) {
           );
           // return rendered form
           $id = "captcha_examples_${module}_${challenge}";
-          drupal_process_form($id, $form);
+          $form_state = array();
+          drupal_process_form($id, $form, $form_state);
           $output .= drupal_render_form($id, $form);
         }
       }
