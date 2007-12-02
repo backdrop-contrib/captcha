@@ -422,7 +422,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       return;
     }
     $captcha_point = db_fetch_object($result);
-    if (!$captcha_point->type) {
+    if (!$captcha_point || !$captcha_point->type) {
       return;
     }
 
@@ -519,7 +519,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       return;
     }
     $captcha_point = db_fetch_object($result);
-    if ($captcha_point->type) {
+    if ($captcha_point && $captcha_point->type) {
       $form['captcha'] = array(
         '#type' => 'item',
         '#title' => t('CAPTCHA administration'),
