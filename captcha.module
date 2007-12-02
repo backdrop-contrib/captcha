@@ -495,7 +495,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     );
 
     // other internal values needed for the validation phase
-    $form['captcha']['validationdata'] = array(
+    $form['captcha']['captcha_info'] = array(
       '#type' => 'value',
       '#value' => array(
         'form_id' => $form_id,
@@ -506,11 +506,10 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     );
 
     // handle the pre_render functions
-//TODO: enable this again
-//     $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render', 'captcha_pre_render_place_captcha');
+    $form['captcha']['#pre_render'] = array('captcha_pre_render', 'captcha_pre_render_place_captcha');
 
     // Add a validation function for the CAPTCHA part of the form
-    $form['captcha']['#validate'] = ((array) $form['captcha']['#validate']) + array('captcha_validate' => array());
+    $form['captcha']['#element_validate'] =  array('captcha_validate');
 
   }
   elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE) && arg(0) != 'admin') {
@@ -541,23 +540,26 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       );
     }
     // Add pre_render function for placing the CAPTCHA just above the submit button
-    //TODO: enable this again
-//     $form['#pre_render'] = ((array) $form['#pre_render']) + array('captcha_pre_render_place_captcha');
+    $form['captcha']['#pre_render'] = array('captcha_pre_render_place_captcha');
   }
 }
 
 /**
  * Implementation of form #validate.
  */
-function captcha_validate($form_values) {
+function captcha_validate($form, &$form_state) {
   // Get answer and preprocess if needed
-  $captcha_response = $form_values['#post']['captcha_response'];
-  $validationdata = $form_values['validationdata']['#value'];
-  if ($validationdata['preprocess']) {
-    $captcha_response = module_invoke($validationdata['module'], 'captcha', 'preprocess', $validationdata['type'], $captcha_response);
+  $captcha_response = $form_state['values']['captcha_response'];
+  $captcha_info = $form['captcha_info']['#value'];
+  if ($captcha_info['preprocess']) {
+    $captcha_response = module_invoke($captcha_info['module'], 'captcha', 'preprocess', $captcha_info['type'], $captcha_response);
   }
-  $form_id = $validationdata['form_id'];
-  $captcha_token = $form_values['#post']['captcha_token'];
+  $form_id = $captcha_info['form_id'];
+  // not that we use $form_state['clicked_button']['#post']['captcha_token']
+  // here instead of $form_state['values']['captcha_token'], because the latter
+  // contains the captcha_token of the new form, while the former contains
+  // not the captcha token of the posted form.
+  $captcha_token = $form_state['clicked_button']['#post']['captcha_token'];
   // Check if captcha_token exists
   if (!isset($_SESSION['captcha'][$form_id][$captcha_token])) {
     form_set_error('captcha_token', t('Invalid CAPTCHA token.'));
@@ -578,7 +580,7 @@ function captcha_validate($form_values) {
         t('%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
           array('%form_id' => $form_id,
             '%response' => $captcha_response, '%solution' => $_SESSION['captcha'][$form_id][$captcha_token],
-            '%challenge' => $validationdata['type'], '%module' => $validationdata['module'],
+            '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
           )
         ),
         WATCHDOG_NOTICE);
@@ -606,7 +608,8 @@ function captcha_validate($form_values) {
  * The main purpose of this function is to store the solution of the CAPTCHA
  * in the $_SESSION variable.
  */
-function captcha_pre_render($form_id, &$form) {
+function captcha_pre_render($form) {
+  $form_id = $form['captcha_info']['#value']['form_id'];
   // Unset the CAPTCHA if non-CAPTCHA persistent and the CAPTCHA has
   // already been successfully solved for this form.
   // This needs to be done in this pre_render phase when previewing for example
@@ -622,7 +625,7 @@ function captcha_pre_render($form_id, &$form) {
   // possible to remove the CAPTCHA from the form after all.
   if (_captcha_persistence_skip($form_id)) {
     unset($form['captcha']);
-    return;
+    return $form;
   }
 
   // count the number of unsolved CAPTCHAs and flush those if too many
@@ -632,17 +635,18 @@ function captcha_pre_render($form_id, &$form) {
     drupal_set_message(t('You can\'t request more than @num challenges without solving them. Your previous challenges were flushed.', array('@num' => CAPTCHA_UNSOLVED_CHALLENGES_MAX)));
   }
   // store the current CAPTCHA solution in $_SESSION
-  $captcha_token = $form['captcha']['captcha_token']['#value'];
-  $_SESSION['captcha'][$form_id][$captcha_token] = $form['captcha']['captcha_solution']['#value'];
+  $captcha_token = $form['captcha_token']['#value'];
+  $_SESSION['captcha'][$form_id][$captcha_token] = $form['captcha_solution']['#value'];
   $_SESSION['captcha'][$form_id]['success'] = FALSE;
   // empty the value of the captcha_response form item before rendering
-  $form['captcha']['captcha_response']['#value'] = '';
+  $form['captcha_response']['#value'] = '';
+  return $form;
 }
 
 /**
  * Pre_render function to place the CAPTCHA form element just above the last submit button
  */
-function captcha_pre_render_place_captcha(&$form) {
+function captcha_pre_render_place_captcha($form) {
   // search the weights of the buttons in the form
   $button_weights = array();
   foreach (element_children($form) as $key) {
@@ -658,6 +662,7 @@ function captcha_pre_render_place_captcha(&$form) {
     // make sure the form gets sorted before rendering
     unset($form['#sorted']);
   }
+  return $form;
 }
 
 /**
