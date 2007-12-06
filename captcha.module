@@ -401,8 +401,8 @@ function captcha_captcha_point_settings_form_submit($form, &$form_state) {
  */
 function _captcha_persistence_skip($form_id) {
   $persistence = variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS);
-  return ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL &&  ($_SESSION['captcha']['success'] === TRUE))
-    || ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM && ($_SESSION['captcha'][$form_id]['success'] === TRUE));
+  return ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL &&  isset($_SESSION['captcha']['success']) && ($_SESSION['captcha']['success'] === TRUE))
+    || ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM && isset($_SESSION['captcha'][$form_id]['success']) && ($_SESSION['captcha'][$form_id]['success'] === TRUE));
 }
 
 /**
@@ -565,7 +565,7 @@ function captcha_validate($form, &$form_state) {
     form_set_error('captcha_token', t('Invalid CAPTCHA token.'));
   }
   // Check answer
-  if ($captcha_response === $_SESSION['captcha'][$form_id][$captcha_token]) {
+  elseif ($captcha_response === $_SESSION['captcha'][$form_id][$captcha_token]) {
     $_SESSION['captcha'][$form_id]['success'] = TRUE;
     $_SESSION['captcha']['success'] = TRUE;
   }
@@ -630,7 +630,7 @@ function captcha_pre_render($form) {
 
   // count the number of unsolved CAPTCHAs and flush those if too many
   // minus 1 is needed because 'success' is also an item of $_SESSION['captcha'][$form_id]
-  if (count($_SESSION['captcha'][$form_id]) - 1 > CAPTCHA_UNSOLVED_CHALLENGES_MAX) {
+  if (isset($_SESSION['captcha'][$form_id]) && count($_SESSION['captcha'][$form_id]) - 1 > CAPTCHA_UNSOLVED_CHALLENGES_MAX) {
     unset($_SESSION['captcha'][$form_id]);
     drupal_set_message(t('You can\'t request more than @num challenges without solving them. Your previous challenges were flushed.', array('@num' => CAPTCHA_UNSOLVED_CHALLENGES_MAX)));
   }
