@@ -519,24 +519,30 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       return;
     }
     $captcha_point = db_fetch_object($result);
+    $form['captcha'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('CAPTCHA'),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
     if ($captcha_point && $captcha_point->type) {
-      $form['captcha'] = array(
+      $form['captcha']['#description'] = t('Untrusted users will see a CAPTCHA here (!settings).',
+        array('!settings' => l(t('general CAPTCHA settings'), 'admin/user/captcha'))
+      );
+      $form['captcha']['challenge'] = array(
         '#type' => 'item',
-        '#title' => t('CAPTCHA administration'),
-        '#description' => t('The challenge "@type" (by module "@module") is enabled here for untrusted users: !edit, !disable or !general.', array(
+        '#title' => t('Enabled challenge'),
+        '#value' => t('"@type" by module "@module" (!change, !disable)', array(
           '@type' => $captcha_point->type,
           '@module' => $captcha_point->module,
-          '!edit' => l(t('edit challenge type'), "admin/user/captcha/$form_id", array('query' => drupal_get_destination())),
-          '!disable' => l(t('disable challenge'), "admin/user/captcha/$form_id/disable", array('query' => drupal_get_destination())),
-          '!general' => l(t('edit general challenge settings'), 'admin/user/captcha'),
-        ))
+          '!change' => l(t('change'), "admin/user/captcha/$form_id", array('query' => drupal_get_destination())),
+          '!disable' => l(t('disable'), "admin/user/captcha/$form_id/disable", array('query' => drupal_get_destination())),
+        )),
       );
     }
     else {
-      $form['captcha'] = array(
-        '#type' => 'item',
-        '#title' => t('CAPTCHA administration'),
-        '#description' => l(t('Place a challenge here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => drupal_get_destination())),
+      $form['captcha']['add_captcha'] = array(
+        '#value' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => drupal_get_destination()))
       );
     }
     // Add pre_render function for placing the CAPTCHA just above the submit button
@@ -650,7 +656,7 @@ function captcha_pre_render_place_captcha($form) {
   // search the weights of the buttons in the form
   $button_weights = array();
   foreach (element_children($form) as $key) {
-    if ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button') {
+    if (isset($form[$key]['#type']) && ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button')) {
       $button_weights[] = $form[$key]['#weight'];
     }
   }
