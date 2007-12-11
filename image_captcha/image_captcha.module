@@ -30,25 +30,21 @@ function image_captcha_help($section) {
 /**
  * Implementation of hook_menu().
  */
-function image_captcha_menu($may_cache) {
+function image_captcha_menu() {
   $items = array();
-  if ($may_cache) {
-    // add an administration tab for image_captcha
-    $items[] = array(
-      'path' => 'admin/user/captcha/image_captcha',
-      'title' => t('Image CAPTCHA'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => array('image_captcha_settings_form'),
-      'type' => MENU_LOCAL_TASK,
-    );
-    // callback for generating an image
-    $items[] = array(
-      'path' => 'image_captcha',
-      'type' => MENU_CALLBACK,
-      'access' => TRUE,
-      'callback' => 'image_captcha_image',
-    );
-  }
+  // add an administration tab for image_captcha
+  $items['admin/user/captcha/image_captcha'] = array(
+    'title' => 'Image CAPTCHA',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('image_captcha_settings_form'),
+    'type' => MENU_LOCAL_TASK,
+  );
+  // callback for generating an image
+  $items['image_captcha'] = array(
+    'type' => MENU_CALLBACK,
+    'access callback' => TRUE,
+    'page callback' => 'image_captcha_image',
+  );
   return $items;
 }
 
@@ -218,16 +214,15 @@ function image_captcha_settings_form() {
 /**
  * Pre render function for image_captcha_settings_form
  */
-function image_captcha_settings_form_pre_render($form_id, $form) {
+function image_captcha_settings_form_pre_render($form) {
   if (count($form['image_captcha_font_settings']['image_captcha_font']['#options']) == 1) {
     drupal_set_message(t('The image captcha module works best with a TrueType font file (TTF) for generating the images, but because of licencing issues it is not allowed to package fonts with the module. A simple built-in bitmap font is provided as default instead. You can install TrueType fonts yourself by putting them in the fonts directory of the image captcha module (directory "%fontsdir") or by uploading them to your Drupal file system (directory "%filesdir") with for example the upload module.', array('%fontsdir' => drupal_get_path('module', 'image_captcha') .'/fonts', '%filesdir' => file_directory_path())), 'warning');
   }
   if ($form['image_captcha_font_settings']['image_captcha_font']['#default_value'] == 'BUILTIN') {
     drupal_set_message(t('The usage of the built-in bitmap font it is not recommended because of its small size and missing UTF-8 support.'), 'warning');
   }
-
+  return $form;
 }
-
 
 /**
  * Validation function for image_captcha configuration form
