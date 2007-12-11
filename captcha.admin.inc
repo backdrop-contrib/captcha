@@ -1,4 +1,5 @@
 <?php
+// $Id$
 
 /**
  * Return an array with the available CAPTCHA types, for use as options array
