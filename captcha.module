@@ -73,7 +73,8 @@ function captcha_menu() {
   $items['admin/user/captcha/captcha/examples'] = array(
     'title' => 'Examples',
     'description' => 'An overview of the available challenge types with examples.',
-    'page callback' => 'captcha_examples',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('captcha_examples', 5, 6),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
   );
@@ -678,49 +679,42 @@ function captcha_pre_render_place_captcha($form) {
  * If $module and $challenge are set, generate 10 examples of the concerning
  * CAPTCHA.
  */
-function captcha_examples($module=NULL, $challenge=NULL) {
+function captcha_examples($form_state, $module, $challenge) {
+  $form = array();
   if ($module && $challenge) {
     // generate 10 examples
-    $output = '';
     for ($i=0; $i<10; $i++) {
       // generate CAPTCHA
       $captcha = call_user_func_array($module .'_captcha', array('generate', $challenge));
-      $form = $captcha['form'];
-      $id = "captcha_examples_$module_$challenge_$i";
-      drupal_process_form($id, $form);
-      $output .= drupal_render_form($id, $form);
+      // add form elements
+      $form["challenge_{$i}"] = $captcha['form'];
     }
   }
   else {
     // generate a list with examples of the available CAPTCHA types
-    $output = t('This page gives an overview of all available challenge types, generated with their current settings.');
-    foreach (module_implements('captcha') as $module) {
+    $form['info'] = array(
+      '#value' => t('This page gives an overview of all available challenge types, generated with their current settings.'),
+    );
+    foreach (module_implements('captcha') as $mkey => $module) {
       $challenges = call_user_func_array($module .'_captcha', 'list');
       if ($challenges) {
-        foreach ($challenges as $challenge) {
+        foreach ($challenges as $ckey => $challenge) {
           // generate CAPTCHA
           $captcha = call_user_func_array($module .'_captcha', array('generate', $challenge));
           // build form
-          $form = array();
-          $form['captcha'] = array(
+          $form["captcha_{$mkey}_{$ckey}"] = array(
             '#type' => 'fieldset',
             '#title' => t('Challenge "%challenge" by module "%module"', array('%challenge' => $challenge, '%module' => $module)),
+            'challenge' => $captcha['form'],
+            'more_examples' => array(
+              '#value' => l(t('10 more examples of this challenge.'), "admin/user/captcha/captcha/examples/$module/$challenge"),
+            ),
           );
-          $form['captcha'] = array_merge($form['captcha'], $captcha['form']);
-          $form['captcha']['more_examples'] = array(
-            '#type' => 'markup',
-            '#value' => l(t('10 more examples of this challenge.'), "admin/user/captcha/captcha/examples/$module/$challenge"),
-          );
-          // return rendered form
-          $id = "captcha_examples_${module}_${challenge}";
-          $form_state = array();
-          drupal_process_form($id, $form, $form_state);
-          $output .= drupal_render_form($id, $form);
         }
       }
     }
   }
-  return $output;
+  return $form;
 }
 
 /**
