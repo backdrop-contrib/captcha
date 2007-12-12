@@ -32,7 +32,7 @@ msgid "<p>A captcha can be added to virtually each drupal form (which is identif
 msgstr "<p>Ein CAPTCHA kann zu fast jedem Drupal-Formular (das durch ein <em>form_id</em> identifiziert ist) hinzugefügt werden. Das CAPTCHA-Modul bringt einige Standardformulare mit, denen ein CAPTCHA hinzugefügt werden kann, aber beliebige Formulare können einfach hinzugefügt und verwaltet werden, wenn die Option \"%adminlinks\" aktiviert ist.</p><p>Benutzer mit der \"%skipcaptcha\"-<a href=\"@perm\">Berechtigung</a> bekommen kein CAPTCHA angezeigt. Stellen Sie sicher, dass Sie den vertrauenswürdigen Nutzern (z.B. den Administratoren Ihrer Website) diese Berechtigung geben. Wenn Sie die CAPTCHA-Aufgaben testen wollen, stellen Sie sicher dies als Nutzer ohne die \"%skipcaptcha\"-Berechtigung (z.B. als nichtangemeldeter Nutzer) zu tun.</p>"
 
 #: captcha.module:33;174
-msgid "Add captcha adminstration links to forms"
+msgid "Add captcha administration links to forms"
 msgstr "CAPTCHA-Verwaltungslinks zu Formularen hinzufügen"
 
 #: captcha.module:49;59;342

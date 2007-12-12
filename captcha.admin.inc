@@ -38,19 +38,19 @@ function captcha_admin($form_id = '', $op = '') {
         // disable the CAPTCHA for the form: set the module and type to NULL
         db_query("UPDATE {captcha_points} SET module = NULL, type = NULL WHERE form_id = '%s'", $form_id);
         drupal_set_message(t('Disabled CAPTCHA for form %form_id.', array('%form_id' => $form_id)));
-        // goto the CAPTCHA adminstration or alternative destination if present in URI
+        // goto the CAPTCHA administration or alternative destination if present in URI
         drupal_goto('admin/user/captcha');
         break;
       case 'delete':
         db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
         drupal_set_message(t('Deleted CAPTCHA for form %form_id.', array('%form_id' => $form_id)));
-        // goto the CAPTCHA adminstration or alternative destination if present in URI
+        // goto the CAPTCHA administration or alternative destination if present in URI
         drupal_goto('admin/user/captcha');
         break;
       case 'enable':
         db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
         db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
-        // No drupal_goto() call because we have to go to the CAPTCHA adminstration
+        // No drupal_goto() call because we have to go to the CAPTCHA administration
         // form and not a different destination if that would be present in the
         // URI. So we call this form explicitly. The destination will be preserved
         // so after completing the form, the user will still be redirected.
@@ -68,10 +68,10 @@ function captcha_admin($form_id = '', $op = '') {
  * Form builder function for the general CAPTCHA configuration
  */
 function captcha_admin_settings() {
-  // field for the CAPTCHA adminstration mode
+  // field for the CAPTCHA administration mode
   $form['captcha_administration_mode'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Add CAPTCHA adminstration links to forms'),
+    '#title' => t('Add CAPTCHA administration links to forms'),
     '#default_value' => variable_get('captcha_administration_mode', FALSE),
     '#description' => t('This option is very helpful to enable/disable challenges on forms. When enabled, users with the "%admincaptcha" permission will see CAPTCHA administration links on all forms (except on administrative pages, which shouldn\'t be accessible to untrusted users in the first place). These links make it possible to enable a challenge of the desired type or disable it.', array('%admincaptcha' => 'administer CAPTCHA settings')),
   );
@@ -79,7 +79,7 @@ function captcha_admin_settings() {
   $form['captcha_types'] = array(
     '#type' => 'fieldset',
     '#title' => t('Challenge type per form'),
-    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with the help of the \'%CAPTCHA_admin_links\' option.', array('%CAPTCHA_admin_links' => t('Add CAPTCHA adminstration links to forms'))),
+    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with the help of the \'%CAPTCHA_admin_links\' option.', array('%CAPTCHA_admin_links' => t('Add CAPTCHA administration links to forms'))),
     '#tree' => TRUE,
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
@@ -239,7 +239,7 @@ function captcha_captcha_point_settings_form($form_state, $form_id) {
   else {
     // illegal form_id
     drupal_set_message(t('Unavailable form_id %form_id ', array('%form_id' => $form_id)), 'error');
-    // goto the CAPTCHA adminstration or alternative destination if present in URI
+    // goto the CAPTCHA administration or alternative destination if present in URI
     drupal_goto('admin/user/captcha');
   }
 }

@@ -4,7 +4,7 @@
 /**
  * @file
  * This module enables basic CAPTCHA functionality:
- * adminstrators can add a CAPTCHA to desired forms that users without
+ * administrators can add a CAPTCHA to desired forms that users without
  * the 'skip CAPTCHA' permission (typically anonymous visitors) have
  * to solve.
  *
@@ -38,7 +38,7 @@ function captcha_help($path, $arg) {
       return t('<p>A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.</p><p>Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).</p>',
         array(
           '@perm' => url('admin/user/access'),
-          '%adminlinks' => t('Add CAPTCHA adminstration links to forms'),
+          '%adminlinks' => t('Add CAPTCHA administration links to forms'),
           '%skipcaptcha' => 'skip CAPTCHA',
         ));
   }
@@ -151,7 +151,7 @@ function _captcha_persistence_skip($form_id) {
  * Implementation of hook_form_alter().
  *
  * This function adds a CAPTCHA to forms for untrusted users if needed and adds
- * CAPTCHA adminstration links for site adminstrators if this option is enabled.
+ * CAPTCHA administration links for site administrators if this option is enabled.
  */
 function captcha_form_alter(&$form, $form_state, $form_id) {
 

@@ -3,7 +3,7 @@ $Id$
 ### CAPTCHA Readme
 
 captcha.module is the basic CAPTCHA module that offers general CAPTCHA
-adminstration and a simple math challenge.
+administration and a simple math challenge.
 
 text_captcha offers another simple text based challenge.
 

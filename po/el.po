@@ -48,7 +48,7 @@ msgid "Deleted captcha for form %form_id."
 msgstr "Διαγράφηκε το captcha για τη φόρμα %form_id."
 
 #: captcha.module:154
-msgid "Add captcha adminstration links to forms."
+msgid "Add captcha administration links to forms."
 msgstr "Προσθήκη των παραπομπών διαχείρισης του captcha στις φόρμες."
 
 #: captcha.module:156

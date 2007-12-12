@@ -18,7 +18,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2007-12-12 11:25+0100\n"
+"POT-Creation-Date: 2007-12-12 22:59+0100\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -36,7 +36,7 @@ msgid "Deleted CAPTCHA for form %form_id."
 msgstr ""
 
 #: captcha.admin.inc:74;82 captcha.module:41
-msgid "Add CAPTCHA adminstration links to forms"
+msgid "Add CAPTCHA administration links to forms"
 msgstr ""
 
 #: captcha.admin.inc:76
