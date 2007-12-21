@@ -10,8 +10,8 @@ define('IMAGE_CAPTCHA_ALLOWED_CHARACTERS', 'aAbBCdEeFfGHhijKLMmNPQRrSTtWXYZ23456
 /**
  * Implementation of hook_help().
  */
-function image_captcha_help($section) {
-  switch ($section) {
+function image_captcha_help($path, $arg) {
+  switch ($path) {
     case 'admin/user/captcha/image_captcha':
       $output = '<p>'. t('The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be carefull with the size and computation related settings.') .'</p>';
       if (in_array('Image', image_captcha_captcha('list'))) {
@@ -86,7 +86,7 @@ function _image_captcha_utf8_split($str) {
         $width = 4;
       }
       else {
-        watchdog('CAPTCHA', t('Encountered an illegal byte while splitting an utf8 string in characters.'), WATCHDOG_ERROR);
+        watchdog('CAPTCHA', 'Encountered an illegal byte while splitting an utf8 string in characters.', array(), WATCHDOG_ERROR);
         return $characters;
       }
     }
