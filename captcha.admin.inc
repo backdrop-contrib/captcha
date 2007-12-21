@@ -147,7 +147,7 @@ function captcha_admin_settings() {
   $form['captcha_log_wrong_responses'] = array(
     '#type' => 'checkbox',
     '#title' => t('Log wrong responses'),
-    '#description' => t('Report information about wrong responses to the !watchdoglog.', array('!watchdoglog' => l('log', 'admin/logs/watchdog'))),
+    '#description' => t('Report information about wrong responses to the !log.', array('!log' => l('log', 'admin/reports/dblog'))),
     '#default_value' => variable_get('captcha_log_wrong_responses', FALSE),
   );
   // submit button

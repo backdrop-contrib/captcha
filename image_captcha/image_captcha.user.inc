@@ -25,7 +25,7 @@ function image_captcha_image($seed=NULL) {
     $image = @_image_captcha_generate_image($code);
     // check of generation was successful
     if (!$image) {
-      watchdog('CAPTCHA', t('Generation of image CAPTCHA failed. Check your image CAPTCHA configuration and especially the used font.'), WATCHDOG_ERROR);
+      watchdog('CAPTCHA', 'Generation of image CAPTCHA failed. Check your image CAPTCHA configuration and especially the used font.', array(), WATCHDOG_ERROR);
       exit();
     }
     // Send the image resource as an image to the client
@@ -251,7 +251,8 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
     // draw character
     if ($font == 'BUILTIN') {
       imagestring($image, 5, $pos_x, $pos_y, $character, $color);
-    } else {
+    }
+    else {
       imagettftext($image, $font_size, 0, $pos_x, $pos_y, $color, realpath($font), $character);
     }
     // shift cursor
