@@ -49,7 +49,7 @@ function image_captcha_settings_form() {
     '#title' => t('Font settings'),
   );
   $available_fonts = _image_captcha_available_fonts();
-  list($default_font, $errmsg) = _image_captcha_get_font();
+  list($default_font, $errmsg, $errvar) = _image_captcha_get_font();
   $form['image_captcha_font_settings']['image_captcha_font'] = array(
     '#type' => 'select',
     '#title' => t('Font'),

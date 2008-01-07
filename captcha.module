@@ -146,9 +146,9 @@ function _captcha_persistence_skip($form_id) {
       return isset($_SESSION['captcha']['success']) && ($_SESSION['captcha']['success'] === TRUE);
     case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM:
       return isset($_SESSION['captcha'][$form_id]['success']) && ($_SESSION['captcha'][$form_id]['success'] === TRUE);
-    default:  
+    default:
       return FALSE;
-  } 
+  }
 }
 
 /**
@@ -189,8 +189,8 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     if (!$captcha) {
       //The selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and then quit.
       watchdog('CAPTCHA',
-        t('CAPTCHA problem: hook_captcha() of module %module returned nothing when trying to retrieve challenge type %type for form %form_id.',
-          array('%type' => $captcha_point->type, '%module' => $captcha_point->module, '%form_id' => $form_id)),
+        'CAPTCHA problem: hook_captcha() of module %module returned nothing when trying to retrieve challenge type %type for form %form_id.',
+        array('%type' => $captcha_point->type, '%module' => $captcha_point->module, '%form_id' => $form_id),
         WATCHDOG_ERROR);
       return;
     }
@@ -329,11 +329,10 @@ function captcha_validate($form, &$form_state) {
     // log to watchdog if needed
     if (variable_get('captcha_log_wrong_responses', FALSE)) {
       watchdog('CAPTCHA',
-        t('%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
-          array('%form_id' => $form_id,
-            '%response' => $captcha_response, '%solution' => $_SESSION['captcha'][$form_id][$captcha_token],
-            '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
-          )
+        '%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
+        array('%form_id' => $form_id,
+          '%response' => $captcha_response, '%solution' => $_SESSION['captcha'][$form_id][$captcha_token],
+          '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
         ),
         WATCHDOG_NOTICE);
     }

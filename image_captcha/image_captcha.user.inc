@@ -48,9 +48,9 @@ function image_captcha_image($seed=NULL) {
  */
 function _image_captcha_generate_image($code) {
   // get font
-  list($font, $errmsg) = _image_captcha_get_font();
+  list($font, $errmsg, $errvar) = _image_captcha_get_font();
   if (!$font) {
-    watchdog('CAPTCHA', $errmsg, WATCHDOG_ERROR);
+    watchdog('CAPTCHA', $errmsg, $errvar, WATCHDOG_ERROR);
     exit();
   }
   // get other settings

@@ -55,11 +55,13 @@ function image_captcha_menu() {
 function _image_captcha_get_font() {
   $font = variable_get('image_captcha_font', 'BUILTIN');
   $errmsg = FALSE;
+  $errvar = array();
   if ($font != 'BUILTIN' && (!is_file($font) || !is_readable($font))) {
-    $errmsg = t('Could not find or read the configured font "%font" for the image captcha.', array('%font' => $font));
+    $errmsg = 'Could not find or read the configured font "%font" for the image captcha.';
+    $errvar = array('%font' => $font);
     $font = FALSE;
   }
-  return array($font, $errmsg);
+  return array($font, $errmsg, $errvar);
 }
 
 /**
@@ -103,7 +105,7 @@ function image_captcha_captcha($op, $captcha_type='') {
   switch ($op) {
     case 'list':
       // only offer image CAPTCHA if possible to generate an image CAPTCHA
-      list($font, $errmsg) = _image_captcha_get_font();
+      list($font, $errmsg, $errvar) = _image_captcha_get_font();
       if (function_exists('imagejpeg') && $font) {
         return array('Image');
       }
