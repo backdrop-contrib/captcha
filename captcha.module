@@ -35,12 +35,11 @@ function captcha_help($path, $arg) {
     case 'admin/user/captcha':
     case 'admin/user/captcha/captcha':
     case 'admin/user/captcha/captcha/settings':
-      return t('<p>A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.</p><p>Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).</p>',
-        array(
-          '@perm' => url('admin/user/permissions'),
-          '%adminlinks' => t('Add CAPTCHA administration links to forms'),
-          '%skipcaptcha' => 'skip CAPTCHA',
-        ));
+      $output = '<p>'. t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.',
+        array('%adminlinks' => t('Add CAPTCHA administration links to forms'))) .'</p>';
+      $output .= '<p>' . t('Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).',
+        array('%skipcaptcha' => 'skip CAPTCHA', '@perm' => url('admin/user/permissions'))) .'</p>';
+      return $output;
   }
 }
 
@@ -90,7 +89,6 @@ function captcha_perm() {
   return array('administer CAPTCHA settings', 'skip CAPTCHA');
 }
 
-
 /**
  * Implementation of hook_requirements().
  */
@@ -124,15 +122,16 @@ function captcha_theme() {
  * If the locale module is enabled, an optional language code can be given
  */
 function _captcha_get_description($lang_code=NULL) {
+  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.');
   if (module_exists('locale')) {
     if ($lang_code == NULL) {
       global $language;
       $lang_code = $language->language;
     }
-    $description = variable_get("captcha_description_$lang_code", t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.'));
+    $description = variable_get("captcha_description_$lang_code", $default);
   }
   else {
-    $description = variable_get('captcha_description', t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.'));
+    $description = variable_get('captcha_description', $default);
   }
   return $description;
 }
@@ -142,9 +141,14 @@ function _captcha_get_description($lang_code=NULL) {
  * be skipped because of CAPTCHA persistence.
  */
 function _captcha_persistence_skip($form_id) {
-  $persistence = variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS);
-  return ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL &&  isset($_SESSION['captcha']['success']) && ($_SESSION['captcha']['success'] === TRUE))
-    || ($persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM && isset($_SESSION['captcha'][$form_id]['success']) && ($_SESSION['captcha'][$form_id]['success'] === TRUE));
+  switch (variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS)) {
+    case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL:
+      return isset($_SESSION['captcha']['success']) && ($_SESSION['captcha']['success'] === TRUE);
+    case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM:
+      return isset($_SESSION['captcha'][$form_id]['success']) && ($_SESSION['captcha'][$form_id]['success'] === TRUE);
+    default:  
+      return FALSE;
+  } 
 }
 
 /**
@@ -199,7 +203,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
         '#type' => 'fieldset',
         '#title' => t('CAPTCHA'),
         '#description' => $captcha_description,
-        '#attributes' => array('class' => 'captcha')
+        '#attributes' => array('class' => 'captcha'),
       );
     }
     else {
@@ -413,7 +417,7 @@ function captcha_pre_render_place_captcha($form) {
   return $form;
 }
 
-    /**
+/**
  * Default implementation of hook_captcha
  */
 function captcha_captcha($op, $captcha_type = '') {

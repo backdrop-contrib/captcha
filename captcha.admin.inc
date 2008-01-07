@@ -5,12 +5,12 @@
  * Return an array with the available CAPTCHA types, for use as options array
  * for a select form elements.
  * The array is an associative array mapping "$module/$type" to
- * "$module/$type" with $module the module name implementing the CAPTCHA
+ * "$type ($module)" with $module the module name implementing the CAPTCHA
  * and $type the name of the CAPTCHA type.
- * (It also includes a 'none' => 'none' option)
+ * (It also includes a 'none' => '<none>' option)
  */
 function _captcha_available_challenge_types() {
-  $captcha_types['none'] = 'none';
+  $captcha_types['none'] = '<'. t('none') .'>';
   foreach (module_implements('captcha') as $module) {
     $result = call_user_func_array($module .'_captcha', 'list');
     if (is_array($result)) {
