@@ -251,10 +251,12 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       ),
     );
 
-    // handle the pre_render functions
-    $form['captcha']['#pre_render'] = array('captcha_pre_render', 'captcha_pre_render_place_captcha');
+    // Add pre_render function for additional CAPTCHA processing.
+    $form['captcha']['#pre_render'] = array('captcha_pre_render');
+    // Add pre_render function for placement of CAPTCHA formt element (above submit buttons).
+    $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
 
-    // Add a validation function for the CAPTCHA part of the form
+    // Add a validation function for the CAPTCHA form element.
     $form['captcha']['#element_validate'] =  array('captcha_validate');
 
   }
@@ -291,8 +293,8 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
         '#value' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/user/captcha/$form_id/enable", array('query' => drupal_get_destination()))
       );
     }
-    // Add pre_render function for placing the CAPTCHA just above the submit button
-    $form['captcha']['#pre_render'] = array('captcha_pre_render_place_captcha');
+    // Add pre_render function for placement of CAPTCHA formt element (above submit buttons).
+    $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
   }
 }
 
@@ -401,7 +403,7 @@ function captcha_pre_render_place_captcha($form) {
   // search the weights of the buttons in the form
   $button_weights = array();
   foreach (element_children($form) as $key) {
-    if (isset($form[$key]['#type']) && ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button')) {
+    if ($key == 'buttons' || isset($form[$key]['#type']) && ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button')) {
       $button_weights[] = $form[$key]['#weight'];
     }
   }
