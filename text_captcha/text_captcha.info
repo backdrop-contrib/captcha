@@ -1,7 +1,0 @@
-; $Id$
-name = "Text CAPTCHA"
-description = "Provides a simple text based CAPTCHA."
-package = "Spam control"
-dependencies[] = captcha
-core = 6.x
-
