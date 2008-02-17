@@ -10,3 +10,4 @@ Drupal 5:
 Drupal 6:
   DRUPAL-6--1
 
+HEAD contains an experimental branch for Drupal 6
