@@ -125,6 +125,16 @@ function captcha_theme() {
 }
 
 /**
+ * Implementation of hook_cron().
+ *
+ * Remove old entries from captcha_challenges table.
+ */
+function captcha_cron() {
+  // remove challenges older than 1 hour
+  db_query('DELETE FROM {captcha_challenges} WHERE timestamp < %d', time() - 3600);
+}
+
+/**
  * Get the description which appears above the CAPTCHA in forms.
  * If the locale module is enabled, an optional language code can be given
  */
@@ -225,26 +235,12 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     // Add the form elements of the generated CAPTCHA to the form
     $form['captcha'] = array_merge($form['captcha'], $captcha['form']);
 
-    // Store the solution of the generated CAPTCHA as an internal form value.
-    // This will be stored later in $_SESSION during the pre_render phase.
-    // It can't be saved at this point because hook_form_alter is not only run
-    // before form rendering, but also before form validation (which happens
-    // in a new (POST) request. Consequently the right CAPTCHA solution would be
-    // overwritten just before validation. The pre_render functions are not run
-    // before validation and are the right place to store the solution in $_SESSION.
-    $form['captcha']['captcha_solution'] = array(
-      '#type' => 'value',
-      '#value' => $captcha['solution'],
-    );
-
-    // The CAPTCHA token is used to differentiate between different instances
-    // of the same form. This makes it possible to request the same form a
-    // couple of times before submitting them. The solution of the CAPTCHA of
-    // each of these form instances will be stored at the pre_render phase in
-    // $_SESSION['captcha'][$form_id][$captcha_token]
-    $form['captcha']['captcha_token'] = array(
+    // add solution to captcha_challenges table
+    db_query("INSERT into {captcha_challenges} (solution, sid, timestamp) VALUES ('%s', '%s', %d)", $captcha['solution'], session_id(), time());
+    $challenge_id = db_last_insert_id('captcha_challenges', 'challenge_id');
+    $form['captcha']['captcha_challenge_id'] = array(
       '#type' => 'hidden',
-      '#value' => md5(mt_rand()),
+      '#value' => $challenge_id,
     );
 
     // other internal values needed for the validation phase
@@ -309,6 +305,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
  * Implementation of form #validate.
  */
 function captcha_validate($form, &$form_state) {
+
   // Get answer and preprocess if needed
   $captcha_response = $form_state['values']['captcha_response'];
   $captcha_info = $form_state['values']['captcha_info'];
@@ -316,50 +313,51 @@ function captcha_validate($form, &$form_state) {
     $captcha_response = module_invoke($captcha_info['module'], 'captcha', 'preprocess', $captcha_info['type'], $captcha_response);
   }
   $form_id = $captcha_info['form_id'];
-  // not that we use $form_state['clicked_button']['#post']['captcha_token']
-  // here instead of $form_state['values']['captcha_token'], because the latter
-  // contains the captcha_token of the new form, while the former contains
-  // not the captcha token of the posted form.
-  $captcha_token = $form_state['clicked_button']['#post']['captcha_token'];
-  // Check if captcha_token exists
-  if (!isset($_SESSION['captcha'][$form_id][$captcha_token])) {
-    form_set_error('captcha_token', t('Invalid CAPTCHA token.'));
-  }
-  // Check answer
-  elseif ($captcha_response === $_SESSION['captcha'][$form_id][$captcha_token]) {
-    $_SESSION['captcha'][$form_id]['success'] = TRUE;
-    $_SESSION['captcha']['success'] = TRUE;
+  // Note that we use $form_state['clicked_button']['#post']['captcha_challenge_id']
+  // here instead of $form_state['values']['captcha_challenge_id'], because the latter
+  // contains the challenge_id of the new form, while the former contains
+  // not the challenge_id of the posted form.
+  $challenge_id = $form_state['clicked_button']['#post']['captcha_challenge_id'];
+
+  $solution = db_result(db_query('SELECT solution FROM {captcha_challenges} WHERE challenge_id = %d', $challenge_id));
+  if ($solution === FALSE) {
+    // unknown challenge_id
+    form_set_error('captcha', t('CAPTCHA test failed (unknown challenge_id).'));
   }
   else {
-    // set form error
-    form_set_error('captcha_response', t('The answer you entered for the CAPTCHA was not correct.'));
-    // update wrong response counter
-    variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
-    // log to watchdog if needed
-    if (variable_get('captcha_log_wrong_responses', FALSE)) {
-      watchdog('CAPTCHA',
-        '%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
-        array('%form_id' => $form_id,
-          '%response' => $captcha_response, '%solution' => $_SESSION['captcha'][$form_id][$captcha_token],
-          '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
-        ),
-        WATCHDOG_NOTICE);
+    // Unset the solution to prevent reuse of the same CAPTCHA solution
+    $result = db_query('DELETE FROM {captcha_challenges} WHERE challenge_id = %d', $challenge_id);
+
+    // Check answer
+    if ($captcha_response == $solution) {
+      $_SESSION['captcha'][$form_id]['success'] = TRUE;
+      $_SESSION['captcha']['success'] = TRUE;
     }
-    // If CAPTCHA was on a login form: stop validating, quit the current request
-    // and forward to the current page (like a reload) to prevent loging in.
-    // We do that because the log in procedure, which happens after
-    // captcha_validate(), does not check error conditions of extra form
-    // elements like the CAPTCHA.
-    if ($form_id == 'user_login' || $form_id == 'user_login_block') {
-      drupal_goto($_GET['q']);
+    else {
+      // set form error
+      form_set_error('captcha_response', t('The answer you entered for the CAPTCHA was not correct.'));
+      // update wrong response counter
+      variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
+      // log to watchdog if needed
+      if (variable_get('captcha_log_wrong_responses', FALSE)) {
+        watchdog('CAPTCHA',
+          '%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
+          array('%form_id' => $form_id,
+            '%response' => $captcha_response, '%solution' => $solution,
+            '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
+          ),
+          WATCHDOG_NOTICE);
+      }
+      // If CAPTCHA was on a login form: stop validating, quit the current request
+      // and forward to the current page (like a reload) to prevent loging in.
+      // We do that because the log in procedure, which happens after
+      // captcha_validate(), does not check error conditions of extra form
+      // elements like the CAPTCHA.
+      if ($form_id == 'user_login' || $form_id == 'user_login_block') {
+        drupal_goto($_GET['q']);
+      }
     }
   }
-
-  // Unset the solution to prevent reuse of the same CAPTCHA solution
-  // by a spammer that repeats posting a form without requesting
-  // (and thus rendering) a new form. Note that a new CAPTCHA solution is only
-  // set at the pre_render phase.
-  unset($_SESSION['captcha'][$form_id][$captcha_token]);
 }
 
 /**
@@ -388,20 +386,6 @@ function captcha_pre_render($form) {
     return $form;
   }
 
-  // count the number of unsolved CAPTCHAs and unset the oldest if too many
-  // minus 1 is needed because 'success' is also an item of $_SESSION['captcha'][$form_id]
-  if (isset($_SESSION['captcha'][$form_id]) && count($_SESSION['captcha'][$form_id]) - 1 > CAPTCHA_UNSOLVED_CHALLENGES_MAX) {
-    foreach (array_keys($_SESSION['captcha'][$form_id]) as $captcha_token) {
-      if ($captcha_token != 'success') {
-        unset($_SESSION['captcha'][$form_id][$captcha_token]);
-        break;
-      }
-    }
-  }
-  // store the current CAPTCHA solution in $_SESSION
-  $captcha_token = $form['captcha_token']['#value'];
-  $_SESSION['captcha'][$form_id][$captcha_token] = $form['captcha_solution']['#value'];
-  $_SESSION['captcha'][$form_id]['success'] = FALSE;
   // empty the value of the captcha_response form item before rendering
   $form['captcha_response']['#value'] = '';
   return $form;
