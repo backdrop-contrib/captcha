@@ -160,9 +160,9 @@ function _captcha_get_description($lang_code=NULL) {
 function _captcha_persistence_skip($form_id) {
   switch (variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS)) {
     case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL:
-      return isset($_SESSION['captcha']['success']) && ($_SESSION['captcha']['success'] === TRUE);
+      return isset($_SESSION['captcha_success_form_ids']) && count($_SESSION['captcha_success_form_ids']);
     case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM:
-      return isset($_SESSION['captcha'][$form_id]['success']) && ($_SESSION['captcha'][$form_id]['success'] === TRUE);
+      return isset($_SESSION['captcha_success_form_ids'][$form_id]);
     default:
       return FALSE;
   }
@@ -255,12 +255,12 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     );
 
     // Add pre_render function for additional CAPTCHA processing.
-    $form['captcha']['#pre_render'] = array('captcha_pre_render');
+    $form['#pre_render'][] = 'captcha_pre_render';
     // Add pre_render function for placement of CAPTCHA formt element (above submit buttons).
     $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
 
     // Add a validation function for the CAPTCHA form element.
-    $form['captcha']['#element_validate'] =  array('captcha_validate');
+    $form['#validate'][] = 'captcha_validate';
 
   }
   elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE) && arg(0) != 'admin') {
@@ -330,8 +330,7 @@ function captcha_validate($form, &$form_state) {
 
     // Check answer
     if ($captcha_response == $solution) {
-      $_SESSION['captcha'][$form_id]['success'] = TRUE;
-      $_SESSION['captcha']['success'] = TRUE;
+      $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
     }
     else {
       // set form error
@@ -362,12 +361,9 @@ function captcha_validate($form, &$form_state) {
 
 /**
  * Implementation of form #pre_render.
- *
- * The main purpose of this function is to store the solution of the CAPTCHA
- * in the $_SESSION variable.
  */
 function captcha_pre_render($form) {
-  $form_id = $form['captcha_info']['#value']['form_id'];
+  $form_id = $form['captcha']['captcha_info']['#value']['form_id'];
   // Unset the CAPTCHA if non-CAPTCHA persistent and the CAPTCHA has
   // already been successfully solved for this form.
   // This needs to be done in this pre_render phase when previewing for example
