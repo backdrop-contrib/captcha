@@ -180,11 +180,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     // Visitor does not have permission to skip the CAPTCHA
 
     // Get CAPTCHA type and module for this form. Return if no CAPTCHA was set.
-    $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-    if (!$result) {
-      return;
-    }
-    $captcha_point = db_fetch_object($result);
+    $captcha_point = db_fetch_object(db_query("SELECT module, type FROM {captcha_points} WHERE form_id = '%s'", $form_id));
     if (!$captcha_point || !$captcha_point->type) {
       return;
     }
@@ -383,7 +379,7 @@ function captcha_pre_render($form) {
   }
 
   // empty the value of the captcha_response form item before rendering
-  $form['captcha_response']['#value'] = '';
+  $form['captcha']['captcha_response']['#value'] = '';
   return $form;
 }
 
