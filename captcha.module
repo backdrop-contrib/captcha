@@ -86,13 +86,6 @@ function captcha_menu() {
     'page arguments' => array(5, 6),
     'type' => MENU_CALLBACK,
   );
-  $items['captcha/js'] = array(
-    'file' => 'captcha.pages.inc',
-    'page callback' => 'captcha_js',
-    'access callback' => TRUE, //variable_get('captcha_allow_ajax_reload', TRUE),
-    'type' => MENU_CALLBACK,
-  );
-
   return $items;
 }
 
@@ -167,7 +160,6 @@ function _captcha_get_description($lang_code=NULL) {
  * CAPTCHA administration links for site administrators if this option is enabled.
  */
 function captcha_form_alter(&$form, $form_state, $form_id) {
-dpm('captcha_form_alter');
 
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip the CAPTCHA

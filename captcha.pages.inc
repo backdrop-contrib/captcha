@@ -78,15 +78,12 @@ function _captcha_generate_challenge($form_id) {
   }
 
   // Add the form elements of the generated CAPTCHA to the form
-  $form['captcha']['challenge'] = $captcha['form'];
-  $form['captcha']['challenge']['#prefix'] = '<div id="captcha-challenge">';
-  $form['captcha']['challenge']['#suffix'] = '</div>';
-
+  $form['captcha'] = array_merge($form['captcha'], $captcha['form']);
 
   // add solution to captcha_challenges table
   db_query("INSERT into {captcha_challenges} (solution, sid, timestamp) VALUES ('%s', '%s', %d)", $captcha['solution'], session_id(), time());
   $challenge_id = db_last_insert_id('captcha_challenges', 'challenge_id');
-  $form['captcha']['challenge']['captcha_challenge_id'] = array(
+  $form['captcha']['captcha_challenge_id'] = array(
     '#type' => 'hidden',
     '#value' => $challenge_id,
   );
@@ -101,22 +98,6 @@ function _captcha_generate_challenge($form_id) {
       'type' => $captcha_point->type,
     ),
   );
-
-  if (variable_get('captcha_allow_ajax_reload', TRUE)) {
-    $form['captcha']['captcha_reload'] = array(
-      '#type' => 'submit',
-      '#value' => t('Another challenge'),
-      '#description' => t('Get another challenge'),
-      '#submit' => array('captcha_reload_submit'), // If no javascript action.
-      '#ahah' => array(
-        'path' => 'captcha/js',
-        'wrapper' => 'captcha-challenge',
-        'method' => 'append',
-        'effect' => 'slide',
-      ),
-    );
-  }
-
   return $form;
 }
 
@@ -226,35 +207,4 @@ function captcha_pre_render_place_captcha($form) {
     unset($form['#sorted']);
   }
   return $form;
-}
-
-/**
- * AJAX callback for challenge reload
- */
-function captcha_js() {
-  //TODO: update cached form (form is automatically cached when ahah is set?)
-  $form_id = $_POST['form_id'];
-  $_POST['captcha_challenge_id']; //TODO: remove this unused challenge?
-
-  // Generate challenge for the form (if any) and add it to the form
-  $captcha_elements = _captcha_generate_challenge($form_id);
-  if (!$captcha_elements) {
-    // no CAPTCHA needed for this form_id
-    drupal_json(array('status' => FALSE, 'data' => ''));
-    exit();
-  }
-  // build and render
-  $form = $captcha_elements['captcha'];
-  $form += array(
-    '#post' => $_POST,
-    '#programmed' => FALSE,
-    '#tree' => FALSE,
-    '#parents' => array(),
-  );
-  $form_state = array('submitted' => FALSE);
-  $form = form_builder('captcha_js', $form, $form_state);
-  $output = theme('status_messages') . drupal_render($form['challenge']);
-
-  drupal_json(array('status' => TRUE, 'data' => $output));
-  exit();
 }
