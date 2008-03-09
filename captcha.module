@@ -38,7 +38,7 @@ function captcha_help($path, $arg) {
       $output = '<p>'. t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.',
         array('%adminlinks' => t('Add CAPTCHA administration links to forms'))) .'</p>';
       $output .= '<p>'. t('Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).',
-        array('%skipcaptcha' => 'skip CAPTCHA', '@perm' => url('admin/user/permissions'))) .'</p>';
+        array('%skipcaptcha' => t('skip CAPTCHA'), '@perm' => url('admin/user/permissions'))) .'</p>';
       return $output;
   }
 }
