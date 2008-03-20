@@ -86,6 +86,13 @@ function captcha_menu() {
     'page arguments' => array(5, 6),
     'type' => MENU_CALLBACK,
   );
+  $items['captcha/js'] = array(
+    'file' => 'captcha.pages.inc',
+    'page callback' => 'captcha_js',
+    'access callback' => TRUE, //variable_get('captcha_allow_ajax_reload', TRUE),
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 }
 
