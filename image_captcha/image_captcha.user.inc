@@ -15,11 +15,10 @@ function image_captcha_image($seed=NULL) {
   if (!$seed) {
     return;
   }
-
-  $code = db_result(db_query("SELECT solution FROM {captcha_challenges} WHERE data = '%s'", $seed));
-
-  dvm($code);
-
+  // get the code to draw from $_SESSION
+  $code = $_SESSION['image_captcha'][$seed];
+  // unset the code from $_SESSION to prevent rerendering the CAPTCHA
+  unset($_SESSION['image_captcha'][$seed]);
   // only generate an image if there is an code
   if ($code) {
     // generate the image
