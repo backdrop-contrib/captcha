@@ -43,6 +43,24 @@ function image_captcha_image($seed=NULL) {
   }
 }
 
+
+/**
+ * small helper function for parsing a hexadecimal color to a RGB tuple
+ */
+function _image_captcha_hex_to_rgb($hex) {
+  // handle #RGB format
+  if (strlen($hex) == 4) {
+    $hex = $hex[1] . $hex[1] . $hex[2] . $hex[2] . $hex[3] . $hex[3];
+  }
+  $c = hexdec($hex);
+  $rgb = array();
+  for ($i = 16; $i >= 0; $i -= 8) {
+    $rgb[] = ($c >> $i) & 0xFF;
+  }
+  return $rgb;
+}
+
+
 /**
  * base function for generating a image CAPTCHA
  */
@@ -67,8 +85,9 @@ function _image_captcha_generate_image($code) {
     return FALSE;
   }
 
-  // background
-  $background_color = imagecolorallocate($image, 255, 255, 255);
+  // get background color and paint
+  $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
+  $background_color = imagecolorallocate($image, $background_rgb[0], $background_rgb[1], $background_rgb[2]);
   imagefilledrectangle($image, 0, 0, $width, $height, $background_color);
 
   // draw text
@@ -205,7 +224,12 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
   }
 }
 
-function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text, $light_colors=FALSE) {
+ /**
+ * Helper function for drawing text on the image
+ * 
+ * @param $background_mode if the text is for the background of the double vision mode
+ */
+function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text, $background_mode=FALSE) {
   // get characters
   $characters = _image_captcha_utf8_split($text);
   $character_quantity = count($characters);
@@ -227,6 +251,33 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   // character jittering
   $jittering_x = .3 * $font_size;
   $jittering_y = .3 * $font_size;
+  
+  // get colors
+  $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
+  $foreground_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_foreground_color', '#000000'));
+  // correct foreground for background mode (double vision)
+  if ($background_mode) {
+    for ($i=0; $i<3; $i++) {
+      $foreground_rgb[$i] = 0.75 * $background_rgb[$i] + 0.25 * $foreground_rgb[$i];
+    }
+  }
+  $background_color = imagecolorallocate($image, $background_rgb[0], $background_rgb[1], $background_rgb[2]);
+  $foreground_color = imagecolorallocate($image, $foreground_rgb[0], $foreground_rgb[1], $foreground_rgb[2]);
+  // precalculate the value ranges for color randomness
+  $foreground_randomness = (int)(variable_get('image_captcha_foreground_color_randomness', 100));
+  if ($foreground_randomness) {
+    if ($background_mode) {
+      $foreground_randomness *= .25;
+    }
+    $foreground_color_range = array();
+    for ($i=0; $i<3; $i++) {
+      $foreground_color_range[$i] = array(max(0, $foreground_rgb[$i] - $foreground_randomness), min(255, $foreground_rgb[$i] + $foreground_randomness));
+    }
+  }
+
+  // set default text color
+  $color = $foreground_color;
+
   // start cursor
   $x = $spacing;
   foreach ($characters as $character) {
@@ -238,13 +289,16 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
     }
     // calculate y position
     $y = .5 * ($height - $character_height);
-    // generate random color
-    if ($light_colors) {
-      $color = imagecolorallocate($image, mt_rand(128, 255), mt_rand(128, 255), mt_rand(128, 255));
+    
+    // set text color in case of randomness
+    if ($foreground_randomness) {
+      $color = imagecolorallocate($image,
+        mt_rand($foreground_color_range[0][0], $foreground_color_range[0][1]),
+        mt_rand($foreground_color_range[1][0], $foreground_color_range[1][1]),
+        mt_rand($foreground_color_range[2][0], $foreground_color_range[2][1])
+      );
     }
-    else {
-      $color = imagecolorallocate($image, mt_rand(0, 127), mt_rand(0, 127), mt_rand(0, 127));
-    }
+    
     // add jitter to position
     $pos_x = $x + mt_rand(-$jittering_x, $jittering_x);
     $pos_y = $y + mt_rand(-$jittering_y, $jittering_y);
