@@ -226,32 +226,21 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
 
  /**
  * Helper function for drawing text on the image
- * 
+ *
  * @param $background_mode if the text is for the background of the double vision mode
  */
 function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text, $background_mode=FALSE) {
   // get characters
   $characters = _image_captcha_utf8_split($text);
   $character_quantity = count($characters);
-  // get total width
+
+  // get character width for builtin font
   if ($font == 'BUILTIN') {
     $character_width = imagefontwidth(5);
     $character_height = imagefontheight(5);
-    $textwidth = $character_quantity * $character_width;
+    $bbox = array(0, $character_height, $character_width, $character_height, $character_width, 0, 0, 0);
   }
-  else {
-    $bbox = imagettfbbox($font_size, 0, realpath($font), $text);
-    if (!$bbox) {
-      return FALSE;
-    }
-    $textwidth = $bbox[2] - $bbox[0];
-  }
-  // calculate spacing
-  $spacing = ($width - $textwidth) / ($character_quantity + 1);
-  // character jittering
-  $jittering_x = .3 * $font_size;
-  $jittering_y = .3 * $font_size;
-  
+
   // get colors
   $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
   $foreground_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_foreground_color', '#000000'));
@@ -278,18 +267,32 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   // set default text color
   $color = $foreground_color;
 
-  // start cursor
-  $x = $spacing;
-  foreach ($characters as $character) {
-    // get character dimensions
+  // character box
+  $cbox_width = $width / $character_quantity;
+  $cbox_height = $height;
+
+  foreach ($characters as $c => $character) {
+    // ideal position (without jitterin)
+    $center_x = ($c+.5) * $cbox_width;
+    $center_y = .5 * $height;
+
+    // get character dimensions for ttf fonts
     if ($font != 'BUILTIN') {
       $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
-      $character_width = $bbox[2] - $bbox[0];
-      $character_height = $bbox[5] - $bbox[3];
     }
-    // calculate y position
-    $y = .5 * ($height - $character_height);
-    
+
+    // determine print position
+    $pos_x = $center_x - .5 * ($bbox[0] + $bbox[2]);
+    $pos_y = $center_y - .5 * ($bbox[1] + $bbox[7]);
+
+    // calculate jitter
+    $dev_x = .5 * max(0, 1 * $cbox_width - ($bbox[2] - $bbox[0]));
+    $dev_y = .5 * max(0, 1 * $cbox_height - ($bbox[1] - $bbox[7]));
+
+    // add jitter to position
+    $pos_x = $pos_x + mt_rand($c>0 ? -$dev_x : 0,  $c<$character_quantity-1 ? $dev_x : 0);
+    $pos_y = $pos_y + mt_rand(-$dev_y,$dev_y);
+
     // set text color in case of randomness
     if ($foreground_randomness) {
       $color = imagecolorallocate($image,
@@ -298,10 +301,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
         mt_rand($foreground_color_range[2][0], $foreground_color_range[2][1])
       );
     }
-    
-    // add jitter to position
-    $pos_x = $x + mt_rand(-$jittering_x, $jittering_x);
-    $pos_y = $y + mt_rand(-$jittering_y, $jittering_y);
+
     // draw character
     if ($font == 'BUILTIN') {
       imagestring($image, 5, $pos_x, $pos_y, $character, $color);
@@ -309,9 +309,12 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
     else {
       imagettftext($image, $font_size, 0, $pos_x, $pos_y, $color, realpath($font), $character);
     }
-    // shift cursor
-    $x += $character_width + $spacing;
+
+    // for debugging purposes: draw character bounding box
+    // imagerectangle($image, $pos_x + $bbox[0], $pos_y + $bbox[1], $pos_x + $bbox[2], $pos_y + $bbox[7], $color);
+
   }
+
   // return a sign of success
   return TRUE;
 }
