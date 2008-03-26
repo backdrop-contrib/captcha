@@ -86,12 +86,12 @@ function image_captcha_settings_form() {
       '1.5' => t('large'),
     ),
   );
-  
+
     // color settings
   $form['image_captcha_color_settings'] = array(
     '#type' => 'fieldset',
     '#title' => t('Color settings'),
-    '#description' => t('Configuration of the colors of background and foreground in the image CAPTCHA.'),
+    '#description' => t('Configuration of the background and text colors in the image CAPTCHA.'),
   );
   $form['image_captcha_color_settings']['image_captcha_background_color'] = array(
     '#type' => 'textfield',
@@ -103,15 +103,15 @@ function image_captcha_settings_form() {
   );
   $form['image_captcha_color_settings']['image_captcha_foreground_color'] = array(
     '#type' => 'textfield',
-    '#title' => t('Foreground color'),
-    '#description' => t('Enter the hexadecimal code for the foreground color (e.g. #000 or #004283).'),
+    '#title' => t('Text color'),
+    '#description' => t('Enter the hexadecimal code for the text color (e.g. #000 or #004283).'),
     '#default_value' => variable_get('image_captcha_foreground_color', '#000000'),
     '#maxlength' => 7,
     '#size' => 8,
   );
   $form['image_captcha_color_settings']['image_captcha_foreground_color_randomness'] = array(
     '#type' => 'select',
-    '#title' => t('Additional variation of foreground color'),
+    '#title' => t('Additional variation of text color'),
     '#options' => array(
       0 => t('none'),
       50 => t('small'),
@@ -120,7 +120,7 @@ function image_captcha_settings_form() {
       200 => t('very high'),
     ),
     '#default_value' => (int) variable_get('image_captcha_foreground_color_randomness', 100),
-    '#description' => t('The different characters will have randomized colors in the specified range around the foreground color.'),
+    '#description' => t('The different characters will have randomized colors in the specified range around the text color.'),
   );
 
 
@@ -215,12 +215,12 @@ function image_captcha_settings_form_validate($form, &$form_state) {
   elseif ($font != 'BUILTIN' && (!is_file($font) || !is_readable($font))) {
     form_set_error('image_captcha_font', t('Font does not exist or is not readable.'));
   }
-  
+
   // check color settings
  if (!preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $form_state['values']['image_captcha_background_color'])){
   form_set_error('image_captcha_background_color', t('Background color is not a valid hexadecimal color value.'));
   }
   if (!preg_match('/^#([0-9a-fA-F]{3}){1,2}$/', $form_state['values']['image_captcha_foreground_color'])){
-    form_set_error('image_captcha_foreground_color', t('Foreground color is not a valid hexadecimal color value.'));
+    form_set_error('image_captcha_foreground_color', t('Text color is not a valid hexadecimal color value.'));
   }
 }
