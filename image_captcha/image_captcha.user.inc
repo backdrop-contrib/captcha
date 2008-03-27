@@ -267,13 +267,14 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   // set default text color
   $color = $foreground_color;
 
-  // character box
-  $cbox_width = $width / $character_quantity;
-  $cbox_height = $height;
+  // the image is seperated in different character cages, one for each character
+  // each character will be somewhere inside that cage
+  $ccage_width = $width / $character_quantity;
+  $ccage_height = $height;
 
   foreach ($characters as $c => $character) {
-    // ideal position (without jitterin)
-    $center_x = ($c+.5) * $cbox_width;
+    // initial position of character: in the center of its cage
+    $center_x = ($c+.5) * $ccage_width;
     $center_y = .5 * $height;
 
     // get character dimensions for ttf fonts
@@ -281,19 +282,21 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
     }
 
-    // determine print position
+    // determine print position: at what coordinate should the character be
+    // printed so that the bounding box would be nicely centered in the cage?
     $pos_x = $center_x - .5 * ($bbox[0] + $bbox[2]);
     $pos_y = $center_y - .5 * ($bbox[1] + $bbox[7]);
 
-    // calculate jitter
-    $dev_x = .5 * max(0, 1 * $cbox_width - ($bbox[2] - $bbox[0]));
-    $dev_y = .5 * max(0, 1 * $cbox_height - ($bbox[1] - $bbox[7]));
+    // calculate available room to jitter: how much can the character be moved
+    // so that it stays inside its cage?
+    $dev_x = .5 * max(0, $ccage_width - ($bbox[2] - $bbox[0]));
+    $dev_y = .5 * max(0, $ccage_height - ($bbox[1] - $bbox[7]));
 
     // add jitter to position
-    $pos_x = $pos_x + mt_rand($c>0 ? -$dev_x : 0,  $c<$character_quantity-1 ? $dev_x : 0);
-    $pos_y = $pos_y + mt_rand(-$dev_y,$dev_y);
+    $pos_x = $pos_x + mt_rand(-$dev_x, $dev_x);
+    $pos_y = $pos_y + mt_rand(-$dev_y, $dev_y);
 
-    // set text color in case of randomness
+    // calculate text color in case of randomness
     if ($foreground_randomness) {
       $color = imagecolorallocate($image,
         mt_rand($foreground_color_range[0][0], $foreground_color_range[0][1]),
