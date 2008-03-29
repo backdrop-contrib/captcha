@@ -233,7 +233,7 @@ function captcha_point_admin_form($form_state, $captcha_point_form_id=NULL) {
  * validation function for captcha_point_admin_form
  */
 function captcha_point_admin_form_validate($form, $form_state) {
-  if (!preg_match('/^[a-z_]+$/', $form_state['values']['captcha_point_form_id'])) {
+  if (!preg_match('/^[a-z0-9_]+$/', $form_state['values']['captcha_point_form_id'])) {
     form_set_error('captcha_point_form_id', t('Illegal form_id'));
   }
 }
