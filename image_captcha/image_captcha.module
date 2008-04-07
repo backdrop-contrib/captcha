@@ -34,6 +34,7 @@ function image_captcha_menu() {
     'file' => 'image_captcha.admin.inc',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('image_captcha_settings_form'),
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_LOCAL_TASK,
   );
   // callback for generating an image

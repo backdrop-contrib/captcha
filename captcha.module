@@ -62,11 +62,13 @@ function captcha_menu() {
   // alternative CAPTCHA types and their own configuration page as local task)
   $items['admin/user/captcha/captcha'] = array(
     'title' => 'CAPTCHA',
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -20,
   );
   $items['admin/user/captcha/captcha/settings'] = array(
     'title' => 'General settings',
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => 0,
   );
@@ -76,6 +78,7 @@ function captcha_menu() {
     'file' => 'captcha.admin.inc',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('captcha_examples', 5, 6),
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_LOCAL_TASK,
     'weight' => 5,
   );
@@ -84,6 +87,7 @@ function captcha_menu() {
     'file' => 'captcha.admin.inc',
     'page callback' => 'captcha_point_admin',
     'page arguments' => array(5, 6),
+    'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_CALLBACK,
   );
   return $items;
