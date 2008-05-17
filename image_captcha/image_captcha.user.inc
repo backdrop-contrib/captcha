@@ -224,7 +224,7 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
   }
 }
 
- /**
+/**
  * Helper function for drawing text on the image
  *
  * @param $background_mode if the text is for the background of the double vision mode

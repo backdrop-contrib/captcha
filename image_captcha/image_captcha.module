@@ -102,7 +102,7 @@ function _image_captcha_utf8_split($str) {
 /**
  * Implementation of hook_captcha
  */
-function image_captcha_captcha($op, $captcha_type='') {
+function image_captcha_captcha($op, $captcha_type='', $response='') {
   switch ($op) {
     case 'list':
       // only offer image CAPTCHA if possible to generate an image CAPTCHA
@@ -113,6 +113,7 @@ function image_captcha_captcha($op, $captcha_type='') {
       else {
         return array();
       }
+
     case 'generate':
       if ($captcha_type == 'Image') {
         // In offline mode, the image CAPTCHA does not work because the request
@@ -129,11 +130,25 @@ function image_captcha_captcha($op, $captcha_type='') {
         for ($i = 0; $i < $code_length; $i++) {
           $code .= $allowed_chars[array_rand($allowed_chars)];
         }
+
         // store the answer in $_SESSION for the image generator function (which happens in another http request)
         $seed = mt_rand();
         $_SESSION['image_captcha'][$seed] = $code;
+
         // build the result to return
         $result = array();
+
+        // Handle the case insesitivity option and change the code to lower case
+        // before saving it as solution.
+        if (variable_get('image_captcha_case_insensitive', FALSE)) {
+          $code = strtolower($code);
+          $result['preprocess'] = TRUE;
+          $description = t('Enter the characters shown in the image without spaces.');
+        }
+        else {
+          $description = t('Enter the characters shown in the image without spaces, also respect upper and lower case.');
+        }
+
         $result['solution'] = $code;
         $result['form']['captcha_image'] = array(
           '#type' => 'markup',
@@ -143,12 +158,18 @@ function image_captcha_captcha($op, $captcha_type='') {
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => t('What code is in the image?'),
-          '#description' => t('Copy the characters (respecting upper/lower case) from the image.'),
+          '#description' => $description,
           '#weight' => 0,
           '#required' => TRUE,
           '#size' => 15,
         );
         return $result;
+      }
+
+    case 'preprocess':
+      // Preprocessing the response for case insesitive validation
+      if ($captcha_type == 'Image') {
+        return strtolower($response);
       }
     break;
   }

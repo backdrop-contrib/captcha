@@ -42,6 +42,13 @@ function image_captcha_settings_form() {
     '#default_value' => (int) variable_get('image_captcha_code_length', 5),
     '#description' => t('The code length influences the size of the image. Note that larger values make the image generation more CPU intensive.'),
   );
+  // Option fo case insensitive validation
+  $form['image_captcha_code_settings']['image_captcha_case_insensitive'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Case insensitive validation'),
+    '#description' => t('Enable this option to ignore uppercase/lowercase errors in the response. This can be usefull for adapting the challenge to your audience or for certain fonts where the differences between upper and lower case are too small.'),
+    '#default_value' => variable_get('image_captcha_case_insensitive', FALSE),
+  );
 
   // font related stuff
   $form['image_captcha_font_settings'] = array(
