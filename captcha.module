@@ -183,7 +183,11 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
 
     // Add a validation function for the CAPTCHA form element.
-    $form['#validate'][] = 'captcha_validate';
+    // It is put in front of the list of the validation callbacks (if any).
+    // This is needed for user login protection, where the login is done in
+    // a validation callback (user_login_authenticate_validate), so
+    // captcha_validate() needs to run before that.
+    $form['#validate'] = array_merge(array('captcha_validate'), (array)($form['#validate']));
 
   }
   elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE) && arg(0) != 'admin') {
