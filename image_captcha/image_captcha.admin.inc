@@ -168,7 +168,7 @@ function image_captcha_settings_form() {
   // noise
   $form['image_captcha_distortion_and_noise']['image_captcha_dot_noise'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Add salt and peper noise'),
+    '#title' => t('Add salt and pepper noise'),
     '#default_value' => variable_get('image_captcha_dot_noise', 0),
     '#description' => t('This option adds randomly colored point noise.'),
   );

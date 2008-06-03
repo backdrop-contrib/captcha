@@ -270,7 +270,7 @@ msgstr ""
 msgid "@x + @y = "
 msgstr ""
 
-#: (duplicate) captcha.module:116 
+#: (duplicate) captcha.module:116
 msgid "Already @counter blocked form submissions"
 msgstr ""
 
@@ -439,7 +439,7 @@ msgid "When enabled, characters appear twice in the image, overlayed onto each o
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:127
-msgid "Add salt and peper noise"
+msgid "Add salt and pepper noise"
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:129
@@ -509,4 +509,3 @@ msgstr ""
 #: image_captcha/image_captcha.info:0
 msgid "Provides an image based CAPTCHA."
 msgstr ""
-
