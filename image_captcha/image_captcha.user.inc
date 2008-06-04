@@ -134,7 +134,7 @@ function _image_captcha_generate_image($code) {
     }
 
     if (variable_get('image_captcha_bilinair_interpolation', FALSE)) {
-      // distortion with bilineair interpolation
+      // distortion with bilinear interpolation
       for ($x = 0; $x < $width; $x++) {
         for ($y = 0; $y < $height; $y++) {
           // get distorted sample point in source image
@@ -148,7 +148,7 @@ function _image_captcha_generate_image($code) {
             $color = $background_color;
           }
           else {
-            // bilineair interpolation: sample at four corners
+            // bilinear interpolation: sample at four corners
             $color_00 = imagecolorat($image, $sxf  , $syf  );
             $color_00_r = ($color_00 >> 16) & 0xFF;
             $color_00_g = ($color_00 >> 8) & 0xFF;

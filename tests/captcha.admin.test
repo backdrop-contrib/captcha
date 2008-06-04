@@ -7,12 +7,12 @@
 class CaptchaAdminTest extends DrupalTestCase {
 
   /**
-   * User with CAPTCHA adminstration permission
+   * User with CAPTCHA administration permission
    */
   var $admin_user;
 
   /**
-   * User without CAPTCHA adminstration permission
+   * User without CAPTCHA administration permission
    */
   var $normal_user;
 

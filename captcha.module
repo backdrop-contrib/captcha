@@ -83,7 +83,7 @@ function captcha_menu() {
     'weight' => 5,
   );
   $items['admin/user/captcha/captcha/captcha_point'] = array(
-    'title' => 'CAPTCHA point adminstration',
+    'title' => 'CAPTCHA point administration',
     'file' => 'captcha.admin.inc',
     'page callback' => 'captcha_point_admin',
     'page arguments' => array(5, 6),

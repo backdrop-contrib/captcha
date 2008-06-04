@@ -427,7 +427,7 @@ msgid "Smooth distortion"
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:115
-msgid "This option enables bilineair interpolation of the distortion which makes the image look smoother, but it is more CPU intensive."
+msgid "This option enables bilinear interpolation of the distortion which makes the image look smoother, but it is more CPU intensive."
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:120
@@ -435,7 +435,7 @@ msgid "Double vision"
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:122
-msgid "When enabled, characters appear twice in the image, overlayed onto each other."
+msgid "When enabled, characters appear twice in the image, overlaid onto each other."
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:127
@@ -483,7 +483,7 @@ msgid "Generation of image CAPTCHA failed. Check your image CAPTCHA configuratio
 msgstr ""
 
 #: image_captcha/image_captcha.module:16
-msgid "The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be carefull with the size and computation related settings."
+msgid "The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be careful with the size and computation related settings."
 msgstr ""
 
 #: image_captcha/image_captcha.module:20

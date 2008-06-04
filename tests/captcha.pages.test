@@ -7,7 +7,7 @@
 class CaptchaPagesTest extends DrupalTestCase {
 
   /**
-   * User with CAPTCHA adminstration permission
+   * User with CAPTCHA administration permission
    */
   var $admin_user;
 

@@ -156,14 +156,14 @@ function image_captcha_settings_form() {
     '#type' => 'checkbox',
     '#title' => t('Smooth distortion'),
     '#default_value' => variable_get('image_captcha_bilinair_interpolation', FALSE),
-    '#description' => t('This option enables bilineair interpolation of the distortion which makes the image look smoother, but it is more CPU intensive.'),
+    '#description' => t('This option enables bilinear interpolation of the distortion which makes the image look smoother, but it is more CPU intensive.'),
   );
   //double vision
   $form['image_captcha_distortion_and_noise']['image_captcha_double_vision'] = array(
     '#type' => 'checkbox',
     '#title' => t('Double vision'),
     '#default_value' => variable_get('image_captcha_double_vision', 0),
-    '#description' => t('When enabled, characters appear twice in the image, overlayed onto each other.'),
+    '#description' => t('When enabled, characters appear twice in the image, overlaid onto each other.'),
   );
   // noise
   $form['image_captcha_distortion_and_noise']['image_captcha_dot_noise'] = array(
