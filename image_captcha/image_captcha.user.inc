@@ -15,12 +15,11 @@ function image_captcha_image($seed=NULL) {
   if (!$seed) {
     return;
   }
-  // get the code to draw from $_SESSION
-  $code = $_SESSION['image_captcha'][$seed];
-  // unset the code from $_SESSION to prevent rerendering the CAPTCHA
-  unset($_SESSION['image_captcha'][$seed]);
-  // only generate an image if there is an code
-  if ($code) {
+  // Only generate captcha if code exists in the session.
+  if (isset($_SESSION['image_captcha'][$seed])) {
+    $code = $_SESSION['image_captcha'][$seed];
+    // Unset the code from $_SESSION to prevent rerendering the CAPTCHA.
+    unset($_SESSION['image_captcha'][$seed]);
     // generate the image
     $image = @_image_captcha_generate_image($code);
     // check of generation was successful
