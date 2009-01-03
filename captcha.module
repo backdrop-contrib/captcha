@@ -10,10 +10,14 @@
  *
  */
 
-define('CAPTCHA_UNSOLVED_CHALLENGES_MAX', 20);
+define('CAPTCHA_UNSOLVED_CHALLENGES_MAX', 20); //TODO: remove this?
 define('CAPTCHA_PERSISTENCE_SHOW_ALWAYS', 1);
 define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM', 2);
 define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL', 3);
+
+define('CAPTCHA_STATUS_UNSOLVED', 0);
+define('CAPTCHA_STATUS_SOLVED', 1);
+define('CAPTCHA_STATUS_EXAMPLE', 2);
 
 /**
  * Implementation of hook_help().
@@ -131,11 +135,11 @@ function captcha_theme() {
 /**
  * Implementation of hook_cron().
  *
- * Remove old entries from captcha_challenges table.
+ * Remove old entries from captcha_sessions table.
  */
 function captcha_cron() {
-  // remove challenges older than 1 hour
-  db_query('DELETE FROM {captcha_challenges} WHERE timestamp < %d', time() - 3600);
+  // remove challenges older than 1 day
+  db_query('DELETE FROM {captcha_sessions} WHERE timestamp < %d', time() - 60*60*24);
 }
 
 /**
@@ -168,27 +172,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip the CAPTCHA
     require_once('captcha.pages.inc');
-
-    // Generate challenge for the form (if any) and add it to the form
-    $captcha_elements = _captcha_generate_challenge($form_id);
-    if (!$captcha_elements) {
-      // no CAPTCHA needed for this form_id
-      return;
-    }
-    $form['captcha'] = $captcha_elements['captcha'];
-
-    // Add pre_render function for additional CAPTCHA processing.
-    $form['#pre_render'][] = 'captcha_pre_render';
-    // Add pre_render function for placement of CAPTCHA formt element (above submit buttons).
-    $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
-
-    // Add a validation function for the CAPTCHA form element.
-    // It is put in front of the list of the validation callbacks (if any).
-    // This is needed for user login protection, where the login is done in
-    // a validation callback (user_login_authenticate_validate), so
-    // captcha_validate() needs to run before that.
-    $form['#validate'] = array_merge(array('captcha_validate'), (array)($form['#validate']));
-
+    _captcha_form_alter_untrusted_user($form, $form_state, $form_id);
   }
   elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE) && arg(0) != 'admin') {
     // For administrators: show CAPTCHA info and offer link to configure it
