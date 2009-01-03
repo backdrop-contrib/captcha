@@ -9,17 +9,18 @@
  */
 
 /**
- * menu callback function that generates the CAPTCHA image
+ * Menu callback function that generates the CAPTCHA image.
  */
-function image_captcha_image($seed=NULL) {
-  if (!$seed) {
-    return;
+function image_captcha_image($captcha_sid=NULL) {
+  if (!$captcha_sid) {
+    exit();
   }
+  
+  // Get solution (the code to show).
+  $code = db_result(db_query("SELECT solution FROM {captcha_sessions} WHERE csid = %d", (int)($captcha_sid)));
+
   // Only generate captcha if code exists in the session.
-  if (isset($_SESSION['image_captcha'][$seed])) {
-    $code = $_SESSION['image_captcha'][$seed];
-    // Unset the code from $_SESSION to prevent rerendering the CAPTCHA.
-    unset($_SESSION['image_captcha'][$seed]);
+  if ($code !== FALSE) {
     // generate the image
     $image = @_image_captcha_generate_image($code);
     // check of generation was successful
@@ -38,8 +39,8 @@ function image_captcha_image($seed=NULL) {
     imagejpeg($image);
     // Clean up
     imagedestroy($image);
-    exit();
   }
+  exit();
 }
 
 

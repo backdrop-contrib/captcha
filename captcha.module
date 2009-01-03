@@ -171,7 +171,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
 
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip the CAPTCHA
-    require_once('captcha.pages.inc');
+    require_once('./'. drupal_get_path('module', 'captcha') .'/captcha.pages.inc');
     _captcha_form_alter_untrusted_user($form, $form_state, $form_id);
   }
   elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE) && arg(0) != 'admin') {
@@ -210,6 +210,23 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
     // Add pre_render function for placement of CAPTCHA formt element (above submit buttons).
     $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
   }
+}
+
+/**
+ * Helper function for generating a new CAPTCHA session ID
+ */
+function _captcha_generate_captcha_session($status=CAPTCHA_STATUS_UNSOLVED) {
+  global $user;
+  db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), time(), $form_id, '', $status, 0);
+  $captcha_sid = db_last_insert_id('captcha_sessions', 'csid');
+  return $captcha_sid;
+}
+
+/**
+ * Helper function for updating the solution in the CAPTCHA session table.
+ */
+function _captcha_update_captcha_session($captcha_sid, $solution) {
+  db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", time(), $solution, $captcha_sid);
 }
 
 /**

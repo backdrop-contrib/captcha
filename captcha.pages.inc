@@ -1,7 +1,6 @@
 <?php
 // $Id$
 
-
 /**
  * Form alter phase of form processing for untrusted users.
  */
@@ -26,16 +25,15 @@ function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id) {
   && isset($form_state['post']['captcha_sid'])) {
     $captcha_sid = $form_state['post']['captcha_sid'];
   } else {
-    // New CAPTCHA session.
-    global $user;
-    db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), time(), $form_id, '', CAPTCHA_STATUS_UNSOLVED, 0);
-    $captcha_sid = db_last_insert_id('captcha_sessions', 'csid');
+    // Generate new CAPTCHA session.
+    $captcha_sid = _captcha_generate_captcha_session(CAPTCHA_STATUS_UNSOLVED);
   }
 
   if (_captcha_required_for_user($captcha_sid, $form_id)) {
 
-    // Generate a CAPTCHA and its solution
-    $captcha = module_invoke($captcha_point->module, 'captcha', 'generate', $captcha_point->type);
+    // Generate a CAPTCHA and its solution (note that the CAPTCHA session ID
+    // is given as thrid argument.
+    $captcha = module_invoke($captcha_point->module, 'captcha', 'generate', $captcha_point->type, $captcha_sid);
     if (!$captcha) {
       // The selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and then quit.
       watchdog('CAPTCHA',
@@ -109,18 +107,19 @@ function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id) {
 function _captcha_required_for_user($captcha_sid, $form_id) {
   $captcha_session_status = db_result(db_query("SELECT status FROM {captcha_sessions} WHERE csid = %d", $captcha_sid));
 
+  $captcha_success_form_ids = (array)($_SESSION['captcha_success_form_ids']);
   switch (variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS)) {
     case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL:
-      $captcha_persistence_status = isset($_SESSION['captcha_success_form_ids']) && (count($_SESSION['captcha_success_form_ids']) > 0);
+      $captcha_persistence_status = (count($captcha_success_form_ids) > 0);
       break;
     case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM:
-      $captcha_persistence_status = isset($_SESSION['captcha_success_form_ids'][$form_id]);
+      $captcha_persistence_status = isset($captcha_success_form_ids[$form_id]);
       break;
     default:
       $captcha_persistence_status = FALSE;
   }
 
-  return !($captcha_session_status || $captcha_persistence_status);
+  return ($captcha_session_status == CAPTCHA_STATUS_UNSOLVED) && !$captcha_persistence_status;
 }
 
 /**
@@ -141,16 +140,14 @@ function captcha_validate($form, &$form_state) {
   // the csid of the posted form.
   $csid = $form_state['clicked_button']['#post']['captcha_sid'];
 
-  $solution = db_result(db_query('SELECT solution FROM {captcha_sessions} WHERE csid = %d', $csid));
+  $solution = db_result(db_query('SELECT solution FROM {captcha_sessions} WHERE csid = %d, status = %d', $csid, CAPTCHA_STATUS_UNSOLVED));
 
   if ($solution === FALSE) {
-    // unknown challenge_id
+    // Unknown challenge_id.
     form_set_error('captcha', t('CAPTCHA test failed (unknown csid).'));
   }
   else {
-    // Unset the solution to prevent reuse of the same CAPTCHA solution
-
-    // Check answer
+    // Check answer.
     if ($captcha_response == $solution) {
       // Correct answer.
       $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
@@ -197,7 +194,7 @@ function captcha_pre_render_untrusted_user($form) {
 
   if (_captcha_required_for_user($captcha_sid, $form_id)) {
     // Update captcha_sessions table.
-    db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", time(), $captcha_info['solution'], $captcha_sid);
+    _captcha_update_captcha_session($captcha_sid, $captcha_info['solution']);
   }
   else {
     // Remove CAPTCHA widgets from form.

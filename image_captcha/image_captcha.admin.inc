@@ -46,7 +46,7 @@ function image_captcha_settings_form() {
   $form['image_captcha_code_settings']['image_captcha_case_insensitive'] = array(
     '#type' => 'checkbox',
     '#title' => t('Case insensitive validation'),
-    '#description' => t('Enable this option to ignore uppercase/lowercase errors in the response. This can be usefull for adapting the challenge to your audience or for certain fonts where the differences between upper and lower case are too small.'),
+    '#description' => t('Enable this option to ignore uppercase/lowercase errors in the response. This can be usefull for certain target audiences or fonts.'),
     '#default_value' => variable_get('image_captcha_case_insensitive', FALSE),
   );
 
