@@ -140,7 +140,7 @@ function captcha_validate($form, &$form_state) {
   // the csid of the posted form.
   $csid = $form_state['clicked_button']['#post']['captcha_sid'];
 
-  $solution = db_result(db_query('SELECT solution FROM {captcha_sessions} WHERE csid = %d, status = %d', $csid, CAPTCHA_STATUS_UNSOLVED));
+  $solution = db_result(db_query('SELECT solution FROM {captcha_sessions} WHERE csid = %d AND status = %d', $csid, CAPTCHA_STATUS_UNSOLVED));
 
   if ($solution === FALSE) {
     // Unknown challenge_id.
