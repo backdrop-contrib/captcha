@@ -188,6 +188,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       '#collapsed' => TRUE,
     );
     if ($captcha_point && $captcha_point->type) {
+      $form['captcha']['#title'] = t('CAPTCHA: "@type" enabled', array('@type' => $captcha_point->type));
       $form['captcha']['#description'] = t('Untrusted users will see a CAPTCHA here (!settings).',
         array('!settings' => l(t('general CAPTCHA settings'), 'admin/user/captcha'))
       );
@@ -203,6 +204,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       );
     }
     else {
+      $form['captcha']['#title'] = t('CAPTCHA: no challenge enabled');
       $form['captcha']['add_captcha'] = array(
         '#value' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/user/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination()))
       );
