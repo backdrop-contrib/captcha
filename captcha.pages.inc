@@ -94,6 +94,7 @@ function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id) {
       'type' => $captcha_point->type,
       'captcha_sid' => $captcha_sid,
       'solution' => $captcha['solution'],
+      'preprocess' => isset($captcha['preprocess'])? $captcha['preprocess'] : FALSE,
     ),
   );
 
