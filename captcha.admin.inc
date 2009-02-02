@@ -26,33 +26,35 @@ function _captcha_available_challenge_types() {
  * Form builder function for the general CAPTCHA configuration
  */
 function captcha_admin_settings() {
-  // Field set with overview of form_ids and their challenge.
-  $form['captcha_form_id_overview'] = array(
+  // Configuration of which forms to protect, with what challenge.
+  $form['captcha_form_protection'] = array(
     '#type' => 'fieldset',
     '#title' => t('Form protection'),
-    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with the help of the \'%CAPTCHA_admin_links\' option or the <a href="!add_captcha_point">the CAPTCHA point form</a>.',
-      array('%CAPTCHA_admin_links' => t('Add CAPTCHA administration links to forms'),
-        '!add_captcha_point' => url('admin/user/captcha/captcha/captcha_point'))),
+    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with textfield at the bottom of the table or with the help of the \'%CAPTCHA_admin_links\' option below.',
+      array('%CAPTCHA_admin_links' => t('Add CAPTCHA administration links to forms'))
+      ),
+  );
+  // List known form_ids.
+  $form['captcha_form_protection']['captcha_form_id_overview'] = array(
     '#theme' => 'captcha_admin_settings_captcha_points',
     '#tree' => TRUE,
   );
-  // List known form_ids.
-  $form['captcha_form_id_overview']['captcha_captcha_points'] = array();
+  $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'] = array();
   $captcha_types = _captcha_available_challenge_types();
   $result = db_query("SELECT * FROM {captcha_points} ORDER BY form_id");
   while ($captcha_point = db_fetch_object($result)) {
-    $form['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id] = array();
-    $form['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['form_id'] = array(
+    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id] = array();
+    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['form_id'] = array(
       '#value' => $captcha_point->form_id,
     );
     // Select widget for CAPTCHA type.
-    $form['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['captcha_type'] = array(
+    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['captcha_type'] = array(
       '#type' => 'select',
       '#default_value' => isset($captcha_point->module) ? "{$captcha_point->module}/{$captcha_point->type}": "none",
       '#options' => $captcha_types,
     );
     // Additional operations.
-    $form['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['operations'] = array(
+    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id]['operations'] = array(
       '#value' => implode(", ", array(
         l(t('delete'), "admin/user/captcha/captcha/captcha_point/{$captcha_point->form_id}/delete"),
       ))
@@ -60,21 +62,21 @@ function captcha_admin_settings() {
   }
 
   // Form items for new form_id.
-  $form['captcha_form_id_overview']['captcha_new_captcha_point'] = array();
+  $form['captcha_form_protection']['captcha_form_id_overview']['captcha_new_captcha_point'] = array();
   // Textfield for form_id.
-  $form['captcha_form_id_overview']['captcha_new_captcha_point']['form_id'] = array(
+  $form['captcha_form_protection']['captcha_form_id_overview']['captcha_new_captcha_point']['form_id'] = array(
     '#type' => 'textfield',
     '#size' => 16,
   );
   // Select widget for CAPTCHA type.
-  $form['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'] = array(
+  $form['captcha_form_protection']['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'] = array(
     '#type' => 'select',
     '#default_value' => "{$captcha_point->module}/{$captcha_point->type}",
     '#options' => $captcha_types,
   );
 
   // Field for the CAPTCHA administration mode
-  $form['captcha_administration_mode'] = array(
+  $form['captcha_form_protection']['captcha_administration_mode'] = array(
     '#type' => 'checkbox',
     '#title' => t('Add CAPTCHA administration links to forms'),
     '#default_value' => variable_get('captcha_administration_mode', FALSE),
