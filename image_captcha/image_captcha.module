@@ -2,6 +2,7 @@
 // $Id$
 
 /**
+ * @file
  * Implementation of image CAPTCHA for use with the CAPTCHA module
  */
 
@@ -101,7 +102,7 @@ function _image_captcha_utf8_split($str) {
 }
 
 /**
- * Implementation of hook_captcha
+ * Implementation of hook_captcha().
  */
 function image_captcha_captcha($op, $captcha_type='', $arg3='') {
   switch ($op) {

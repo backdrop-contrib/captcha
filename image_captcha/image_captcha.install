@@ -1,6 +1,11 @@
 <?php
 // $Id$
 
+/*
+ * @file
+ * Installation/uninstallation related functions for the image_captcha module.
+ */
+
 /**
  * On uninstall: remove module variables and clear variable cache
  */

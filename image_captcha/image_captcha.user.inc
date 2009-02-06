@@ -2,7 +2,8 @@
 // $Id$
 
 /**
- * Implementation of image CAPTCHA for use with the CAPTCHA module
+ * @file
+ * Functions for the generation of the CAPTCHA image.
  *
  * Loosely Based on MyCaptcha by Heine Deelstra
  * (http://heine.familiedeelstra.com/mycaptcha-download)
@@ -15,7 +16,7 @@ function image_captcha_image($captcha_sid=NULL) {
   if (!$captcha_sid) {
     exit();
   }
-  
+
   // Get solution (the code to show).
   $code = db_result(db_query("SELECT solution FROM {captcha_sessions} WHERE csid = %d", (int)($captcha_sid)));
 
@@ -45,7 +46,7 @@ function image_captcha_image($captcha_sid=NULL) {
 
 
 /**
- * small helper function for parsing a hexadecimal color to a RGB tuple
+ * Small helper function for parsing a hexadecimal color to a RGB tuple.
  */
 function _image_captcha_hex_to_rgb($hex) {
   // handle #RGB format
@@ -62,7 +63,7 @@ function _image_captcha_hex_to_rgb($hex) {
 
 
 /**
- * base function for generating a image CAPTCHA
+ * Base function for generating a image CAPTCHA.
  */
 function _image_captcha_generate_image($code) {
   // get font
@@ -225,9 +226,9 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
 }
 
 /**
- * Helper function for drawing text on the image
+ * Helper function for drawing text on the image.
  *
- * @param $background_mode if the text is for the background of the double vision mode
+ * @param $background_mode if the text is for the background of the double vision mode.
  */
 function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text, $background_mode=FALSE) {
   // get characters
@@ -256,7 +257,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   $foreground_randomness = (int)(variable_get('image_captcha_foreground_color_randomness', 100));
   if ($foreground_randomness) {
     if ($background_mode) {
-      $foreground_randomness *= .25;
+      $foreground_randomness *= 0.25;
     }
     $foreground_color_range = array();
     for ($i=0; $i<3; $i++) {
@@ -274,8 +275,8 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
 
   foreach ($characters as $c => $character) {
     // initial position of character: in the center of its cage
-    $center_x = ($c+.5) * $ccage_width;
-    $center_y = .5 * $height;
+    $center_x = ($c + 0.5) * $ccage_width;
+    $center_y = 0.5 * $height;
 
     // get character dimensions for ttf fonts
     if ($font != 'BUILTIN') {
