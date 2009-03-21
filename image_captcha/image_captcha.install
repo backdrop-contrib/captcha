@@ -7,6 +7,19 @@
  */
 
 /**
+ * Implementation of hook_update_N()
+ */
+function image_captcha_update_6201() {
+  // Fixing a typo in a variable.
+  $old = 'image_captcha_bilinair_interpolation';
+  $new = 'image_captcha_bilinear_interpolation';
+  variable_set($new, variable_get($old, FALSE));
+  variable_del($old);
+  $items = array();
+  return $items;
+}
+
+/**
  * On uninstall: remove module variables and clear variable cache
  */
 function image_captcha_uninstall() {

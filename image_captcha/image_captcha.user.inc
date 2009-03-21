@@ -134,7 +134,7 @@ function _image_captcha_generate_image($code) {
       return FALSE;
     }
 
-    if (variable_get('image_captcha_bilinair_interpolation', FALSE)) {
+    if (variable_get('image_captcha_bilinear_interpolation', FALSE)) {
       // distortion with bilinear interpolation
       for ($x = 0; $x < $width; $x++) {
         for ($y = 0; $y < $height; $y++) {

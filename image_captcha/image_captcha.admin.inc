@@ -157,10 +157,10 @@ function image_captcha_settings_form() {
     '#default_value' => (int) variable_get('image_captcha_distortion_amplitude', 6),
     '#description' => t('Set the degree of wave distortion in the image.'),
   );
-  $form['image_captcha_distortion_and_noise']['image_captcha_bilinair_interpolation'] = array(
+  $form['image_captcha_distortion_and_noise']['image_captcha_bilinear_interpolation'] = array(
     '#type' => 'checkbox',
     '#title' => t('Smooth distortion'),
-    '#default_value' => variable_get('image_captcha_bilinair_interpolation', FALSE),
+    '#default_value' => variable_get('image_captcha_bilinear_interpolation', FALSE),
     '#description' => t('This option enables bilinear interpolation of the distortion which makes the image look smoother, but it is more CPU intensive.'),
   );
   //double vision
