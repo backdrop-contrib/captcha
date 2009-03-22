@@ -19,7 +19,7 @@ function image_captcha_help($path, $arg) {
         require_once('./'. drupal_get_path('module', 'captcha') .'/captcha.admin.inc');
         $captcha = _captcha_generate_example_challenge('image_captcha', 'Image');
         $img = $captcha['captcha_image']['#value'];
-        $output .= t('<p>Example image, generated with the current settings:</p>!img', array('!img' => $img));
+        $output .= '<p>'. t('Example image, generated with the current settings:') .'</p>'. $img;
       }
       return $output;
   }

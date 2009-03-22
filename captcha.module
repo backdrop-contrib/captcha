@@ -114,7 +114,11 @@ function captcha_requirements($phase) {
     // show the wrong response counter in the status report
     $requirements['captcha_wrong_response_counter'] = array(
       'title' => $t('CAPTCHA'),
-      'value' => $t('Already @counter blocked form submissions', array('@counter' => variable_get('captcha_wrong_response_counter', 0))),
+      'value' => format_plural(
+        variable_get('captcha_wrong_response_counter', 0),
+        'Already 1 blocked form submission',
+        'Already @count blocked form submissions'
+      ),
       'severity' => REQUIREMENT_INFO,
     );
   }
