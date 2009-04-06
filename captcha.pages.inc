@@ -2,102 +2,159 @@
 // $Id$
 
 /**
- * Form alter phase of form processing for untrusted users.
+ * Implementation of a part of hook_form_alter for untrusted users.
  */
-function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id) {
+function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id, $captcha_point) {
 
-  // Get CAPTCHA type and module for given form_id. Return if no CAPTCHA was set.
-  $captcha_point = db_fetch_object(db_query("SELECT module, type FROM {captcha_points} WHERE form_id = '%s'", $form_id));
-  if (!$captcha_point || !$captcha_point->type) {
-    return;
-  }
+  $captcha_element = array(
+    '#type' => 'captcha',
+    '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
+  );
+  $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
+  _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
 
-    // Prevent caching of the page with this CAPTCHA enabled form.
-  // This needs to be done even if the CAPTCHA will be skipped later:
-  // other untrusted users should not get a cached page when
-  // the current untrusted user can skip the current CAPTCHA.
-  global $conf;
-  $conf['cache'] = FALSE;
+}
 
-  // Retrieve or generate CAPTCHA session ID.
-  if (isset($form_state['post']['form_id'])
-  && $form_state['post']['form_id'] == $form_id
-  && isset($form_state['post']['captcha_sid'])) {
-    $captcha_sid = $form_state['post']['captcha_sid'];
-  } else {
-    // Generate new CAPTCHA session.
-    $captcha_sid = _captcha_generate_captcha_session(CAPTCHA_STATUS_UNSOLVED);
-  }
 
-  if (_captcha_required_for_user($captcha_sid, $form_id)) {
+/**
+ * Helper function to get placement information for a given form_id.
+ * @param $form_id the form_id to get the placement information for.
+ * @param $form if a form corresponding to the given form_id, if there
+ *   is no placement info for the given form_id, this form is examined to
+ *   guess the placement.
+ * @return placement info array (@see _captcha_insert_captcha_element() for more
+ *   info about the fields 'path', 'key' and 'weight'.
+ */
+function _captcha_get_captcha_placement($form_id, $form) {
+  // Get CAPTCHA placement map from cache. Two levels of cache:
+  // static variable in this function and storage in the variables table.
+  static $placement_map = NULL;
+  // Try first level cache.
+  if ($placement_map === NULL) {
+    // If first level cache missed: try second level cache.
+    $placement_map = variable_get('captcha_placement_map_cache', NULL);
+    // TODO: add UI in admin UI for flushing this cache.
 
-    // Generate a CAPTCHA and its solution (note that the CAPTCHA session ID
-    // is given as thrid argument.
-    $captcha = module_invoke($captcha_point->module, 'captcha', 'generate', $captcha_point->type, $captcha_sid);
-    if (!$captcha) {
-      // The selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and then quit.
-      watchdog('CAPTCHA',
-        'CAPTCHA problem: hook_captcha() of module %module returned nothing when trying to retrieve challenge type %type for form %form_id.',
-        array('%type' => $captcha_point->type, '%module' => $captcha_point->module, '%form_id' => $form_id),
-        WATCHDOG_ERROR);
-      return;
+    if ($placement_map === NULL) {
+      // If second level cache missed: start from a fresh placement map.
+      $placement_map = array();
+      // TODO: prefill with some hard coded default entries as follows?
+      // $placement_map['comment_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
+      // $placement_map['user_login'] = array('path' => array(), 'key' => NULL, 'weight' => 1.9);
+      // TODO: also make the placement 'overridable' from the admin UI?
     }
+  }
 
-    // Add a CAPTCHA part to the form (depends on value of captcha_description).
-    $captcha_description = _captcha_get_description();
-    if ($captcha_description) {
-      // $captcha_description is not empty: CAPTCHA part is a fieldset with description.
-      $form['captcha']['captcha_widgets'] = array(
-        '#type' => 'fieldset',
-        '#title' => t('CAPTCHA'),
-        '#description' => $captcha_description,
-        '#attributes' => array('class' => 'captcha'),
+  // Query the placement map.
+  if (array_key_exists($form_id, $placement_map)) {
+    $placement = $placement_map[$form_id];
+  }
+  // If no placement info is available in placement map:
+  // search the form for buttons and guess placement from it.
+  else {
+    $buttons = _captcha_search_buttons($form);
+    // TODO: make this more sofisticated? Use cases needed.
+    $placement = $buttons[0];
+    // Store calculated placement in caches.
+    $placement_map[$form_id] = $placement;
+    variable_set('captcha_placement_map_cache', $placement_map);
+  }
+  return $placement;
+}
+
+/**
+ * Helper function for searching the buttons in a form.
+ *
+ * @param $form the form to search button elements in
+ * @return an array of paths to the buttons.
+ *   A path is an array of keys leading to the button, the last
+ *   item in the path is the weight of the button element
+ *   (or NULL if undefined).
+ */
+function _captcha_search_buttons($form) {
+  $buttons = array();
+  foreach (element_children($form) as $key) {
+    // Look for submit or button type elements.
+    if (isset($form[$key]['#type']) && ($form[$key]['#type'] == 'submit' || $form[$key]['#type'] == 'button')) {
+      $weight = isset($form[$key]['#weight']) ? $form[$key]['#weight'] : NULL;
+      $buttons[] = array(
+        'path' => array(),
+        'key' => $key,
+        'weight' => $weight,
       );
+    }
+    // Process children recurively.
+    $children_buttons = _captcha_search_buttons($form[$key]);
+    foreach ($children_buttons as $b) {
+      $b['path'] = array_merge(array($key), $b['path']);
+      $buttons[] = $b;
+    }
+  }
+  return $buttons;
+}
+
+/**
+ * Helper function to insert a CAPTCHA element in a form before a given form element.
+ * @param $form the form to add the CAPTCHA element to.
+ * @param $placement information where the CAPTCHA element should be inserted.
+ *   $target should be an associative array with fields:
+ *     - 'path': path of the container in the form where the CAPTCHA element should be inserted.
+ *     - 'key': the key of the element before which the CAPTCHA element
+ *       should be inserted. If the field 'key' is undefined or NULL, the CAPTCHA will
+ *       just be appended to the container.
+ *     - 'weight': if 'key' is not NULL: should be the weight of the element defined by 'key'.
+ *       If 'key' is NULL and weight is not NULL: set the weight property of the CAPTCHA element
+ *       to this value.
+ * @param $captcha_element the CAPTCHA element to insert.
+ */
+function _captcha_insert_captcha_element(&$form, $placement, $captcha_element) {
+  // Get common path, target and target weight.
+  $target_key = $placement['key'];
+  $target_weight = $placement['weight'];
+  $path = $placement['path'];
+
+  // Walk through the form along the path.
+  $form_stepper = &$form;
+  foreach ($path as $step) {
+    if (isset($form_stepper[$step])) {
+      $form_stepper = & $form_stepper[$step];
     }
     else {
-      // $captcha_description is empty: CAPTCHA part is an empty markup form element.
-      $form['captcha']['captcha_widgets'] = array(
-        '#type' => 'markup',
-        '#prefix' => '<div class="captcha">',
-        '#suffix' => '</div>',
-      );
+      // Given path is invalid: stop stepping and
+      // continue in best effort (append instead of insert).
+      $target_key = NULL;
+      break;
     }
-
-    // Add the form elements of the generated CAPTCHA to the form
-    $form['captcha']['captcha_widgets'] = array_merge($form['captcha']['captcha_widgets'], $captcha['form']);
-
-
-    // Add pre_render callback for additional CAPTCHA processing.
-    $form['#pre_render'][] = 'captcha_pre_render_untrusted_user';
-    // Add pre_render callback for placement of CAPTCHA formt element (above submit buttons).
-    $form['#pre_render'][] = 'captcha_pre_render_place_captcha';
-
-    // Add a validation callback for the CAPTCHA form element.
-    // It is put in front of the list of the validation callbacks (if any).
-    // This is needed for user login protection, where the login is done in
-    // a validation callback (user_login_authenticate_validate), so
-    // captcha_validate() needs to run before that.
-    $form['#validate'] = array_merge(array('captcha_validate'), (array)($form['#validate']));
-
   }
 
-  $form['captcha']['captcha_sid'] = array(
-    '#type' => 'hidden',
-    '#value' => $captcha_sid,
-  );
-
-  // Store information for usage in the validation and pre_render phase.
-  $form['captcha']['captcha_info'] = array(
-    '#type' => 'value',
-    '#value' => array(
-      'module' => $captcha_point->module,
-      'type' => $captcha_point->type,
-      'captcha_sid' => $captcha_sid,
-      'solution' => $captcha['solution'],
-      'preprocess' => isset($captcha['preprocess'])? $captcha['preprocess'] : FALSE,
-    ),
-  );
-
-
+  // If no target is available: just append the CAPTCHA element to the container.
+  if ($target_key == NULL || !array_key_exists($target_key, $form_stepper)) {
+    // Optionally, set weight of CAPTCHA element.
+    if ($target_weight != NULL) {
+      $captcha_element['#weight'] = $target_weight;
+    }
+    $form_stepper['captcha'] =  $captcha_element;
+  }
+  // If there is a target available: make sure the CAPTCHA element comes right before it.
+  else {
+    // If target has a weight: set weight of CAPTCHA element a bit smaller
+    // and just append the CAPTCHA: sorting will fix the ordering anyway.
+    if ($target_weight != NULL) {
+      $captcha_element['#weight'] = $target_weight - .1;
+      $form_stepper['captcha'] =  $captcha_element;
+    }
+    else {
+      // If we can't play with weights: insert the CAPTCHA element at the right position.
+      // Because PHP lacks a function for this (array_splice() comes close,
+      // but it does not preserve the key of the inserted element), we do it by hand:
+      // chop of the end, append the CAPTCHA element and put the end back.
+      $offset = array_search($target_key, array_keys($form_stepper));
+      $end = array_splice($form_stepper, $offset);
+      $form_stepper['captcha'] =  $captcha_element;
+      foreach($end as $k => $v) {
+        $form_stepper[$k] = $v;
+      }
+    }
+  }
 }
 
