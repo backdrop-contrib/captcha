@@ -2,19 +2,86 @@
 // $Id$
 
 /**
- * Implementation of a part of hook_form_alter for untrusted users.
+ * Helper function for generating a new CAPTCHA session.
+ *
+ * @param $form_id the form_id of the form to add a CAPTCHA to.
+ * @param $status the initial status of the CAPTHCA session.
+ * @return the session ID of the new CAPTCHA session.
  */
-function _captcha_form_alter_untrusted_user(&$form, $form_state, $form_id, $captcha_point) {
-
-  $captcha_element = array(
-    '#type' => 'captcha',
-    '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
-  );
-  $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
-  _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
-
+function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS_UNSOLVED) {
+  global $user;
+  db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), time(), $form_id, 'undefined', $status, 0);
+  $captcha_sid = db_last_insert_id('captcha_sessions', 'csid');
+  return $captcha_sid;
 }
 
+/**
+ * Helper function for updating the solution in the CAPTCHA session table.
+ *
+ * @param $captcha_sid the CAPTCHA session ID to update.
+ * @param $solution the new solution to associate with the given CAPTCHA session.
+ */
+function _captcha_update_captcha_session($captcha_sid, $solution) {
+  db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", time(), $solution, $captcha_sid);
+}
+
+/**
+ * Helper function for checking if CAPTCHA is required for user,
+ * based on CAPTCHA session ID and user session info.
+ */
+function _captcha_required_for_user($captcha_sid, $form_id) {
+  $captcha_session_status = db_result(db_query("SELECT status FROM {captcha_sessions} WHERE csid = %d", $captcha_sid));
+
+  $captcha_success_form_ids = (array)($_SESSION['captcha_success_form_ids']);
+  switch (variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SHOW_ALWAYS)) {
+    case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL:
+      $captcha_persistence_status = (count($captcha_success_form_ids) > 0);
+      break;
+    case CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM:
+      $captcha_persistence_status = isset($captcha_success_form_ids[$form_id]);
+      break;
+    default:
+      $captcha_persistence_status = FALSE;
+  }
+
+  return ($captcha_session_status == CAPTCHA_STATUS_UNSOLVED) && !$captcha_persistence_status;
+}
+
+/**
+ * Get the description which appears above the CAPTCHA in forms.
+ * If the locale module is enabled, an optional language code can be given
+ */
+function _captcha_get_description($lang_code=NULL) {
+  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.');
+  if (module_exists('locale')) {
+    if ($lang_code == NULL) {
+      global $language;
+      $lang_code = $language->language;
+    }
+    $description = variable_get("captcha_description_$lang_code", $default);
+  }
+  else {
+    $description = variable_get('captcha_description', $default);
+  }
+  return $description;
+}
+
+/**
+ * Parse or interpret the given captcha_type.
+ * @param $captcha_type string representation of the CAPTCHA type,
+ *      e.g. 'default', 'none', 'captcha/Math', 'image_captcha/Image'
+ * @return list($captcha_module, $captcha_type)
+ */
+function _captcha_parse_captcha_type($captcha_type) {
+  if ($captcha_type == 'none') {
+    return array(NULL, NULL);
+  }
+  if ($captcha_type == 'default') {
+    // TODO: implement UI for setting the default CAPTCHA type;
+    $captcha_type = 'captcha/Math';
+  }
+  return explode('/', $captcha_type);
+}
 
 /**
  * Helper function to get placement information for a given form_id.

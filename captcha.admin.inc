@@ -26,6 +26,8 @@ function _captcha_available_challenge_types() {
  * Form builder function for the general CAPTCHA configuration
  */
 function captcha_admin_settings() {
+  module_load_include('inc', 'captcha');
+
   // Configuration of which forms to protect, with what challenge.
   $form['captcha_form_protection'] = array(
     '#type' => 'fieldset',
@@ -355,6 +357,7 @@ function captcha_point_disable_confirm_submit($form, &$form_state) {
 
 /**
  * Helper function for generating an example challenge.
+ * TODO: port this to hook_elements() usage.
  */
 function _captcha_generate_example_challenge($module, $type) {
   $captcha_sid = _captcha_generate_captcha_session(CAPTCHA_STATUS_EXAMPLE);
@@ -373,6 +376,8 @@ function _captcha_generate_example_challenge($module, $type) {
  * CAPTCHA.
  */
 function captcha_examples($form_state, $module, $challenge) {
+  module_load_include('inc', 'captcha');
+
   $form = array();
   if ($module && $challenge) {
     // Generate 10 example challenges.
