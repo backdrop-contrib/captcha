@@ -485,6 +485,8 @@ function captcha_captcha($op, $captcha_type = '') {
   switch ($op) {
     case 'list':
       return array('Math');
+      break;
+
     case 'generate':
       if ($captcha_type == 'Math') {
         $result = array();
@@ -507,5 +509,6 @@ function captcha_captcha($op, $captcha_type = '') {
         );
         return $result;
       }
+      break;
   }
 }

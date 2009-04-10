@@ -116,6 +116,7 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
       else {
         return array();
       }
+      break;
 
     case 'generate':
       if ($captcha_type == 'Image') {
@@ -170,12 +171,13 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
         );
         return $result;
       }
+      break;
 
     case 'preprocess':
       // Preprocessing the response for case insensitive validation (see above).
       if ($captcha_type == 'Image') {
         return strtolower($arg3);
       }
-    break;
+      break;
   }
 }
