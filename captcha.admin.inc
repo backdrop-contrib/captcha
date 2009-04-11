@@ -168,20 +168,6 @@ function theme_captcha_admin_settings_captcha_points($form) {
 }
 
 /**
- * Helper function for adding/updating a CAPTCHA point.
- */
-function _captcha_update_captcha_point($form_id, $captcha_type) {
-  db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-  if ($captcha_type == 'none') {
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
-  }
-  else {
-    list($module, $type) = explode('/', $captcha_type);
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', '%s', '%s')", $form_id, $module, $type);
-  }
-}
-
-/**
  * Validation handler for captcha_admin_settings form.
  */
 function captcha_admin_settings_validate($form, $form_state) {
