@@ -186,14 +186,14 @@ function captcha_admin_settings_submit($form, &$form_state) {
 
   // Process CAPTCHA points
   foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
-    _captcha_update_captcha_point($captcha_point_form_id, $data['captcha_type']);
+    captcha_set_form_id_setting($captcha_point_form_id, $data['captcha_type']);
   }
 
   // Add new CAPTCHA point?
   $captcha_point_form_id = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['form_id'];
   if (!empty($captcha_point_form_id)) {
     $captcha_type = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'];
-    _captcha_update_captcha_point($captcha_point_form_id, $captcha_type);
+    captcha_set_form_id_setting($captcha_point_form_id, $captcha_type);
     drupal_set_message(t('Added CAPTCHA point.'), 'status');
   }
 
@@ -296,7 +296,7 @@ function captcha_point_admin_form_validate($form, $form_state) {
 function captcha_point_admin_form_submit($form, $form_state) {
   $captcha_point_form_id = $form_state['values']['captcha_point_form_id'];
   $captcha_type = $form_state['values']['captcha_type'];
-  _captcha_update_captcha_point($captcha_point_form_id, $captcha_type);
+  captcha_set_form_id_setting($captcha_point_form_id, $captcha_type);
   drupal_set_message(t('Saved CAPTCHA point settings.'), 'status');
 }
 

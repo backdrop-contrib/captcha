@@ -32,7 +32,7 @@ class CapchaTestCase extends DrupalWebTestCase {
     $this->drupalLogout();
 
     // Set a CAPTCHA on login form
-    _captcha_update_captcha_point('user_login', 'captcha/Math');
+    captcha_set_form_id_setting('user_login', 'captcha/Math');
 
     // Check if there is a CAPTCHA on the login form (look for the title).
     $this->drupalGet('user');
