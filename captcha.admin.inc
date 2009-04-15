@@ -247,8 +247,7 @@ function captcha_point_admin_form($form_state, $captcha_point_form_id=NULL) {
       '#value' => check_plain($captcha_point_form_id),
       '#disabled' => TRUE,
     );
-    $result = db_query("SELECT * FROM {captcha_points} WHERE form_id = '%s'", $captcha_point_form_id);
-    $captcha_point = db_fetch_object($result);
+    $captcha_point = captcha_get_form_id_setting($captcha_point_form_id);
     if ($captcha_point) {
       $default_captcha_type = "{$captcha_point->module}/{$captcha_point->type}";
     }
