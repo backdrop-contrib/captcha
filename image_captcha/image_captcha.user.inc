@@ -66,10 +66,10 @@ function _image_captcha_hex_to_rgb($hex) {
  * Base function for generating a image CAPTCHA.
  */
 function _image_captcha_generate_image($code) {
-  // get font
-  list($font, $errmsg, $errvar) = _image_captcha_get_font();
-  if (!$font) {
-    watchdog('CAPTCHA', $errmsg, $errvar, WATCHDOG_ERROR);
+  // Get font.
+  list($font, $errno) = _image_captcha_get_font();
+  if ($errno != 0) {
+    watchdog('CAPTCHA', 'Could not find or read the configured font ("%font") for the image CAPTCHA.', array('%font' => $font), WATCHDOG_ERROR);
     exit();
   }
   // get other settings
