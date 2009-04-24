@@ -196,10 +196,13 @@ function image_captcha_settings_form() {
     '#type' => 'select',
     '#title' => t('Noise level'),
     '#options' => array(
-      2 => t('low'),
-      5 => t('normal'),
-      7 => t('high'),
-      10 => t('severe'),
+      1 => t('1 - low'),
+      2 => '2',
+      3 => t('3 - medium'),
+      4 => '4',
+      5 => t('5 - high'),
+      7 => '7',
+      10 => t('10 - severe'),
     ),
     '#default_value' => (int) variable_get('image_captcha_noise_level', 5),
   );

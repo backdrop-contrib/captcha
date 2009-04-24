@@ -213,7 +213,7 @@ function _image_captcha_image_generator_add_lines(&$image, $width, $height, $col
 }
 
 function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colors) {
-  $noise_quantity = ($width * $height)/2.0 * ((int) variable_get('image_captcha_noise_level', 5)) / 10.0;
+  $noise_quantity = $width * $height * ((int) variable_get('image_captcha_noise_level', 5)) / 10.0;
   for ($i = 0; $i < $noise_quantity; $i++ ) {
     imagesetpixel($image, mt_rand(0, $width), mt_rand(0, $height), $colors[array_rand($colors)]);
   }
