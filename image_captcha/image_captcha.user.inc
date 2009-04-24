@@ -92,13 +92,7 @@ function _image_captcha_generate_image($code) {
   imagefilledrectangle($image, 0, 0, $width, $height, $background_color);
 
   // draw text
-  if (variable_get('image_captcha_double_vision', 0)) {
-    $result = _image_captcha_image_generator_print_string($image, $width, $height, $font, $font_size, $code, TRUE);
-    if (!$result) {
-      return FALSE;
-    }
-  }
-  $result = _image_captcha_image_generator_print_string($image, $width, $height, $font, $font_size, $code, FALSE);
+  $result = _image_captcha_image_generator_print_string($image, $width, $height, $font, $font_size, $code);
   if (!$result) {
     return FALSE;
   }
@@ -227,10 +221,8 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
 
 /**
  * Helper function for drawing text on the image.
- *
- * @param $background_mode if the text is for the background of the double vision mode.
  */
-function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text, $background_mode=FALSE) {
+function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text) {
   // get characters
   $characters = _image_captcha_utf8_split($text);
   $character_quantity = count($characters);
@@ -245,20 +237,11 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   // get colors
   $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
   $foreground_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_foreground_color', '#000000'));
-  // correct foreground for background mode (double vision)
-  if ($background_mode) {
-    for ($i=0; $i<3; $i++) {
-      $foreground_rgb[$i] = 0.75 * $background_rgb[$i] + 0.25 * $foreground_rgb[$i];
-    }
-  }
   $background_color = imagecolorallocate($image, $background_rgb[0], $background_rgb[1], $background_rgb[2]);
   $foreground_color = imagecolorallocate($image, $foreground_rgb[0], $foreground_rgb[1], $foreground_rgb[2]);
   // precalculate the value ranges for color randomness
   $foreground_randomness = (int)(variable_get('image_captcha_foreground_color_randomness', 100));
   if ($foreground_randomness) {
-    if ($background_mode) {
-      $foreground_randomness *= 0.25;
-    }
     $foreground_color_range = array();
     for ($i=0; $i<3; $i++) {
       $foreground_color_range[$i] = array(max(0, $foreground_rgb[$i] - $foreground_randomness), min(255, $foreground_rgb[$i] + $foreground_randomness));
