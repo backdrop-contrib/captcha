@@ -66,15 +66,15 @@ msgstr "CAPTCHA instellingen beheren"
 
 #: captcha.admin.inc:90
 msgid "Allow CAPTCHAs and CAPTCHA administration links on administrative pages"
-msgstr "Laat CAPTCHAs en CAPTCHA-configuratielinks toe op adminstrative pagina's."
+msgstr "Laat CAPTCHAs en CAPTCHA-configuratielinks toe op administrative pagina's."
 
 #: captcha.admin.inc:92
 msgid ""
-"This option makes it possible to add CAPTCHAs to forms on adminstrative "
+"This option makes it possible to add CAPTCHAs to forms on administrative "
 "pages. CAPTCHAs are disabled by default on administrative pages (which "
 "shouldn't be accessible to untrusted users normally) to avoid the related "
 "overhead. In some situations, e.g. in the case of demo sites, it can be "
-"usefull to allow CAPTCHAs on adminstrative pages."
+"usefull to allow CAPTCHAs on administrative pages."
 msgstr ""
 "Deze optie maakt het mogelijk om CAPTCHAs toe te voegen aan formulieren op "
 "administratieve pagina's. CAPTCHAs zijn standaard afwezig op administratieve "

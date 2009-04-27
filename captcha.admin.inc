@@ -89,7 +89,7 @@ function captcha_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Allow CAPTCHAs and CAPTCHA administration links on administrative pages'),
     '#default_value' => variable_get('captcha_allow_on_admin_pages', FALSE),
-    '#description' => t('This option makes it possible to add CAPTCHAs to forms on adminstrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on adminstrative pages.'),
+    '#description' => t('This option makes it possible to add CAPTCHAs to forms on administrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on administrative pages.'),
   );
 
   // field(s) for setting the additional CAPTCHA description
