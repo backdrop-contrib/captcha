@@ -77,12 +77,19 @@ function captcha_admin_settings() {
     '#options' => $captcha_types,
   );
 
-  // Field for the CAPTCHA administration mode
+  // Field for the CAPTCHA administration mode.
   $form['captcha_form_protection']['captcha_administration_mode'] = array(
     '#type' => 'checkbox',
     '#title' => t('Add CAPTCHA administration links to forms'),
     '#default_value' => variable_get('captcha_administration_mode', FALSE),
-    '#description' => t('This option is very helpful to enable/disable challenges on forms. When enabled, users with the "%admincaptcha" permission will see CAPTCHA administration links on all forms (except on administrative pages, which shouldn\'t be accessible to untrusted users in the first place). These links make it possible to enable a challenge of the desired type or disable it.', array('%admincaptcha' => t('administer CAPTCHA settings'))),
+    '#description' => t('This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the "%admincaptcha" permission will see a fieldsset with CAPTCHA administration links on all forms, except on administrative pages.', array('%admincaptcha' => t('administer CAPTCHA settings'))),
+  );
+  // Field for the CAPTCHAs on admin pages.
+  $form['captcha_form_protection']['captcha_allow_on_admin_pages'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Allow CAPTCHAs and CAPTCHA administration links on administrative pages'),
+    '#default_value' => variable_get('captcha_allow_on_admin_pages', FALSE),
+    '#description' => t('This option makes it possible to add CAPTCHAs to forms on adminstrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on adminstrative pages.'),
   );
 
   // field(s) for setting the additional CAPTCHA description
@@ -183,6 +190,7 @@ function captcha_admin_settings_validate($form, $form_state) {
 function captcha_admin_settings_submit($form, &$form_state) {
 
   variable_set('captcha_administration_mode', $form_state['values']['captcha_administration_mode']);
+  variable_set('captcha_allow_on_admin_pages', $form_state['values']['captcha_allow_on_admin_pages']);
 
   // Process CAPTCHA points
   foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
