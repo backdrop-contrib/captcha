@@ -6,6 +6,10 @@
  * Tests for CAPTCHA module.
  */
 
+// TODO: write test to check protection of log in forms (which is a bit special because there is no submit phase, login happens during validation).
+// TODO: write test to check persistence
+// TODO: write test for CAPTCHAs on admin pages
+
 class CapchaTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
