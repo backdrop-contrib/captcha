@@ -121,11 +121,13 @@ function _captcha_get_captcha_placement($form_id, $form) {
   else {
     $buttons = _captcha_search_buttons($form);
     // TODO: make this more sofisticated? Use cases needed.
+    // Use case: the CAPTCHA examples page (has no buttons).
     $placement = $buttons[0];
     // Store calculated placement in caches.
     $placement_map[$form_id] = $placement;
     variable_set('captcha_placement_map_cache', $placement_map);
   }
+
   return $placement;
 }
 

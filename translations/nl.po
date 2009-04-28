@@ -49,7 +49,6 @@ msgid "delete"
 msgstr "verwijderen"
 
 #: captcha.admin.inc:85
-#, fuzzy
 msgid ""
 "This option makes it easy to manage CAPTCHA settings on forms. When enabled, "
 "users with the \"%admincaptcha\" permission will see a fieldsset with "
@@ -58,7 +57,7 @@ msgstr ""
 "Deze optie is handig om CAPTCHA's te beheren op formulieren. "
 "Wanneer deze optie ingeschakeld is, zien gebruikers met de \"%admincaptcha\" "
 "permissie de CAPTCHA-configuratielinks op alle formulieren, met uitzondering "
-"van de beheerpagina'."
+"van de beheerpagina's."
 
 #: captcha.admin.inc:85 captcha.module:106
 msgid "administer CAPTCHA settings"
@@ -66,7 +65,7 @@ msgstr "CAPTCHA instellingen beheren"
 
 #: captcha.admin.inc:90
 msgid "Allow CAPTCHAs and CAPTCHA administration links on administrative pages"
-msgstr "Laat CAPTCHAs en CAPTCHA-configuratielinks toe op administrative pagina's."
+msgstr "Laat CAPTCHA's en CAPTCHA-configuratielinks toe op beheerspagina's."
 
 #: captcha.admin.inc:92
 msgid ""
@@ -76,11 +75,11 @@ msgid ""
 "overhead. In some situations, e.g. in the case of demo sites, it can be "
 "usefull to allow CAPTCHAs on administrative pages."
 msgstr ""
-"Deze optie maakt het mogelijk om CAPTCHAs toe te voegen aan formulieren op "
-"administratieve pagina's. CAPTCHAs zijn standaard afwezig op administratieve "
-"pagina's (die normaal gezien niet toegankelijk zijn voor onbetrouwbare bezoekers) "
+"Deze optie maakt het mogelijk om CAPTCHA's toe te voegen aan formulieren op "
+"beheerspagina's. CAPTCHA's zijn standaard afwezig op beheerspagina's "
+"(die normaal gezien niet toegankelijk zijn voor onbetrouwbare bezoekers) "
 "om de gerelateerde overhead te vermijden. In sommige situaties, zoals bij demo-websites "
-"kan het nuttig zijn om CAPTCHAs toe te laten op administrative paginas."
+"kan het nuttig zijn om CAPTCHA's toe te laten op beheerspagina's."
 
 #: captcha.admin.inc:100;115
 msgid "Challenge description"
@@ -212,12 +211,10 @@ msgid "Disable"
 msgstr "Uitschakelen"
 
 #: captcha.admin.inc:342
-#, fuzzy
 msgid "Deleted CAPTCHA for form %form_id."
 msgstr "CAPTCHA verwijderd voor formulier %form_id."
 
 #: captcha.admin.inc:346
-#, fuzzy
 msgid "Disabled CAPTCHA for form %form_id."
 msgstr "CAPTCHA uitgeschakeld voor formulier %form_id."
 
@@ -304,7 +301,7 @@ msgid ""
 msgstr ""
 "Gebruikers met de \"%skipcaptcha\" <a href=\"@perm\">permissie</a> krijgen "
 "geen CAPTCHA voorgeschoteld. Verleen deze permissie aan de betrouwbare "
-"gebruikers (b.v site administratoren). Indien u de CAPTCHA's wil testen, doe "
+"gebruikers (b.v websitebeheerders). Indien u de CAPTCHA's wil testen, doe "
 "het dan als gebruiker zonder de \"%skipcaptcha\" permissie (b.v. als anonyme "
 "gebruiker)."
 
@@ -401,11 +398,10 @@ msgid ""
 msgstr ""
 
 #: captcha.module:119
-#, fuzzy
 msgid "Already 1 blocked form submission"
 msgid_plural "Already @count blocked form submissions"
-msgstr[0] "Reeds 1 tegengehouden formulier inzending"
-msgstr[1] "Reeds @counter tegengehouden formulier inzendingen"
+msgstr[0] "Reeds 1 tegengehouden formulierinzending"
+msgstr[1] "Reeds @counter tegengehouden formulierinzendingen"
 
 #: captcha.module:60
 msgid "Administer how and where CAPTCHAs are used."
@@ -424,9 +420,8 @@ msgid "An overview of the available challenge types with examples."
 msgstr "Overzicht van de beschikbare CAPTCHA types met voorbeelden."
 
 #: captcha.module:92
-#, fuzzy
 msgid "CAPTCHA point administration"
-msgstr "CAPTCHA point administratie"
+msgstr "CAPTCHA-point-beheer"
 
 #: captcha.install:156
 msgid "Unsupported database."
@@ -530,7 +525,6 @@ msgid ""
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:108
-#, fuzzy
 msgid "Character spacing"
 msgstr "Karakter spati&euml;ring"
 
@@ -611,7 +605,6 @@ msgid "low"
 msgstr "laag"
 
 #: image_captcha/image_captcha.admin.inc:171
-#, fuzzy
 msgid "severe"
 msgstr "ernstig"
 
@@ -630,7 +623,6 @@ msgid ""
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:185
-#, fuzzy
 msgid "Add salt and pepper noise"
 msgstr "Zout- en peperruis toevoegen"
 
