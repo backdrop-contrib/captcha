@@ -9,6 +9,7 @@
 // TODO: write test to check protection of log in forms (which is a bit special because there is no submit phase, login happens during validation).
 // TODO: write test to check persistence
 // TODO: write test for CAPTCHAs on admin pages
+// TODO: write test for CAPTCHA point admin forms (enable, edit, delete)
 
 class CapchaTestCase extends DrupalWebTestCase {
 
@@ -23,6 +24,8 @@ class CapchaTestCase extends DrupalWebTestCase {
   function setUp() {
     // Load two modules: the captcha module itself and the comment module for testing anonymous comments.
     parent::setUp('captcha', 'comment');
+    module_load_include('inc', 'captcha');
+
   }
 
   /**
@@ -41,7 +44,7 @@ class CapchaTestCase extends DrupalWebTestCase {
     // Check if there is a CAPTCHA on the login form (look for the title).
     $this->drupalGet('user');
     $captcha = captcha_captcha('generate', 'Math');
-    $this->assertText($captcha['form']['captcha_response']['#title'], $message="CAPTCHA should be added to form (user_login).", 'CAPTCHA');
+    $this->assertText($captcha['form']['captcha_response']['#title'], 'CAPTCHA should be added to form (user_login).', 'CAPTCHA');
 
 
     // Try to log in, which should fail.
@@ -59,6 +62,37 @@ class CapchaTestCase extends DrupalWebTestCase {
     $this->drupalGet('user');
     $this->assertField('name', t('Username field found.'), 'CAPTCHA');
     $this->assertField('pass', t('Password field found.'), 'CAPTCHA');
+
+  }
+
+
+  /**
+   * Test the CAPTCHA point setting getter/setter.
+   */
+  function testCaptchaPointSettingGetterAndSetter() {
+    // Set to 'none'.
+    captcha_set_form_id_setting('comment_form', 'none');
+    $result = captcha_get_form_id_setting('comment_form');
+    $this->assertNotNull($result, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
+    $this->assertNull($result->module, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
+    $this->assertNull($result->type, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
+    // Set to 'default'
+    captcha_set_form_id_setting('comment_form', 'default');
+    variable_set('captcha_default_challenge', 'foo/bar');
+    $result = captcha_get_form_id_setting('comment_form');
+    $this->assertNotNull($result, 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
+    $this->assertEqual($result->module, 'foo', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
+    $this->assertEqual($result->type, 'bar', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
+    // Set to 'baz/boo'.
+    captcha_set_form_id_setting('comment_form', 'baz/boo');
+    $result = captcha_get_form_id_setting('comment_form');
+    $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
+    $this->assertEqual($result->module, 'baz', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
+    $this->assertEqual($result->type, 'boo', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
+    // Set to NULL (which should delete the CAPTCHA point setting entry).
+    captcha_set_form_id_setting('comment_form', NULL);
+    $result = captcha_get_form_id_setting('comment_form');
+    $this->assertNull($result, 'Setting and getting CAPTCHA point: NULL', 'CAPTCHA');
 
   }
 
