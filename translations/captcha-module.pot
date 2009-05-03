@@ -283,7 +283,7 @@ msgid "The answer you entered for the CAPTCHA was not correct."
 msgstr ""
 
 #: captcha.module:523
-msgid "Math Question"
+msgid "Math question"
 msgstr ""
 
 #: captcha.module:524

@@ -368,7 +368,7 @@ msgid "The answer you entered for the CAPTCHA was not correct."
 msgstr "Het antwoord dat u opgaf voor de CAPTCHA was niet juist."
 
 #: captcha.module:523
-msgid "Math Question"
+msgid "Math question"
 msgstr "Wiskunde vraag"
 
 #: captcha.module:524

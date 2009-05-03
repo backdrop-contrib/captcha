@@ -488,7 +488,7 @@ function captcha_captcha($op, $captcha_type = '') {
         // or string overrides.
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          '#title' => t('Math Question'),
+          '#title' => t('Math question'),
           '#description' => t('Solve this simple math problem and enter the result. E.g. for 1+3, enter 4.'),
           '#field_prefix' => t('@x + @y = ', array('@x' => $x, '@y' => $y)),
           '#size' => 4,
