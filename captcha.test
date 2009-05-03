@@ -6,7 +6,6 @@
  * Tests for CAPTCHA module.
  */
 
-// TODO: write test to check protection of log in forms (which is a bit special because there is no submit phase, login happens during validation).
 // TODO: write test to check persistence
 // TODO: write test for CAPTCHAs on admin pages
 // TODO: write test for CAPTCHA point admin forms (enable, edit, delete)
@@ -64,7 +63,48 @@ class CapchaTestCase extends DrupalWebTestCase {
     $this->assertField('pass', t('Password field found.'), 'CAPTCHA');
 
   }
+}
 
+
+class CapchaAdminTestCase extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => t('CAPTCHA administration functionality'),
+      'description' => t('Testing of the CAPTCHA administration interface and functionality.'),
+      'group' => t('CAPTCHA'),
+    );
+  }
+
+  function setUp() {
+    // Load two modules: the captcha module itself and the comment module for testing anonymous comments.
+    parent::setUp('captcha', 'comment');
+    module_load_include('inc', 'captcha');
+
+    // Create a normal user.
+    $permissions = array(
+      'access comments', 'post comments', 'post comments without approval',
+    );
+    $this->normal_user = $this->drupalCreateUser($permissions);
+    // Create an admin user.
+    $permissions[] = 'administer CAPTCHA settings';
+    $this->admin_user = $this->drupalCreateUser($permissions);
+
+  }
+
+  /**
+   * Test access to the admin pages.
+   */
+  function testAdminAccess() {
+    $this->drupalLogin($this->normal_user);
+    $this->drupalGet('admin/user/captcha');
+    file_put_contents('tmp.simpletest.html', $this->drupalGetContent());
+    $this->assertText(t('Access denied'), 'Normal users should not be able to access the CAPTCHA admin pages', 'CAPTCHA');
+
+    $this->drupalLogin($this->admin_user);
+    $this->drupalGet('admin/user/captcha');
+    $this->assertNoText(t('Access denied'), 'Admin users should be able to access the CAPTCHA admin pages', 'CAPTCHA');
+  }
 
   /**
    * Test the CAPTCHA point setting getter/setter.
