@@ -376,14 +376,13 @@ function captcha_point_disable_confirm_submit($form, &$form_state) {
 
 /**
  * Helper function for generating an example challenge.
- * TODO: port this to hook_elements() usage.
  */
 function _captcha_generate_example_challenge($module, $type) {
-  $captcha_sid = _captcha_generate_captcha_session(CAPTCHA_STATUS_EXAMPLE);
-  $captcha = call_user_func_array($module .'_captcha', array('generate', $type, $captcha_sid));
-  _captcha_update_captcha_session($captcha_sid, $captcha['solution']);
-  $captcha['form']['captcha_response']['#default_value'] = $captcha['solution'];
-  return $captcha['form'];
+  return array(
+    '#type' => 'captcha',
+    '#captcha_type' => $module .'/'. $type,
+    '#captcha_admin_mode' => TRUE,
+  );
 }
 
 /**
