@@ -40,11 +40,15 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
 /**
  * Get the CAPTCHA setting for a given form_id.
  *
- * @param $form_id
- * @return NULL if no setting is known or a captcha_point object with fields 'module' and 'type'.
+ * @param $form_id the form_id to query for
+ * @param $symbolic flag to return as (symbolic) strings instead of object.
  *
+ * @return NULL if no setting is known
+ *   or a captcha_point object with fields 'module' and 'type'.
+ *   If argument $symbolic is true, returns (symbolic) as 'none', 'default'
+ *   or in the form 'captcha/Math'.
  */
-function captcha_get_form_id_setting($form_id) {
+function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
   $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = '%s'", $form_id);
   if (!$result) {
     return NULL;
@@ -54,9 +58,20 @@ function captcha_get_form_id_setting($form_id) {
     $captcha_point = NULL;
   }
   elseif ($captcha_point->type == 'default') {
-    list($module, $type) = explode('/', variable_get('captcha_default_challenge', 'captcha/Math'));
-    $captcha_point->module = $module;
-    $captcha_point->type = $type;
+    if (!$symbolic) {
+      list($module, $type) = explode('/', variable_get('captcha_default_challenge', 'captcha/Math'));
+      $captcha_point->module = $module;
+      $captcha_point->type = $type;
+    }
+    else {
+      $captcha_point = 'default';
+    }
+  }
+  elseif ($captcha_point->module == NULL && $captcha_point->type == NULL && $symbolic) {
+    $captcha_point = 'none';
+  }
+  elseif ($symbolic) {
+    $captcha_point = $captcha_point->module .'/'. $captcha_point->type;
   }
   return $captcha_point;
 }

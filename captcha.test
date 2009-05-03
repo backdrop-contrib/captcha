@@ -8,7 +8,7 @@
 
 // TODO: write test to check persistence
 // TODO: write test for CAPTCHAs on admin pages
-// TODO: write test for CAPTCHA point admin forms (enable, edit, delete)
+// TODO: test for default challenge type
 
 class CapchaTestCase extends DrupalWebTestCase {
 
@@ -88,6 +88,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->normal_user = $this->drupalCreateUser($permissions);
     // Create an admin user.
     $permissions[] = 'administer CAPTCHA settings';
+    $permissions[] = 'skip CAPTCHA';
     $this->admin_user = $this->drupalCreateUser($permissions);
 
   }
@@ -116,6 +117,8 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $this->assertNull($result->module, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $this->assertNull($result->type, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertEqual($result, 'none', 'Setting and symbolic getting CAPTCHA point: "none"', 'CAPTCHA');
     // Set to 'default'
     captcha_set_form_id_setting('comment_form', 'default');
     variable_set('captcha_default_challenge', 'foo/bar');
@@ -123,18 +126,157 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $this->assertEqual($result->module, 'foo', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $this->assertEqual($result->type, 'bar', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertEqual($result, 'default', 'Setting and symbolic getting CAPTCHA point: "default"', 'CAPTCHA');
     // Set to 'baz/boo'.
     captcha_set_form_id_setting('comment_form', 'baz/boo');
     $result = captcha_get_form_id_setting('comment_form');
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $this->assertEqual($result->module, 'baz', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $this->assertEqual($result->type, 'boo', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertEqual($result, 'baz/boo', 'Setting and symbolic getting CAPTCHA point: "baz/boo"', 'CAPTCHA');
     // Set to NULL (which should delete the CAPTCHA point setting entry).
     captcha_set_form_id_setting('comment_form', NULL);
     $result = captcha_get_form_id_setting('comment_form');
     $this->assertNull($result, 'Setting and getting CAPTCHA point: NULL', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertNull($result, 'Setting and symbolic getting CAPTCHA point: NULL', 'CAPTCHA');
 
   }
 
 
+  /**
+   * Helper function for checking CAPTCHA setting of a form.
+   *
+   * @param $form_id the form_id of the form to investigate.
+   * @param $challenge_type what the challenge type shoul be:
+   *   NULL, 'none', 'default' or something like 'captcha/Math'
+   */
+  protected function assertCaptchaSetting($form_id, $challenge_type) {
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertEqual($result, $challenge_type, 'Check CAPTCHA setting for form.', 'CAPTCHA');
+  }
+
+  /**
+   * Testing of the CAPTCHA administration links.
+   */
+  function testCaptchAdminLinks() {
+    // Log in as admin
+    $this->drupalLogin($this->admin_user);
+
+    // Enable CAPTCHA administration links.
+    $edit = array(
+      'captcha_administration_mode' => TRUE,
+    );
+    $this->drupalPost('admin/user/captcha', $edit, 'Save configuration');
+
+    // Create a node with comments enabled.
+    $node_settings = array(
+      'type' => 'page',
+      'comment' => COMMENT_NODE_READ_WRITE,
+    );
+    $node = $this->drupalCreateNode($node_settings);
+
+    // Go to node page
+    $this->drupalGet('node/' . $node->nid);
+
+    // Click the add new comment link
+    $this->clickLink(t('Add new comment'));
+    $add_comment_url = $this->getUrl();
+
+    ////////////////////////////////////////////////////////////
+    // Click the CAPTCHA admin link to enable a challenge.
+    $this->clickLink(t('Place a CAPTCHA here for untrusted users.'));
+    // Enable Math CAPTCHA.
+    $edit = array('captcha_type' => 'captcha/Math');
+    $this->drupalPost($this->getUrl(), $edit, t('Save'));
+
+    // Check if returned to original comment form.
+    $this->assertEqual($add_comment_url, $this->getUrl(),
+      'After setting CAPTCHA with CAPTCHA admin links: should return to original form.', 'CAPTCHA');
+    // Check if CAPTCHA was successfully enabled (on CAPTCHA admin links fieldset).
+    $this->assertText(t('CAPTCHA: challenge "@type" enabled', array('@type' => 'Math')),
+      'Enable a challenge through the CAPTCHA admin links', 'CAPTCHA');
+    // Check if CAPTCHA was successfully enabled (through API).
+    $this->assertCaptchaSetting('comment_form', 'captcha/Math');
+
+    //////////////////////////////////////////////////////
+    // Edit challenge type through CAPTCHA admin links.
+    $this->clickLink(t('change'));
+    // Enable Math CAPTCHA.
+    $edit = array('captcha_type' => 'default');
+    $this->drupalPost($this->getUrl(), $edit, t('Save'));
+
+    // Check if returned to original comment form.
+    $this->assertEqual($add_comment_url, $this->getUrl(),
+      'After editing challenge type CAPTCHA admin links: should return to original form.', 'CAPTCHA');
+    // Check if CAPTCHA was successfully changed (on CAPTCHA admin links fieldset).
+    // This is actually the same as the previous setting because the captcha/Math is the
+    // default for the default challenge. TODO Make sure the edit is a real change.
+    $this->assertText(t('CAPTCHA: challenge "@type" enabled', array('@type' => 'Math')),
+      'Enable a challenge through the CAPTCHA admin links', 'CAPTCHA');
+    // Check if CAPTCHA was successfully edited (through API).
+    $this->assertCaptchaSetting('comment_form', 'default');
+
+
+
+    //////////////////////////////////////////////////////
+    // Disable challenge through CAPTCHA admin links.
+    $this->clickLink(t('disable'));
+    // And confirm.
+    $this->drupalPost($this->getUrl(), array(), 'Disable');
+
+    // Check if returned to original comment form.
+    $this->assertEqual($add_comment_url, $this->getUrl(),
+      'After disablin challenge with CAPTCHA admin links: should return to original form.', 'CAPTCHA');
+    // Check if CAPTCHA was successfully disabled (on CAPTCHA admin links fieldset).
+    $this->assertText(t('CAPTCHA: no challenge enabled'),
+      'Disable challenge through the CAPTCHA admin links', 'CAPTCHA');
+    // Check if CAPTCHA was successfully disabled (through API).
+    $this->assertCaptchaSetting('comment_form', 'none');
+
+  }
+
+
+  function testUntrustedUserPosting() {
+    // Set CAPTCHA on comment form.
+    captcha_set_form_id_setting('comment_form', 'captcha/Math');
+
+    // Create a node with comments enabled.
+    $node_settings = array(
+      'type' => 'page',
+      'comment' => COMMENT_NODE_READ_WRITE,
+    );
+    $node = $this->drupalCreateNode($node_settings);
+
+    // Log in as normal (untrusted) user.
+    $this->drupalLogin($this->normal_user);
+
+    // Go to node page and click the "add comment" link.
+    $this->drupalGet('node/' . $node->nid);
+    $this->clickLink(t('Add new comment'));
+    $add_comment_url = $this->getUrl();
+
+    // Check if CAPTCHA is visible on form.
+    $this->assertText(t('Math question'),
+      'CAPTCHA should be on form for untrusted user.', 'CAPTCHA');
+    // Try to post a comment with wrong answer.
+    $edit = array(
+      'subject' => 'check thiz out!',
+      'comment' => 'cool site u have',
+      'captcha_response' => 'xx',
+    );
+    $this->drupalPost($add_comment_url, $edit, t('Preview'));
+    $this->assertText(t('The answer you entered for the CAPTCHA was not correct.'),
+      'wrong CAPTCHA should block form submission.', 'CAPTCHA');
+
+    //TODO: more testing for untrusted posts.
+  }
 }
+
+
+
+// Some tricks to debug:
+// drupal_debug($data) // from devel module
+// file_put_contents('tmp.simpletest.html', $this->drupalGetContent());
