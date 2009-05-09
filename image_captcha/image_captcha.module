@@ -26,13 +26,6 @@ function image_captcha_help($path, $arg) {
   switch ($path) {
     case 'admin/user/captcha/image_captcha':
       $output = '<p>'. t('The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be careful with the size and computation related settings.') .'</p>';
-      if (in_array('Image', image_captcha_captcha('list'))) {
-        module_load_include('inc', 'captcha', 'captcha.admin');
-        module_load_include('inc', 'captcha');
-        $captcha = _captcha_generate_example_challenge('image_captcha', 'Image');
-        $img = $captcha['captcha_image']['#value'];
-        $output .= '<p>'. t('Example image, generated with the current settings:') .'</p>'. $img;
-      }
       return $output;
   }
 }

@@ -203,8 +203,8 @@ function captcha_process($element, $edit, &$form_state, $complete_form) {
   // Get implementing module and challenge for CAPTCHA.
   list($captcha_type_module, $captcha_type_challenge) = _captcha_parse_captcha_type($element['#captcha_type']);
   if (_captcha_required_for_user($captcha_sid, $this_form_id) || $element['#captcha_admin_mode']) {
-    // Generate a CAPTCHA and its solution (note that the CAPTCHA session ID
-    // is given as thrid argument.
+    // Generate a CAPTCHA and its solution
+    // (note that the CAPTCHA session ID is given as third argument).
     $captcha = module_invoke($captcha_type_module, 'captcha', 'generate', $captcha_type_challenge, $captcha_sid);
     if (!$captcha) {
       // The selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and then quit.

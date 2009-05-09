@@ -40,6 +40,17 @@ function image_captcha_settings_form() {
     return $form;
   }
 
+  $form['image_captcha_example'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Example'),
+    '#description' => t('Presolved image CAPTCHA example, generated with the current settings.'),
+  );
+  $form['image_captcha_example']['image'] = array(
+    '#type' => 'captcha',
+    '#captcha_type' => 'image_captcha/Image',
+    '#captcha_admin_mode' => TRUE,
+  );
+
   // General code settings.
   $form['image_captcha_code_settings'] = array(
     '#type' => 'fieldset',
