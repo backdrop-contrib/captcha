@@ -141,6 +141,14 @@ function captcha_admin_settings() {
     );
   }
 
+  // Option for case sensitive/insensitive validation of the responses.
+  $form['captcha_case_sensitive_validation'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Case sensitive validation'),
+    '#description' => t('Disable this option to ignore uppercase/lowercase errors in the response.'),
+    '#default_value' => variable_get('captcha_case_sensitive_validation', TRUE),
+  );
+
   // Field for CAPTCHA persistence.
   $form['captcha_persistence'] = array(
     '#type' => 'radios',
@@ -240,8 +248,8 @@ function captcha_admin_settings_submit($form, &$form_state) {
     variable_set('captcha_description', $form_state['values']['captcha_description']);
   }
 
+  variable_set('captcha_case_sensitive_validation', $form_state['values']['captcha_case_sensitive_validation']);
   variable_set('captcha_persistence', $form_state['values']['captcha_persistence']);
-
   variable_set('captcha_log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
 
   drupal_set_message(t('The CAPTCHA settings were saved.'), 'status');

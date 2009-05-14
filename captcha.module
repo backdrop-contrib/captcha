@@ -389,6 +389,11 @@ function captcha_validate($element, &$form_state) {
     form_set_error('captcha', t('CAPTCHA test failed (unknown csid).'));
   }
   else {
+    // In case of case insensitive validation: convert solution and response to lower case.
+    if (!variable_get('captcha_case_sensitive_validation', TRUE)) {
+      $solution = strtolower($solution);
+      $captcha_response = strtolower($captcha_response);
+    }
     // Check answer.
     if ($captcha_response == $solution) {
       // Correct answer.

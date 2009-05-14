@@ -9,6 +9,7 @@
 // TODO: write test to check persistence
 // TODO: write test for CAPTCHAs on admin pages
 // TODO: test for default challenge type
+// TODO: test about case sensitive/insensitive validation
 
 class CapchaTestCase extends DrupalWebTestCase {
 

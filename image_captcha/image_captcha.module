@@ -162,13 +162,11 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
 
         // Handle the case insesitivity option and change the code to lower case
         // before saving it as solution.
-        if (variable_get('image_captcha_case_insensitive', FALSE)) {
-          $code = strtolower($code);
-          $result['preprocess'] = TRUE;
-          $description = t('Enter the characters (without spaces) shown in the image.');
+        if (variable_get('captcha_case_sensitive_validation', TRUE)) {
+          $description = t('Enter the characters shown in the image. Ignore spaces and be careful about upper and lower case.');
         }
         else {
-          $description = t('Enter the characters shown in the image. Ignore spaces and be careful about upper and lower case.');
+          $description = t('Enter the characters (without spaces) shown in the image.');
         }
 
         $result['solution'] = $code;
@@ -193,11 +191,5 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
       }
       break;
 
-    case 'preprocess':
-      // Preprocessing the response for case insensitive validation (see above).
-      if ($captcha_type == 'Image') {
-        return strtolower($arg3);
-      }
-      break;
   }
 }
