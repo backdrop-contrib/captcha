@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Captcha uk Ukrainian Translation\n"
 "POT-Creation-Date: 2009-05-16 17:44+0300\n"
-"PO-Revision-Date: 2009-05-16 18:17+0300\n"
+"PO-Revision-Date: 2009-05-16 18:26+0300\n"
 "Last-Translator: Andriy Podanenko <podarok@ua.fm>\n"
 "Language-Team: uk <podarok@ua.fm>\n"
 "MIME-Version: 1.0\n"
@@ -111,7 +111,7 @@ msgstr "Зберегти"
 
 #: captcha.admin.inc:135
 msgid "Challenge type (module)"
-msgstr ""
+msgstr "Тип капчі ( субмобуль )"
 
 #: captcha.admin.inc:135
 msgid "Operations"
@@ -119,35 +119,35 @@ msgstr "Дії"
 
 #: captcha.admin.inc:166
 msgid "The CAPTCHA settings were saved."
-msgstr ""
+msgstr "Параметри капчі було збережено"
 
 #: captcha.admin.inc:195;210
 msgid "Form ID"
-msgstr ""
+msgstr "Ідентифікатор форми"
 
 #: captcha.admin.inc:196;211
 msgid "The Drupal form_id of the form to add the CAPTCHA to."
-msgstr ""
+msgstr "Ідентифікатор форми form_id Друпала, до якого застосувати капчу"
 
 #: captcha.admin.inc:217
 msgid "Challenge type"
-msgstr ""
+msgstr "Тип капчі"
 
 #: captcha.admin.inc:218
 msgid "The CAPTCHA type to use for this form"
-msgstr ""
+msgstr "Тип капчі, що використовувати до цієї форми"
 
 #: captcha.admin.inc:237
 msgid "Illegal form_id"
-msgstr ""
+msgstr "Некоректний form_id"
 
 #: captcha.admin.inc:255
 msgid "Saved CAPTCHA point settings."
-msgstr ""
+msgstr "Збережено параметри балів капчі"
 
 #: captcha.admin.inc:272
 msgid "Are you sure you want to delete the CAPTCHA for form_id %form_id?"
-msgstr ""
+msgstr "Ви впевнені щодо видалення капчі для ідентифікатора форми form_id = %form_id ?"
 
 #: captcha.admin.inc:273
 msgid "Delete"
@@ -155,7 +155,7 @@ msgstr "Стерти"
 
 #: captcha.admin.inc:276
 msgid "Are you sure you want to disable the CAPTCHA for form_id %form_id?"
-msgstr ""
+msgstr "Ви впевнені щодо вимкнення капчі для ідентифікатора форми form_id = %form_id ?"
 
 #: captcha.admin.inc:277
 msgid "Disable"
@@ -163,23 +163,23 @@ msgstr "Вимкнути"
 
 #: captcha.admin.inc:290
 msgid "Deleted CAPTCHA for form %form_id."
-msgstr ""
+msgstr "Видалено капчу для форми %form_id."
 
 #: captcha.admin.inc:294
 msgid "Disabled CAPTCHA for form %form_id."
-msgstr ""
+msgstr "Вимкнено капчу для форми %form_id."
 
 #: captcha.admin.inc:320
 msgid "This page gives an overview of all available challenge types, generated with their current settings."
-msgstr ""
+msgstr "Ця сторінка надає опис всіх доступних типів капчі, згенерованих теперішніми параметрами."
 
 #: captcha.admin.inc:331
 msgid "Challenge \"%challenge\" by module \"%module\""
-msgstr ""
+msgstr "Капча \"%challenge\" модуля \"%module\""
 
 #: captcha.admin.inc:334
 msgid "10 more examples of this challenge."
-msgstr ""
+msgstr "Ще 10 прикладів даного типу капчі"
 
 #: captcha.module:24
 msgid "\"CAPTCHA\" is an acronym for \"Completely Automated Public Turing test to tell Computers and Humans Apart\". It is typically a challenge-response test to determine whether the user is human. The CAPTCHA module is a tool to fight automated submission by malicious users (spamming) of for example comments forms, user registration forms, guestbook forms, etc. You can extend the desired forms with an additional challenge, which should be easy for a human to solve correctly, but hard enough to keep automated scripts and spam bots out."
@@ -199,7 +199,7 @@ msgstr "Показувати на окремій сторінці"
 
 #: captcha.module:33
 msgid "CAPTCHA is a trademark of Carnegie Mellon University."
-msgstr ""
+msgstr "CAPTCHA is a trademark of Carnegie Mellon University."
 
 #: captcha.module:38
 msgid "A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option \"%adminlinks\" is enabled."
@@ -211,7 +211,7 @@ msgstr ""
 
 #: captcha.module:41;100
 msgid "skip CAPTCHA"
-msgstr ""
+msgstr "обхід капчі"
 
 #: captcha.module:136
 msgid "This question is for testing whether you are a human visitor and to prevent automated spam submissions."
@@ -222,7 +222,7 @@ msgstr "Дайте відповідь на це запитання, щоб ми 
 #: image_captcha/image_captcha.user.inc:28
 #: image_captcha/image_captcha.module:92
 msgid "CAPTCHA"
-msgstr ""
+msgstr "CAPTCHA"
 
 #: captcha.module:288
 msgid "Untrusted users will see a CAPTCHA here (!settings)."
@@ -230,7 +230,7 @@ msgstr ""
 
 #: captcha.module:289
 msgid "general CAPTCHA settings"
-msgstr ""
+msgstr "головні параметри капчі"
 
 #: captcha.module:293
 msgid "Enabled challenge"
