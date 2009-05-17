@@ -180,8 +180,16 @@ function _captcha_get_captcha_placement($form_id, $form) {
     if ($placement_map === NULL) {
       // If second level cache missed: start from a fresh placement map.
       $placement_map = array();
-      // TODO: prefill with some hard coded default entries as follows?
-      // $placement_map['comment_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
+      // Prefill with some hard coded default entries.
+
+      // The comment form can have a 'Preview' button, or both a 'Submit' and 'Preview' button,
+      // which is tricy for automatic placement detection. Luckily, Drupal core sets their
+      // weight (19 and 20), so we just have to specify a slightly smaller weight.
+      $placement_map['comment_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
+      // Additional note: the node forms also have the posibility to only show a 'Preview' button.
+      // However, the 'Submit' button is always present, but is just not rendered ('#access' = FALSE)
+      // in those cases. The the automatic button detection should be sufficient for node forms.
+
       // $placement_map['user_login'] = array('path' => array(), 'key' => NULL, 'weight' => 1.9);
       // TODO: also make the placement 'overridable' from the admin UI?
     }
