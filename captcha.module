@@ -502,6 +502,23 @@ function captcha_captcha($op, $captcha_type = '') {
         );
         return $result;
       }
+      elseif ($captcha_type == 'Test') {
+        // This challenge is not visible through the administrative interface
+        // as it is not listed in captcha_captcha('list'),
+        // but it is meant for debugging and testing purposes.
+        // TODO for Drupal 7 version: This should be done with a mock module,
+        // but Drupal 6 does not support this (mock modules can not be hidden).
+        $result = array(
+          'solution' => 'Test 123',
+          'form' => array(),
+        );
+        $result['form']['captcha_response'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Test'),
+          '#required' => TRUE,
+        );
+        return $result;
+      }
       break;
   }
 }
