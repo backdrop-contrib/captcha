@@ -203,9 +203,16 @@ function _captcha_get_captcha_placement($form_id, $form) {
   // search the form for buttons and guess placement from it.
   else {
     $buttons = _captcha_search_buttons($form);
-    // TODO: make this more sofisticated? Use cases needed.
-    // Use case: the CAPTCHA examples page (has no buttons).
-    $placement = $buttons[0];
+    if (count($buttons)) {
+      // Pick first button.
+      // TODO: make this more sofisticated? Use cases needed.
+      $placement = $buttons[0];
+    }
+    else {
+      // Use NULL when no buttons were found.
+      $placement = NULL;
+    }
+
     // Store calculated placement in caches.
     $placement_map[$form_id] = $placement;
     variable_set('captcha_placement_map_cache', $placement_map);
@@ -249,8 +256,9 @@ function _captcha_search_buttons($form) {
  * Helper function to insert a CAPTCHA element in a form before a given form element.
  * @param $form the form to add the CAPTCHA element to.
  * @param $placement information where the CAPTCHA element should be inserted.
- *   $target should be an associative array with fields:
- *     - 'path': path of the container in the form where the CAPTCHA element should be inserted.
+ *   $placement should be an associative array with fields:
+ *     - 'path': path (array of path items) of the container in the form where the
+ *       CAPTCHA element should be inserted.
  *     - 'key': the key of the element before which the CAPTCHA element
  *       should be inserted. If the field 'key' is undefined or NULL, the CAPTCHA will
  *       just be appended to the container.
@@ -260,10 +268,10 @@ function _captcha_search_buttons($form) {
  * @param $captcha_element the CAPTCHA element to insert.
  */
 function _captcha_insert_captcha_element(&$form, $placement, $captcha_element) {
-  // Get common path, target and target weight.
-  $target_key = $placement['key'];
-  $target_weight = $placement['weight'];
-  $path = $placement['path'];
+  // Get path, target and target weight or use defaults if not available.
+  $target_key = isset($placement['key']) ? $placement['key'] : NULL;
+  $target_weight = isset($placement['weight']) ? $placement['weight'] : NULL;
+  $path = isset($placement['path']) ? $placement['path'] : array();
 
   // Walk through the form along the path.
   $form_stepper = &$form;
