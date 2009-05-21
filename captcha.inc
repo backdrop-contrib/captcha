@@ -183,7 +183,7 @@ function _captcha_get_captcha_placement($form_id, $form) {
       // Prefill with some hard coded default entries.
 
       // The comment form can have a 'Preview' button, or both a 'Submit' and 'Preview' button,
-      // which is tricy for automatic placement detection. Luckily, Drupal core sets their
+      // which is tricky for automatic placement detection. Luckily, Drupal core sets their
       // weight (19 and 20), so we just have to specify a slightly smaller weight.
       $placement_map['comment_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
       // Additional note: the node forms also have the posibility to only show a 'Preview' button.

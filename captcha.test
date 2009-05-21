@@ -146,6 +146,33 @@ class CapchaTestCase extends DrupalWebTestCase {
 
   }
 
+  /**
+   * Test if the CAPTCHA description is only shown if there are challenge widgets to show.
+   * For example, when a comment is previewed with correct CAPTCHA answer,
+   * a challenge is generated and added to the form but removed in the pre_render phase.
+   * The CAPTCHA description should not show up either.
+   */
+  function testCaptchaDescriptionAfterPreview() {
+    // Set Test CAPTCHA on comment form
+    captcha_set_form_id_setting('comment_form', 'captcha/Test');
+
+    // Log in as normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Create a node with comments enabled.
+    $node = $this->drupalCreateNode(array('comment' => COMMENT_NODE_READ_WRITE));
+
+    // Preview comment with correct CAPTCHA answer.
+    $edit = array(
+      'subject' => $this->randomName(32, 'subject_'),
+      'comment' =>  $this->randomName(256, 'comment_body'),
+      'captcha_response' => 'Test 123',
+    );
+    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
+
+    $this->assertNoText(_captcha_get_description(), 'CAPTCHA description should not show up after preview with correct response.', 'CAPTCHA');
+  }
+
 }
 
 

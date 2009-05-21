@@ -257,7 +257,7 @@ function captcha_process($element, $edit, &$form_state, $complete_form) {
  * is available. Render it as is otherwise.
  */
 function theme_captcha($element) {
-  if (!empty($element['#description'])) {
+  if (!empty($element['#description']) && isset($element['captcha_widgets'])) {
     $fieldset = array(
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA'),
