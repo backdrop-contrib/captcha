@@ -10,6 +10,7 @@
 // TODO: write test for CAPTCHAs on admin pages
 // TODO: test for default challenge type
 // TODO: test about placement (comment form, node forms, log in form, etc)
+// TODO: test if captcha_cron does it work right
 
 class CapchaTestCase extends DrupalWebTestCase {
 
@@ -26,9 +27,11 @@ class CapchaTestCase extends DrupalWebTestCase {
     parent::setUp('captcha', 'comment');
     module_load_include('inc', 'captcha');
 
-    // Create a normal user that can post comments, but can not skip CAPTCHA (if enabled).
+    // Create a normal user that can post comments and pages,
+    // but can not skip CAPTCHA.
     $permissions = array(
       'access comments', 'post comments', 'post comments without approval',
+      'access content', 'create page content', 'edit own page content',
     );
     $this->normal_user = $this->drupalCreateUser($permissions);
 
@@ -151,9 +154,11 @@ class CapchaTestCase extends DrupalWebTestCase {
    * For example, when a comment is previewed with correct CAPTCHA answer,
    * a challenge is generated and added to the form but removed in the pre_render phase.
    * The CAPTCHA description should not show up either.
+   *
+   * \see testCaptchaSessionReuseOnNodeForms()
    */
-  function testCaptchaDescriptionAfterPreview() {
-    // Set Test CAPTCHA on comment form
+  function testCaptchaDescriptionAfterCommentPreview() {
+    // Set Test CAPTCHA on comment form.
     captcha_set_form_id_setting('comment_form', 'captcha/Test');
 
     // Log in as normal user.
@@ -170,7 +175,38 @@ class CapchaTestCase extends DrupalWebTestCase {
     );
     $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
 
-    $this->assertNoText(_captcha_get_description(), 'CAPTCHA description should not show up after preview with correct response.', 'CAPTCHA');
+    // Check that there is no CAPTCHA after preview.
+    $this->assertNoText(_captcha_get_description(),
+      'CAPTCHA description should not show up after comment preview with correct response.', 'CAPTCHA');
+  }
+
+  /**
+   * Test if the CAPTCHA session ID is reused when previewing nodes:
+   * node preview after correct response should not show CAPTCHA anymore.
+   * The preview functionality of comments and nodes works slightly different under the hood.
+   * CAPTCHA module should be able to handle both.
+   *
+   * \see testCaptchaDescriptionAfterCommentPreview()
+   */
+  function testCaptchaSessionReuseOnNodeForms() {
+    // Set Test CAPTCHA on page form.
+    captcha_set_form_id_setting('page_node_form', 'captcha/Test');
+
+    // Log in as normal user.
+    $this->drupalLogin($this->normal_user);
+
+    // Page settings to post, with correct CAPTCHA answer.
+    $edit = array(
+      'title'     => $this->randomName(8),
+      'body'      => $this->randomName(32),
+      'captcha_response' => 'Test 123',
+    );
+    // Preview the node
+    $this->drupalPost('node/add/page', $edit, t('Preview'));
+
+    // Check that there is no CAPTCHA after preview.
+    $this->assertNoText(_captcha_get_description(),
+      'CAPTCHA description should not show up after node preview with correct response.', 'CAPTCHA');
   }
 
 }

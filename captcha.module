@@ -186,9 +186,13 @@ function captcha_process($element, $edit, &$form_state, $complete_form) {
 
   // Retrieve CAPTCHA session ID from posted data or generate it, if not available.
   $this_form_id = $complete_form['form_id']['#value'];
-  $posted_form_id = (isset($element['#post']['form_id']) ? $element['#post']['form_id'] : NULL);
-  if ($this_form_id == $posted_form_id && isset($element['#post']['captcha_sid'])) {
-    $captcha_sid = $element['#post']['captcha_sid'];
+  // Previously $element['#post']['form_id'] and $element['#post']['captcha_sid']
+  // were used here, but those entry are not available in node preview situations so
+  // we use $form_state['clicked_button']['#post']['form_id'] and
+  // $form_state['clicked_button']['#post']['captcha_sid'] instead.
+  $posted_form_id = (isset($form_state['clicked_button']['#post']['form_id']) ? $form_state['clicked_button']['#post']['form_id'] : NULL);
+  if ($this_form_id == $posted_form_id && isset($form_state['clicked_button']['#post']['captcha_sid'])) {
+    $captcha_sid = $form_state['clicked_button']['#post']['captcha_sid'];
   } else {
     // Generate new CAPTCHA session.
     $captcha_sid = _captcha_generate_captcha_session($this_form_id, CAPTCHA_STATUS_UNSOLVED);
@@ -514,7 +518,7 @@ function captcha_captcha($op, $captcha_type = '') {
         );
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
-          '#title' => t('Test'),
+          '#title' => t('Test one two three'),
           '#required' => TRUE,
         );
         return $result;
