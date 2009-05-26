@@ -288,6 +288,17 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->assertNull($result, 'Setting and getting CAPTCHA point: NULL', 'CAPTCHA');
     $result = captcha_get_form_id_setting('comment_form', TRUE);
     $this->assertNull($result, 'Setting and symbolic getting CAPTCHA point: NULL', 'CAPTCHA');
+    // Set with object.
+    $captcha_type = new stdClass;
+    $captcha_type->module = 'baba';
+    $captcha_type->type = 'fofo';
+    captcha_set_form_id_setting('comment_form', $captcha_type);
+    $result = captcha_get_form_id_setting('comment_form');
+    $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
+    $this->assertEqual($result->module, 'baba', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
+    $this->assertEqual($result->type, 'fofo', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $this->assertEqual($result, 'baba/fofo', 'Setting and symbolic getting CAPTCHA point: "baba/fofo"', 'CAPTCHA');
 
   }
 
