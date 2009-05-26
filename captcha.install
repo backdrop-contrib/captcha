@@ -106,7 +106,7 @@ function captcha_install() {
 
   // insert some defaults
   $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
-    'user_register', 'user_pass', 'user_login', 'user_login_block');
+    'user_register', 'user_pass', 'user_login', 'user_login_block', 'forum_node_form');
   foreach ($form_ids as $form_id) {
     db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
   }
