@@ -225,8 +225,10 @@ function captcha_admin_settings_submit($form, &$form_state) {
   variable_set('captcha_default_challenge', $form_state['values']['captcha_default_challenge']);
 
   // Process CAPTCHA points
-  foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
-    captcha_set_form_id_setting($captcha_point_form_id, $data['captcha_type']);
+  if (isset($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'])) {
+    foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
+      captcha_set_form_id_setting($captcha_point_form_id, $data['captcha_type']);
+    }
   }
 
   // Add new CAPTCHA point?
