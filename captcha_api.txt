@@ -38,6 +38,7 @@ function foo_captcha_captcha($op, $captcha_type='') {
         $captcha['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => t('Enter "foo"'),
+          '#required' => TRUE,
         );
         return $captcha;
       }
