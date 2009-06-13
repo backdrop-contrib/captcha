@@ -10,8 +10,6 @@
  *
  */
 
-// TODO: drop preprocess stuff op of hook_captcha, there are better ways to implement this
-
 
 define('CAPTCHA_PERSISTENCE_SHOW_ALWAYS', 1);
 define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM', 2);
@@ -247,7 +245,6 @@ function captcha_process($element, $edit, &$form_state, $complete_form) {
     'type' => $captcha_type_challenge,
     'captcha_sid' => $captcha_sid,
     'solution' => $captcha['solution'],
-    'preprocess' => isset($captcha['preprocess'])? $captcha['preprocess'] : FALSE,
   );
 
   return $element;
@@ -367,14 +364,11 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
  */
 
 function captcha_validate($element, &$form_state) {
-  // Get answer and preprocess if needed
   $captcha_info = $element['#captcha_info'];
   $form_id = $captcha_info['form_id'];
 
+  // Get CAPTCHA response.
   $captcha_response = $form_state['values']['captcha_response'];
-  if ($captcha_info['preprocess']) {
-    $captcha_response = module_invoke($captcha_info['module'], 'captcha', 'preprocess', $captcha_info['type'], $captcha_response);
-  }
 
   // We use $form_state['clicked_button']['#post']['captcha_sid']
   // instead of $form_state['values']['captcha_sid'] because the latter

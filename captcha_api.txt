@@ -123,38 +123,43 @@ function foo_captcha_help($path, $arg) {
 """
 
 
-=== Optional: preprocess the response ===
+=== Optional: (pre)process the response ===
 In some situations it could be necessary to preprocess the response before
-letting the CAPTCHA module validate it. For example: if you want the validation
-to be case insensitive, you could convert the reponse to lower case.
-To enable response preprocessing:
+letting the CAPTCHA module validate it. For example: remove spaces from the
+response or merge the value of different widgets into one widget value.
+The previous version of the CAPTCHA API (5.x-3.x and 6.x-1.x) contained some
+custom tricks to make this possible, but since version 6.x-2.x it is recommended
+to use the standard Drupal Form API functionality, like the '#process' property.
 
-* Add a non zero 'preprocess' entry to $captcha in the 'generate' part of
-  hook_captcha(). E.g.:
+
+The following example shows how to add a '#process' callback to the captcha_response
+form element, and how that callback can process the response with a fictional
+remove_spaces() function.
 
 """
+/**
+ * Implementation of hook_captcha().
+ */
 function foo_captcha_captcha($op, $captcha_type='') {
-  switch($op) {
-    ...
+  switch ($op) {
+...
     case 'generate':
       if ($captcha_type == 'Foo CAPTCHA') {
-        ...
-        $captcha['preprocess'] = TRUE,
-        ...
-"""
+...
+        $captcha['form']['captcha_response'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Enter "foo"'),
+          '#required' => TRUE,
+          '#process' => array('foo_captcha_process'),
+        );
+...
+}
 
-* Add a 'preprocess' operation to hook_captcha() and add a $response argument
-  to the function signature. E.g.:
-
+/**
+ * Process the response to the foo CAPTCHA before validation.
+ */
+function foo_captcha_process($element, $edit, &$form_state, $complete_form) {
+  $element['#value'] = remove_spaces($element['#value']);
+  return $element;
+}
 """
-function foo_captcha_captcha($op, $captcha_type='', $response='') {
-  switch($op) {
-    ...
-    case 'preprocess':
-      if ($captcha_type == 'Foo CAPTCHA') {
-        return strtolower($response);
-      }
-      break;
-    ...
-"""
-
