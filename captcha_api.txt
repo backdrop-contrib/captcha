@@ -1,3 +1,4 @@
+// $Id$
 
 This documentation is for developers that want to implement their own
 challenge type and integrate it with the base CAPTCHA module.
