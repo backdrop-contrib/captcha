@@ -452,14 +452,13 @@ function captcha_pre_render_process($element) {
     // Update captcha_sessions table: store the solution of the generated CAPTCHA.
     _captcha_update_captcha_session($captcha_sid, $captcha_info['solution']);
 
-    if (!$element['#captcha_admin_mode']) {
-      // Empty the value of the captcha_response form item before rendering
-      $element['captcha_widgets']['captcha_response']['#value'] = '';
+    // Handle the response field if it is available and if it is a textfield.
+    if (isset($element['captcha_widgets']['captcha_response']['#type']) && $element['captcha_widgets']['captcha_response']['#type'] == 'textfield') {
+      // Before rendering: presolve an admin mode challenge or
+      // empty the value of the captcha_response form item.
+      $value = $element['#captcha_admin_mode'] ? $captcha_info['solution'] : '';
+      $element['captcha_widgets']['captcha_response']['#value'] = $value;
     }
-    else {
-      $element['captcha_widgets']['captcha_response']['#value'] = $captcha_info['solution'];
-    }
-
   }
   else {
     // Remove CAPTCHA widgets from form.
