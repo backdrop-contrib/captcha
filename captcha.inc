@@ -128,7 +128,9 @@ function _captcha_required_for_user($captcha_sid, $form_id) {
 
 /**
  * Get the description which appears above the CAPTCHA in forms.
- * If the locale module is enabled, an optional language code can be given
+ * If the locale module is enabled, an optional language code can be given.
+ * @param $lang_code an optional language code to get the descripion for.
+ * @return a string with (localized) CAPTCHA description.
  */
 function _captcha_get_description($lang_code=NULL) {
   $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.');

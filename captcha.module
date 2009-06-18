@@ -219,15 +219,6 @@ function captcha_process($element, $edit, &$form_state, $complete_form) {
     // Add form elements from challenge as children to CAPTCHA form element.
     $element['captcha_widgets'] = $captcha['form'];
 
-    // Add CAPTCHA description if required:
-    // #description is default (NULL) and a description is set in the admin interface.
-    if ($element['#description'] === NULL) {
-      $captcha_description = _captcha_get_description();
-      if ($captcha_description) {
-        $element['#description'] = $captcha_description;
-      }
-    }
-
     if (!$element['#captcha_admin_mode']) {
       // Add a validation callback for the CAPTCHA form element.
       $element['#element_validate'] = array('captcha_validate');
@@ -298,6 +289,11 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
           '#type' => 'captcha',
           '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
         );
+        // Add a CAPTCHA description if required.
+        if (variable_get('captcha_add_captcha_description', TRUE)) {
+          $captcha_element['#description'] = _captcha_get_description();
+        }
+
         # Get placement in form and insert in form.
         $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
         _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);

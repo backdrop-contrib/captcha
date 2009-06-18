@@ -33,6 +33,9 @@ function _captcha_available_challenge_types($add_special_options=TRUE) {
 function captcha_admin_settings() {
   module_load_include('inc', 'captcha');
 
+  // Use javascript for some added usability on admin form.
+  drupal_add_js(drupal_get_path('module', 'captcha') .'/captcha.js');
+
   // Configuration of which forms to protect, with what challenge.
   $form['captcha_form_protection'] = array(
     '#type' => 'fieldset',
@@ -114,13 +117,21 @@ function captcha_admin_settings() {
     '#description' => t('This option makes it possible to add CAPTCHAs to forms on administrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on administrative pages.'),
   );
 
-  // field(s) for setting the additional CAPTCHA description
+  // Configuration option for adding a CAPTCHA description.
+  $form['captcha_add_captcha_description'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add a description to the CAPTCHA.'),
+    '#description' => t('When enabled, the challenge is put in a fieldset with an extra (configurable) description.'),
+    '#default_value' => variable_get('captcha_add_captcha_description', TRUE),
+  );
+  // Textfield(s) for the CAPTCHA description.
   if (module_exists('locale')) {
     $langs = locale_language_list();
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
       '#title' => t('Challenge description'),
       '#description' => t('With this description you can explain the purpose of the challenge to the user.'),
+      '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
     );
     foreach ($langs as $lang_code => $lang_name) {
       $form['captcha_descriptions']["captcha_description_$lang_code"] = array(
@@ -138,6 +149,7 @@ function captcha_admin_settings() {
       '#description' => t('With this description you can explain the purpose of the challenge to the user.'),
       '#default_value' => _captcha_get_description(),
       '#maxlength' => 256,
+      '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
     );
   }
 
@@ -240,6 +252,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
   }
 
   // CAPTCHA description stuff.
+  variable_set('captcha_add_captcha_description', $form_state['values']['captcha_add_captcha_description']);
   if (module_exists('locale')) {
     $langs = locale_language_list();
     foreach ($langs as $lang_code => $lang_name) {
