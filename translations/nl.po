@@ -30,7 +30,7 @@ msgstr "geen"
 
 #: captcha.admin.inc:34
 msgid "Form protection"
-msgstr "Formulier bescherming"
+msgstr "Formulierbescherming"
 
 #: captcha.admin.inc:35
 msgid ""
@@ -61,7 +61,7 @@ msgstr ""
 
 #: captcha.admin.inc:85 captcha.module:106
 msgid "administer CAPTCHA settings"
-msgstr "CAPTCHA instellingen beheren"
+msgstr "CAPTCHA-instellingen beheren"
 
 #: captcha.admin.inc:90
 msgid "Allow CAPTCHAs and CAPTCHA administration links on administrative pages"
@@ -83,7 +83,7 @@ msgstr ""
 
 #: captcha.admin.inc:100;115
 msgid "Challenge description"
-msgstr "CAPTCHA beschrijving"
+msgstr "CAPTCHA-beschrijving"
 
 #: captcha.admin.inc:101;116
 msgid ""
@@ -99,7 +99,7 @@ msgstr "Voor taal %lang_name (code %lang_code)"
 
 #: captcha.admin.inc:125
 msgid "Persistence"
-msgstr "CAPTCHA volharding"
+msgstr "CAPTCHA-volharding"
 
 #: captcha.admin.inc:128
 msgid "Always add a challenge."
@@ -134,7 +134,7 @@ msgstr "Hou foute anwoorden bij"
 #: captcha.admin.inc:139
 msgid "Report information about wrong responses to the !log."
 msgstr ""
-"Informatie omtrent foute CAPTCHA antwoorden worden bijgehouden in het !log."
+"Informatie omtrent foute CAPTCHA-antwoorden worden bijgehouden in het !log."
 
 #: captcha.admin.inc:139
 msgid "log"
@@ -146,7 +146,7 @@ msgstr ""
 
 #: captcha.admin.inc:156
 msgid "Challenge type (module)"
-msgstr "CAPTCHA type (module)"
+msgstr "CAPTCHA-type (module)"
 
 #: captcha.admin.inc:156
 msgid "Operations"
@@ -162,7 +162,7 @@ msgstr "CAPTCHA point instellingen zijn bewaard."
 
 #: captcha.admin.inc:223
 msgid "The CAPTCHA settings were saved."
-msgstr "De CAPTCHA instellingen werden opgeslagen."
+msgstr "De CAPTCHA-instellingen werden opgeslagen."
 
 #: captcha.admin.inc:253;267
 msgid "Form ID"
@@ -176,11 +176,11 @@ msgstr ""
 
 #: captcha.admin.inc:274
 msgid "Challenge type"
-msgstr "CAPTCHA type"
+msgstr "CAPTCHA-type"
 
 #: captcha.admin.inc:275
 msgid "The CAPTCHA type to use for this form"
-msgstr "Het CAPTCHA type te gebruiken voor dit formulier"
+msgstr "Het CAPTCHA-type te gebruiken voor dit formulier"
 
 #: captcha.admin.inc:284
 msgid "Save"
@@ -188,7 +188,7 @@ msgstr "Bewaren"
 
 #: captcha.admin.inc:307
 msgid "Saved CAPTCHA point settings."
-msgstr "CAPTCHA point instellingen zijn bewaard."
+msgstr "CAPTCHA-point-instellingen zijn bewaard."
 
 #: captcha.admin.inc:324
 msgid "Are you sure you want to delete the CAPTCHA for form_id %form_id?"
@@ -361,7 +361,7 @@ msgstr "CAPTCHA plaatsen voor onbetrouwbare gebruikers."
 
 #: captcha.module:421
 msgid "CAPTCHA test failed (unknown csid)."
-msgstr "CAPTCHA test faalde (ongekende csid)."
+msgstr "CAPTCHA-test faalde (ongekende csid)."
 
 #: captcha.module:435
 msgid "The answer you entered for the CAPTCHA was not correct."
@@ -417,7 +417,7 @@ msgstr "Voorbeelden"
 
 #: captcha.module:83
 msgid "An overview of the available challenge types with examples."
-msgstr "Overzicht van de beschikbare CAPTCHA types met voorbeelden."
+msgstr "Overzicht van de beschikbare CAPTCHA-types met voorbeelden."
 
 #: captcha.module:92
 msgid "CAPTCHA point administration"
@@ -442,7 +442,7 @@ msgstr ""
 
 #: captcha.info:0 image_captcha/image_captcha.info:0
 msgid "Spam control"
-msgstr "Spam controle"
+msgstr "Spamcontrole"
 
 #: image_captcha/image_captcha.admin.inc:13
 msgid "Built-in font"
@@ -456,7 +456,7 @@ msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:46
 msgid "Code settings"
-msgstr "Code instellingen"
+msgstr "Code-instellingen"
 
 #: image_captcha/image_captcha.admin.inc:50
 msgid "Characters to use in the code"
@@ -464,7 +464,7 @@ msgstr "Karakters die in de afbeelding kunnen verschijnen"
 
 #: image_captcha/image_captcha.admin.inc:55
 msgid "Code length"
-msgstr "Code lengte"
+msgstr "Codelengte"
 
 #: image_captcha/image_captcha.admin.inc:58
 msgid ""
@@ -488,7 +488,7 @@ msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:71
 msgid "Font settings"
-msgstr "Lettertype instellingen"
+msgstr "Lettertype-instellingen"
 
 #: image_captcha/image_captcha.admin.inc:77
 msgid "Font"
@@ -500,7 +500,7 @@ msgstr "Het TrueType font (.ttf) te gebruiken vor de afbeelding CAPTCHA"
 
 #: image_captcha/image_captcha.admin.inc:88
 msgid "Font size"
-msgstr "Lettertype grootte"
+msgstr "Lettertypegrootte"
 
 #: image_captcha/image_captcha.admin.inc:90
 msgid "tiny"
@@ -544,7 +544,7 @@ msgstr "Configuratie van de achtergrond- en tekstkleuren in de beeld-CAPTCHA."
 
 #: image_captcha/image_captcha.admin.inc:126
 msgid "Background color"
-msgstr "Achtergrond kleur"
+msgstr "Achtergrondkleur"
 
 #: image_captcha/image_captcha.admin.inc:127
 msgid ""
