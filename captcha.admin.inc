@@ -120,8 +120,8 @@ function captcha_admin_settings() {
   // Configuration option for adding a CAPTCHA description.
   $form['captcha_add_captcha_description'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Add a description to the CAPTCHA.'),
-    '#description' => t('When enabled, the challenge is put in a fieldset with an extra (configurable) description.'),
+    '#title' => t('Add a description to the CAPTCHA'),
+    '#description' => t('Add a configurable description to explain the purpose of the CAPTCHA to the visitor.'),
     '#default_value' => variable_get('captcha_add_captcha_description', TRUE),
   );
   // Textfield(s) for the CAPTCHA description.
@@ -129,8 +129,8 @@ function captcha_admin_settings() {
     $langs = locale_language_list();
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
-      '#title' => t('Challenge description'),
-      '#description' => t('With this description you can explain the purpose of the challenge to the user.'),
+      '#title' => t('CAPTCHA description'),
+      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description.'),
       '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
     );
     foreach ($langs as $lang_code => $lang_name) {
@@ -146,7 +146,7 @@ function captcha_admin_settings() {
     $form['captcha_description'] = array(
       '#type' => 'textfield',
       '#title' => t('Challenge description'),
-      '#description' => t('With this description you can explain the purpose of the challenge to the user.'),
+      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description.'),
       '#default_value' => _captcha_get_description(),
       '#maxlength' => 256,
       '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
@@ -253,14 +253,29 @@ function captcha_admin_settings_submit($form, &$form_state) {
 
   // CAPTCHA description stuff.
   variable_set('captcha_add_captcha_description', $form_state['values']['captcha_add_captcha_description']);
+  // Save (or reset) the CAPTCHA descriptions.
   if (module_exists('locale')) {
     $langs = locale_language_list();
     foreach ($langs as $lang_code => $lang_name) {
-      variable_set("captcha_description_$lang_code", $form_state['values']["captcha_description_$lang_code"]);
+      $description = $form_state['values']["captcha_description_$lang_code"];
+      if ($description) {
+        variable_set("captcha_description_$lang_code", $description);
+      }
+      else {
+        variable_del("captcha_description_$lang_code");
+        drupal_set_message(t('Reset of CAPTCHA description for language %language.', array('%language' => $lang_name)), 'status');
+      }
     }
   }
   else {
-    variable_set('captcha_description', $form_state['values']['captcha_description']);
+    $description = $form_state['values']['captcha_description'];
+    if ($description) {
+      variable_set('captcha_description', $description);
+    }
+    else {
+      variable_del('captcha_description');
+      drupal_set_message(t('Reset of CAPTCHA description.'), 'status');
+    }
   }
 
   variable_set('captcha_case_sensitive_validation', $form_state['values']['captcha_case_sensitive_validation']);

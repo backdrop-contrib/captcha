@@ -127,18 +127,24 @@ function _captcha_required_for_user($captcha_sid, $form_id) {
 }
 
 /**
- * Get the description which appears above the CAPTCHA in forms.
- * If the locale module is enabled, an optional language code can be given.
+ * Get the CAPTCHA description as configured on the general CAPTCHA
+ * settings page.
+ *
+ * If the locale module is enabled, the description will be returned
+ * for the current language the page is rendered for. This language
+ * can optionally been overriden with the $lang_code argument.
+ *
  * @param $lang_code an optional language code to get the descripion for.
  * @return a string with (localized) CAPTCHA description.
  */
 function _captcha_get_description($lang_code=NULL) {
-  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.');
+  // If no language code is given: use the language of the current page.
+  global $language;
+  $lang_code = isset($lang_code) ? $lang_code : $language->language;
+  // The hardcoded but localizable default.
+  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.', array(), $lang_code);
+  // Look up the configured CAPTCHA description or fall back on the (localized) default.
   if (module_exists('locale')) {
-    if ($lang_code == NULL) {
-      global $language;
-      $lang_code = $language->language;
-    }
     $description = variable_get("captcha_description_$lang_code", $default);
   }
   else {
