@@ -27,6 +27,10 @@ function _image_captcha_available_fonts() {
  * Configuration form for image_captcha
  */
 function image_captcha_settings_form() {
+
+  // Use javascript for some added usability on admin form.
+  drupal_add_js(drupal_get_path('module', 'image_captcha') .'/image_captcha.js');
+
   $form = array();
 
   // First some error checking.
@@ -91,10 +95,14 @@ function image_captcha_settings_form() {
       '#type' => 'select',
       '#title' => t('Font size'),
       '#options' => array(
-        12 => t('tiny'),
-        20 => t('small'),
-        30 => t('normal'),
-        40 => t('large'),
+        9 => '9 pt - ' . t('tiny'),
+        12 => '12 pt - ' . t('small'),
+        18 => '18 pt',
+        24 => '24 pt - ' . t('normal'),
+        30 => '30 pt',
+        36 => '36 pt - ' . t('large'),
+        48 => '48 pt',
+        64 => '64 pt - ' . t('extra large'),
       ),
       '#default_value' => (int) variable_get('image_captcha_font_size', 30),
       '#description' => t('The font size influences the size of the image. Note that larger values make the image generation more CPU intensive.'),
@@ -113,9 +121,10 @@ function image_captcha_settings_form() {
     '#description' => t('Define the average spacing between characters. Note that larger values make the image generation more CPU intensive.'),
     '#default_value' => variable_get('image_captcha_character_spacing', '1.2'),
     '#options' => array(
-      '1' => t('small'),
-      '1.2' => t('normal'),
-      '1.5' => t('large'),
+      '0.75' => t('tight'),
+      '1' => t('normal'),
+      '1.2' => t('wide'),
+      '1.5' => t('extra wide'),
     ),
   );
 
@@ -167,12 +176,17 @@ function image_captcha_settings_form() {
     '#type' => 'select',
     '#title' => t('Distortion level'),
     '#options' => array(
-      0 => t('none'),
-      2 => t('low'),
-      4 => t('moderate'),
-      6 => t('normal'),
-      8 => t('high'),
-      10 => t('severe'),
+      0 => '0 - '. t('none'),
+      1 => '1',
+      2 => '2 - '. t('low'),
+      3 => '3',
+      4 => '4 - '. t('moderate'),
+      5 => '5',
+      6 => '6 - '. t('normal'),
+      7 => '7',
+      8 => '8 - '. t('high'),
+      9 => '9',
+      10 => '10 - '. t('severe'),
     ),
     '#default_value' => (int) variable_get('image_captcha_distortion_amplitude', 6),
     '#description' => t('Set the degree of wave distortion in the image.'),
@@ -200,13 +214,13 @@ function image_captcha_settings_form() {
     '#type' => 'select',
     '#title' => t('Noise level'),
     '#options' => array(
-      1 => t('1 - low'),
+      1 => '1 - '. t('low'),
       2 => '2',
-      3 => t('3 - medium'),
+      3 => '3 - '. t('medium'),
       4 => '4',
-      5 => t('5 - high'),
+      5 => '5 - '. t('high'),
       7 => '7',
-      10 => t('10 - severe'),
+      10 => '10 - '. t('severe'),
     ),
     '#default_value' => (int) variable_get('image_captcha_noise_level', 5),
   );

@@ -17,7 +17,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
-"POT-Creation-Date: 2009-06-21 17:50+0200\n"
+"POT-Creation-Date: 2009-06-21 17:57+0200\n"
 "PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
 "Last-Translator: NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
@@ -26,7 +26,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 
-#: captcha.admin.inc:16 image_captcha/image_captcha.admin.inc:148;170
+#: captcha.admin.inc:16 image_captcha/image_captcha.admin.inc:157;179
 msgid "none"
 msgstr ""
 
@@ -302,7 +302,7 @@ msgstr ""
 msgid "disable"
 msgstr ""
 
-#: captcha.module:329 image_captcha/image_captcha.admin.inc:45
+#: captcha.module:329 image_captcha/image_captcha.admin.inc:49
 msgid "Example"
 msgstr ""
 
@@ -396,215 +396,219 @@ msgstr ""
 msgid "Built-in font"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:35
+#: image_captcha/image_captcha.admin.inc:39
 msgid "The Image CAPTCHA module can not generate images because your PHP setup does not support it (no <a href=\"!gdlib\">GD library</a>)."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:46
+#: image_captcha/image_captcha.admin.inc:50
 msgid "Presolved image CAPTCHA example, generated with the current settings."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:57
+#: image_captcha/image_captcha.admin.inc:61
 msgid "Code settings"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:61
+#: image_captcha/image_captcha.admin.inc:65
 msgid "Characters to use in the code"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:66
+#: image_captcha/image_captcha.admin.inc:70
 msgid "Code length"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:69
+#: image_captcha/image_captcha.admin.inc:73
 msgid "The code length influences the size of the image. Note that larger values make the image generation more CPU intensive."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:75
+#: image_captcha/image_captcha.admin.inc:79
 msgid "Font settings"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:81
+#: image_captcha/image_captcha.admin.inc:85
 msgid "Font"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:83
+#: image_captcha/image_captcha.admin.inc:87
 msgid "The TrueType font (.ttf) to use for the text in the image CAPTCHA."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:92
+#: image_captcha/image_captcha.admin.inc:96
 msgid "Font size"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:94
+#: image_captcha/image_captcha.admin.inc:98
 msgid "tiny"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:95;116;149
+#: image_captcha/image_captcha.admin.inc:99;158
 msgid "small"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:96;117;173
+#: image_captcha/image_captcha.admin.inc:101;125;185
 msgid "normal"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:97;118
+#: image_captcha/image_captcha.admin.inc:103
 msgid "large"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:100
+#: image_captcha/image_captcha.admin.inc:105
+msgid "extra large"
+msgstr ""
+
+#: image_captcha/image_captcha.admin.inc:108
 msgid "The font size influences the size of the image. Note that larger values make the image generation more CPU intensive."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:112
+#: image_captcha/image_captcha.admin.inc:120
 msgid "Character spacing"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:113
+#: image_captcha/image_captcha.admin.inc:121
 msgid "Define the average spacing between characters. Note that larger values make the image generation more CPU intensive."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:125
-msgid "Color settings"
+#: image_captcha/image_captcha.admin.inc:124
+msgid "tight"
 msgstr ""
 
 #: image_captcha/image_captcha.admin.inc:126
+msgid "wide"
+msgstr ""
+
+#: image_captcha/image_captcha.admin.inc:127
+msgid "extra wide"
+msgstr ""
+
+#: image_captcha/image_captcha.admin.inc:134
+msgid "Color settings"
+msgstr ""
+
+#: image_captcha/image_captcha.admin.inc:135
 msgid "Configuration of the background and text colors in the image CAPTCHA."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:130
+#: image_captcha/image_captcha.admin.inc:139
 msgid "Background color"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:131
+#: image_captcha/image_captcha.admin.inc:140
 msgid "Enter the hexadecimal code for the background color (e.g. #FFF or #FFCE90)."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:138
+#: image_captcha/image_captcha.admin.inc:147
 msgid "Text color"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:139
+#: image_captcha/image_captcha.admin.inc:148
 msgid "Enter the hexadecimal code for the text color (e.g. #000 or #004283)."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:146
+#: image_captcha/image_captcha.admin.inc:155
 msgid "Additional variation of text color"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:150;172
+#: image_captcha/image_captcha.admin.inc:159;183
 msgid "moderate"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:151;174
+#: image_captcha/image_captcha.admin.inc:160;187;221
 msgid "high"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:152
+#: image_captcha/image_captcha.admin.inc:161
 msgid "very high"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:155
+#: image_captcha/image_captcha.admin.inc:164
 msgid "The different characters will have randomized colors in the specified range around the text color."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:162
+#: image_captcha/image_captcha.admin.inc:171
 msgid "Distortion and noise"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:163
+#: image_captcha/image_captcha.admin.inc:172
 msgid "With these settings you can control the degree of obfuscation by distortion and added noise. Do not exaggerate the obfuscation and assure that the code in the image is reasonably readable. For example, do not combine high levels of distortion and noise."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:168
+#: image_captcha/image_captcha.admin.inc:177
 msgid "Distortion level"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:171
+#: image_captcha/image_captcha.admin.inc:181;217
 msgid "low"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:175
+#: image_captcha/image_captcha.admin.inc:189;223
 msgid "severe"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:178
+#: image_captcha/image_captcha.admin.inc:192
 msgid "Set the degree of wave distortion in the image."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:182
+#: image_captcha/image_captcha.admin.inc:196
 msgid "Smooth distortion"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:184
+#: image_captcha/image_captcha.admin.inc:198
 msgid "This option enables bilinear interpolation of the distortion which makes the image look smoother, but it is more CPU intensive."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:189
+#: image_captcha/image_captcha.admin.inc:203
 msgid "Add salt and pepper noise"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:191
+#: image_captcha/image_captcha.admin.inc:205
 msgid "This option adds randomly colored point noise."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:195
+#: image_captcha/image_captcha.admin.inc:209
 msgid "Add line noise"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:197
+#: image_captcha/image_captcha.admin.inc:211
 msgid "This option enables lines randomly drawn on top of the text code."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:201
+#: image_captcha/image_captcha.admin.inc:215
 msgid "Noise level"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:203
-msgid "1 - low"
+#: image_captcha/image_captcha.admin.inc:219
+msgid "medium"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:205
-msgid "3 - medium"
-msgstr ""
-
-#: image_captcha/image_captcha.admin.inc:207
-msgid "5 - high"
-msgstr ""
-
-#: image_captcha/image_captcha.admin.inc:209
-msgid "10 - severe"
-msgstr ""
-
-#: image_captcha/image_captcha.admin.inc:226
+#: image_captcha/image_captcha.admin.inc:240
 msgid "The Image CAPTCHA module can not use True Type fonts because your PHP setup does not support it. There is only a built-in bitmap font available."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:231
+#: image_captcha/image_captcha.admin.inc:245
 msgid "The image CAPTCHA module works best with a TrueType font file (TTF) for generating the images, but because of licencing issues it is not allowed to package fonts with the module. A simple built-in bitmap font is provided as default instead. You can install TrueType fonts yourself by putting them in the fonts directory of the image CAPTCHA module (directory \"%fontsdir\") or by uploading them to your Drupal file system (directory \"%filesdir\") with for example the upload module."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:234
+#: image_captcha/image_captcha.admin.inc:248
 msgid "The usage of the built-in bitmap font it is not recommended because of its small size and missing UTF-8 support."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:245
+#: image_captcha/image_captcha.admin.inc:259
 msgid "The list of characters to use should not contain spaces."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:250
+#: image_captcha/image_captcha.admin.inc:264
 msgid "You need to select a font"
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:253
+#: image_captcha/image_captcha.admin.inc:267
 msgid "Font does not exist or is not readable."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:258
+#: image_captcha/image_captcha.admin.inc:272
 msgid "Background color is not a valid hexadecimal color value."
 msgstr ""
 
-#: image_captcha/image_captcha.admin.inc:261
+#: image_captcha/image_captcha.admin.inc:275
 msgid "Text color is not a valid hexadecimal color value."
 msgstr ""
 
