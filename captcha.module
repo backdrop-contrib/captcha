@@ -155,9 +155,6 @@ function captcha_cron() {
  */
 function captcha_elements() {
   // Define the CAPTCHA form element with default properties.
-  // Unfortunately we can't set the '#description' field here because
-  // Drupal's form API processes it in a weird way: '#description'
-  // becomes an array instead of a string (see _element_info() in form.inc).
   return array('captcha' => array(
     '#input' => TRUE,
     '#process' => array('captcha_process'),
