@@ -11,6 +11,7 @@
 // TODO: test for default challenge type
 // TODO: test about placement (comment form, node forms, log in form, etc)
 // TODO: test if captcha_cron does it work right
+// TODO: test custom CAPTCHA validation stuff
 
 class CapchaTestCase extends DrupalWebTestCase {
 
@@ -135,14 +136,14 @@ class CapchaTestCase extends DrupalWebTestCase {
     // Log in as normal user.
     $this->drupalLogin($this->normal_user);
 
-    // Test case sensitive posting (the default)
-    variable_set('captcha_case_sensitive_validation', TRUE);
+    // Test case sensitive posting.
+    variable_set('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE);
     $this->assertCommentPosting('Test 123', TRUE, 'Case sensitive validation of right casing.');
     $this->assertCommentPosting('test 123', FALSE, 'Case sensitive validation of wrong casing.');
     $this->assertCommentPosting('TEST 123', FALSE, 'Case sensitive validation of wrong casing.');
 
     // Test case insensitive posting (the default)
-    variable_set('captcha_case_sensitive_validation', FALSE);
+    variable_set('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE);
     $this->assertCommentPosting('Test 123', TRUE, 'Case insensitive validation of right casing.');
     $this->assertCommentPosting('test 123', TRUE, 'Case insensitive validation of wrong casing.');
     $this->assertCommentPosting('TEST 123', TRUE, 'Case insensitive validation of wrong casing.');

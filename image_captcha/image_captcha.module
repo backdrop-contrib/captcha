@@ -162,7 +162,7 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
 
         // Handle the case insesitivity option and change the code to lower case
         // before saving it as solution.
-        if (variable_get('captcha_case_sensitive_validation', TRUE)) {
+        if (CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE == variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
           $description = t('Enter the characters shown in the image. Ignore spaces and be careful about upper and lower case.');
         }
         else {

@@ -154,11 +154,15 @@ function captcha_admin_settings() {
   }
 
   // Option for case sensitive/insensitive validation of the responses.
-  $form['captcha_case_sensitive_validation'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Case sensitive validation'),
-    '#description' => t('Disable this option to ignore uppercase/lowercase errors in the response.'),
-    '#default_value' => variable_get('captcha_case_sensitive_validation', TRUE),
+  $form['captcha_default_validation'] = array(
+    '#type' => 'radios',
+    '#title' => t('Default CAPTCHA validation'),
+    '#description' => t('Define how the response should be processed by default. Note that the modules that provide the actual challenges can override or ignore this.'),
+    '#options' => array(
+      CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE => t('Case sensitive validation: the response has to exactly match the solution.'),
+      CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE => t('Case insensitive validation: lowercase/uppercase errors are ignored.'),
+    ),
+    '#default_value' => variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE),
   );
 
   // Field for CAPTCHA persistence.
@@ -278,7 +282,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
     }
   }
 
-  variable_set('captcha_case_sensitive_validation', $form_state['values']['captcha_case_sensitive_validation']);
+  variable_set('captcha_default_validation', $form_state['values']['captcha_default_validation']);
   variable_set('captcha_persistence', $form_state['values']['captcha_persistence']);
   variable_set('captcha_log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
 

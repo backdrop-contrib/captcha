@@ -124,18 +124,12 @@ function foo_captcha_help($path, $arg) {
 """
 
 
-=== Optional: (pre)process the response ===
-In some situations it could be necessary to preprocess the response before
-letting the CAPTCHA module validate it. For example: remove spaces from the
-response or merge the value of different widgets into one widget value.
-The previous version of the CAPTCHA API (5.x-3.x and 6.x-1.x) contained some
-custom tricks to make this possible, but since version 6.x-2.x it is recommended
-to use the standard Drupal Form API functionality, like the '#process' property.
 
-
-The following example shows how to add a '#process' callback to the captcha_response
-form element, and how that callback can process the response with a fictional
-remove_spaces() function.
+=== Optional: custom response validation ===
+The CAPTCHA module provides an option for case sensitive and case insensitve
+validation of the responses. If this is not sufficient, you can provide
+your own validation function with the 'captcha_validate' field, illustrated
+by the following example:
 
 """
 /**
@@ -143,24 +137,28 @@ remove_spaces() function.
  */
 function foo_captcha_captcha($op, $captcha_type='') {
   switch ($op) {
-...
+    ...
     case 'generate':
       if ($captcha_type == 'Foo CAPTCHA') {
-...
-        $captcha['form']['captcha_response'] = array(
-          '#type' => 'textfield',
-          '#title' => t('Enter "foo"'),
-          '#required' => TRUE,
-          '#process' => array('foo_captcha_process'),
-        );
-...
+        $captcha = array();
+        $captcha['solution'] = ...
+        $captcha['form'] = ...
+        $captcha['captcha_validate'] = 'foo_captcha_custom_validation';
+        return $captcha;
+      }
+      break;
+  }
 }
 
 /**
- * Process the response to the foo CAPTCHA before validation.
+ * Custom CAPTCHA validation function.
+ *
+ * @param solution the solution for the challenge as reported by hook_captcha('generate', ...).
+ * @param response the answer given by the user.
+ * @return TRUE on succes and FALSE on failure.
  */
-function foo_captcha_process($element, $edit, &$form_state, $complete_form) {
-  $element['#value'] = remove_spaces($element['#value']);
-  return $element;
+function foo_captcha_custom_validation($solution, $response) {
+  return $response == "foo" || $response == "bar";
 }
 """
+
