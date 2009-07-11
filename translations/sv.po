@@ -81,7 +81,7 @@ msgstr "radera"
 #: captcha.admin.inc:110
 msgid ""
 "This option makes it easy to manage CAPTCHA settings on forms. When enabled, "
-"users with the \"%admincaptcha\" permission will see a fieldsset with "
+"users with the \"%admincaptcha\" permission will see a fieldset with "
 "CAPTCHA administration links on all forms, except on administrative pages."
 msgstr ""
 "Hjälpfunktion för att slå på och stänga av CAPTCHA på formulär. När "

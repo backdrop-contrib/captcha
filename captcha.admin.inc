@@ -107,7 +107,7 @@ function captcha_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Add CAPTCHA administration links to forms'),
     '#default_value' => variable_get('captcha_administration_mode', FALSE),
-    '#description' => t('This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the "%admincaptcha" permission will see a fieldsset with CAPTCHA administration links on all forms, except on administrative pages.', array('%admincaptcha' => t('administer CAPTCHA settings'))),
+    '#description' => t('This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the "%admincaptcha" permission will see a fieldset with CAPTCHA administration links on all forms, except on administrative pages.', array('%admincaptcha' => t('administer CAPTCHA settings'))),
   );
   // Field for the CAPTCHAs on admin pages.
   $form['captcha_form_protection']['captcha_allow_on_admin_pages'] = array(

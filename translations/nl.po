@@ -61,7 +61,7 @@ msgid "delete"
 msgstr "verwijderen"
 
 #: captcha.admin.inc:110
-msgid "This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the \"%admincaptcha\" permission will see a fieldsset with CAPTCHA administration links on all forms, except on administrative pages."
+msgid "This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the \"%admincaptcha\" permission will see a fieldset with CAPTCHA administration links on all forms, except on administrative pages."
 msgstr "Deze optie is handig om CAPTCHA's te beheren op formulieren. Wanneer deze optie ingeschakeld is, zien gebruikers met de \"%admincaptcha\" permissie de CAPTCHA-configuratielinks op alle formulieren, met uitzondering van de beheerpagina's."
 
 #: captcha.admin.inc:110 captcha.module:107
