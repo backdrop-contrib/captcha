@@ -98,7 +98,7 @@ function captcha_admin_settings() {
   // Select widget for CAPTCHA type.
   $form['captcha_form_protection']['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'] = array(
     '#type' => 'select',
-    '#default_value' => "{$captcha_point->module}/{$captcha_point->type}",
+    '#default_value' => 'none',
     '#options' => $captcha_type_options,
   );
 
