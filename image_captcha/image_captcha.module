@@ -126,7 +126,7 @@ function _image_captcha_check_setup() {
 /**
  * Implementation of hook_captcha().
  */
-function image_captcha_captcha($op, $captcha_type='', $arg3='') {
+function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
   switch ($op) {
     case 'list':
       // only offer image CAPTCHA if possible to generate an image CAPTCHA
@@ -154,8 +154,6 @@ function image_captcha_captcha($op, $captcha_type='', $arg3='') {
         for ($i = 0; $i < $code_length; $i++) {
           $code .= $allowed_chars[array_rand($allowed_chars)];
         }
-
-        $captcha_sid = $arg3;
 
         // build the result to return
         $result = array();

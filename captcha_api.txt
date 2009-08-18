@@ -19,6 +19,9 @@ Functionality depends on the first argument $op:
     $captcha['form']: an array of the form elements you want to add to the form.
       There should be a key 'captcha_response' in this array, which points to
       the form element where the user enters his answer.
+    An optional additional argument $captcha_sid with the captcha session ID is
+    available for more advanced challenges (e.g. the image CAPTCHA uses this
+    argument, see image_captcha_captcha()).
 
 Let's give a simple example to make this more clear.
 We create the challenge 'Foo CAPTCHA', which requires the user to
