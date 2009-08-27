@@ -422,9 +422,10 @@ function captcha_validate($element, &$form_state) {
     if (!function_exists($captcha_validate)) {
        $captcha_validate = 'captcha_validate_strict_equality';
     }
-    // Check the response.
-    // TODO: also add $element and $form_state as arguments?
-    if ($captcha_validate($solution, $captcha_response)) {
+    // Check the response with the CAPTCHA validation function.
+    // Appart from the traditional expected $solution and received $response,
+    // we also provide the CAPTCHA $element and $form_state arrays for more advanced use cases.
+    if ($captcha_validate($solution, $captcha_response, $element, $form_state)) {
       // Correct answer.
       $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
       // Record success.

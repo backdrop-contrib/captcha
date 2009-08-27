@@ -165,3 +165,15 @@ function foo_captcha_custom_validation($solution, $response) {
 }
 """
 
+Previous example shows the basic usage for custom validation with only a $solution
+and $response argument, which should be sufficient for most CAPTCHA modules.
+More advanced CAPTCHA modules can also use extra provided arguments $element
+and $form_state:
+"""
+function foo_captcha_custom_validation($solution, $response, $element, $form_state) {
+  return $form_state['foo']['#bar'] = 'baz';
+}
+"""
+These extra arguments are the $element and $form_state arguments of the validation function
+of the #captcha element. See captcha_validate() in captcha.module for more info about this.
+
