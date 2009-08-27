@@ -254,14 +254,20 @@ function image_captcha_settings_form_pre_render($form) {
  * Validation function for image_captcha configuration form
  */
 function image_captcha_settings_form_validate($form, &$form_state) {
-  // check image_captcha_image_allowed_chars for spaces
+  // Check image_captcha_image_allowed_chars for spaces.
   if (preg_match('/\s/', $form_state['values']['image_captcha_image_allowed_chars'])) {
     form_set_error('image_captcha_image_allowed_chars', t('The list of characters to use should not contain spaces.'));
   }
-  // check font
+  // Check font.
   $font = $form_state['values']['image_captcha_font'];
   if ($font == '0') {
     form_set_error('image_captcha_font', t('You need to select a font'));
+  }
+  elseif ($font == 'BUILTIN') {
+    // With the built in font, only latin2 characters should be used.
+    if (preg_match('/[^a-zA-Z0-9]/', $form_state['values']['image_captcha_image_allowed_chars'])) {
+      form_set_error('image_captcha_image_allowed_chars', t('The built-in font only supports Latin2 characters. Only use "a" to "z" and numbers.'));
+    }
   }
   elseif ($font != 'BUILTIN' && (!is_file($font) || !is_readable($font))) {
     form_set_error('image_captcha_font', t('Font does not exist or is not readable.'));
