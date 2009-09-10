@@ -414,7 +414,11 @@ function captcha_validate($element, &$form_state) {
 
   if ($solution === FALSE) {
     // Unknown challenge_id.
-    form_set_error('captcha', t('CAPTCHA test failed (unknown csid).'));
+    form_set_error('captcha', t('CAPTCHA validation error: unknown CAPTCHA session ID. Contact the site administrator if this problem persists.'));
+    watchdog('CAPTCHA',
+      'CAPTCHA validation error: unknown CAPTCHA session ID (%csid).',
+      array('%csid' => var_export($csid, TRUE)),
+      WATCHDOG_ERROR);
   }
   else {
     // Get CAPTCHA validate function or fall back on strict equality.
