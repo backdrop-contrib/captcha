@@ -404,9 +404,9 @@ function captcha_validate($element, &$form_state) {
   // instead of $form_state['values']['captcha_sid'] because the latter
   // contains the captcha_sid associated to the 'newly' generated element,
   // while the former contains the captcha_sid of the posted form.
-  // In most cases both will be the same because of presistence.
-  // However, they will differ when the lifespan of the CAPTCHA session
-  // does not equal the lifespan of a multipage form and then we have to
+  // In most cases both will be the same because of persistence.
+  // However, they will differ when the life span of the CAPTCHA session
+  // does not equal the life span of a multipage form and then we have to
   // pick the right one.
   $csid = $form_state['clicked_button']['#post']['captcha_sid'];
 
@@ -423,7 +423,7 @@ function captcha_validate($element, &$form_state) {
        $captcha_validate = 'captcha_validate_strict_equality';
     }
     // Check the response with the CAPTCHA validation function.
-    // Appart from the traditional expected $solution and received $response,
+    // Apart from the traditional expected $solution and received $response,
     // we also provide the CAPTCHA $element and $form_state arrays for more advanced use cases.
     if ($captcha_validate($solution, $captcha_response, $element, $form_state)) {
       // Correct answer.
