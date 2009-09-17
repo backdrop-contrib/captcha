@@ -10,16 +10,22 @@
  * function to get a list of available fonts
  */
 function _image_captcha_available_fonts() {
-  $available_fonts = array('BUILTIN' => t('Built-in font'));
+  // List of folders to search through for TrueType fonts.
   $fontsdirectories = array(
     drupal_get_path('module', 'image_captcha') .'/fonts',
     file_directory_path(),
   );
+  // Search through the folders and build a list of available fonts.
+  $available_fonts = array();
   foreach ($fontsdirectories as $fontsdirectory) {
     foreach (file_scan_directory($fontsdirectory, '\.[tT][tT][fF]$') as $filename => $font) {
       $available_fonts[$filename] = "{$font->basename} ($filename)";
     }
   }
+
+  // Append the PHP built-in font at the end.
+  $available_fonts['BUILTIN'] = t('Built-in font');
+
   return $available_fonts;
 }
 

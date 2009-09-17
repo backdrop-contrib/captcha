@@ -59,7 +59,7 @@ function image_captcha_menu() {
  * @return array($font, $errno)
  */
 function _image_captcha_get_font() {
-  $font = variable_get('image_captcha_font', 'BUILTIN');
+  $font = variable_get('image_captcha_font', drupal_get_path('module', 'image_captcha') .'/fonts/Tesox/tesox.ttf');
   $errno = 0;
   if ($font != 'BUILTIN' && (!is_file($font) || !is_readable($font))) {
     $errno = IMAGE_CAPTCHA_ERROR_TTF_FILE_READ_PROBLEM;
