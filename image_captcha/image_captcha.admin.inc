@@ -84,9 +84,13 @@ function image_captcha_settings_form() {
     '#type' => 'select',
     '#title' => t('Font'),
     '#default_value' => $default_font,
-    '#description' => t('The TrueType font (.ttf) to use for the text in the image CAPTCHA.'),
+    '#description' => t('Select the font to use for the text in the image CAPTCHA. Apart from the provided defaults, you can also use your own TrueType font: put a TrueType font file (filename extension .ttf) in the "fonts" directory of the image CAPTCHA module (directory "%fontsdir") or in the Drupal "files" directory (directory "%filesdir").',
+      array('%fontsdir' => drupal_get_path('module', 'image_captcha') .'/fonts',
+        '%filesdir' => file_directory_path())
+    ),
     '#options' => $available_fonts,
   );
+
   // add a prerender procedure for checking that a font should be set.
   $form['#pre_render'] = array('image_captcha_settings_form_pre_render');
   // font size
@@ -237,14 +241,11 @@ function image_captcha_settings_form_pre_render($form) {
 
   if ($errno & IMAGE_CAPTCHA_ERROR_NO_TTF_SUPPORT) {
     drupal_set_message(
-      t('The Image CAPTCHA module can not use True Type fonts because your PHP setup does not support it. There is only a built-in bitmap font available.'),
+      t('The Image CAPTCHA module can not use TrueType fonts because your PHP setup does not support it. You can only use a low quality built-in bitmap font.'),
       'warning'
     );
   }
-  else if (count($form['image_captcha_font_settings']['image_captcha_font']['#options']) == 1) {
-    drupal_set_message(t('The image CAPTCHA module works best with a TrueType font file (TTF) for generating the images, but because of licencing issues it is not allowed to package fonts with the module. A simple built-in bitmap font is provided as default instead. You can install TrueType fonts yourself by putting them in the fonts directory of the image CAPTCHA module (directory "%fontsdir") or by uploading them to your Drupal file system (directory "%filesdir") with for example the upload module.', array('%fontsdir' => drupal_get_path('module', 'image_captcha') .'/fonts', '%filesdir' => file_directory_path())), 'warning');
-  }
-  if ($form['image_captcha_font_settings']['image_captcha_font']['#default_value'] == 'BUILTIN') {
+  elseif ($form['image_captcha_font_settings']['image_captcha_font']['#default_value'] == 'BUILTIN') {
     drupal_set_message(t('The usage of the built-in bitmap font it is not recommended because of its small size and missing UTF-8 support.'), 'warning');
   }
   return $form;
