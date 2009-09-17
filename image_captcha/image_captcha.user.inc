@@ -111,7 +111,7 @@ function _image_captcha_generate_image($code) {
   }
 
   // Distort the image.
-  $distortion_amplitude = .25 * $font_size * variable_get('image_captcha_distortion_amplitude', 6) / 10.0;
+  $distortion_amplitude = .25 * $font_size * variable_get('image_captcha_distortion_amplitude', 0) / 10.0;
   if ($distortion_amplitude > 1) {
     // distortion parameters
     $wavelength_xr = (2+3*lcg_value())*$font_size;
