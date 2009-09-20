@@ -338,17 +338,26 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
             '!disable' => l(t('disable'), "admin/user/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
           )),
         );
-        $captcha_element['example'] = array(
-          '#type' => 'fieldset',
-          '#title' => t('Example'),
-          '#description' => t('This is a pre-solved, non-blocking example of this challenge.'),
-        );
-        $captcha_element['example']['example_captcha'] = array(
-          '#type' => 'captcha',
-          '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
-          '#captcha_admin_mode' => TRUE,
-        );
-
+        // Add an example challenge with solution.
+        // This does not work with the reCAPTCHA and Egglue challenges as
+        // discussed in http://drupal.org/node/487032 and
+        // http://drupal.org/node/525586. As a temporary workaround, we
+        // blacklist the reCAPTCHA and Egglue challenges and do not show
+        // an example challenge.
+        // TODO: Once the issues mentioned above are fixed, this workaround
+        // should be removed.
+        if ($captcha_point->module != 'recaptcha' && $captcha_point->module != 'egglue_captcha') {
+          $captcha_element['example'] = array(
+            '#type' => 'fieldset',
+            '#title' => t('Example'),
+            '#description' => t('This is a pre-solved, non-blocking example of this challenge.'),
+          );
+          $captcha_element['example']['example_captcha'] = array(
+            '#type' => 'captcha',
+            '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
+            '#captcha_admin_mode' => TRUE,
+          );
+        }
       } else {
         $captcha_element['#title'] = t('CAPTCHA: no challenge enabled');
         $captcha_element['add_captcha'] = array(
