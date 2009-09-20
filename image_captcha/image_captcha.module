@@ -7,11 +7,8 @@
  */
 
 // TODO: add hook_requirements to avoid installing when there is no GD support
-// TODO: enabling case insensitive validation also disables upper case characters occurences in the image.
-
 
 define('IMAGE_CAPTCHA_ALLOWED_CHARACTERS', 'aAbBCdEeFfGHhijKLMmNPQRrSTtWXYZ23456789');
-
 
 define('IMAGE_CAPTCHA_SETUP_OK', 0);
 define('IMAGE_CAPTCHA_ERROR_NO_GDLIB_WITH_JPEG', 1);
