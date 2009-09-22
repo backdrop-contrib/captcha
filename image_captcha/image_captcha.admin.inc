@@ -138,16 +138,16 @@ function image_captcha_settings_form() {
     ),
   );
 
-    // color settings
+    // Color and file format settings.
   $form['image_captcha_color_settings'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Color settings'),
-    '#description' => t('Configuration of the background and text colors in the image CAPTCHA.'),
+    '#title' => t('Color and image settings'),
+    '#description' => t('Configuration of the background, text colors and file format of the image CAPTCHA.'),
   );
   $form['image_captcha_color_settings']['image_captcha_background_color'] = array(
     '#type' => 'textfield',
     '#title' => t('Background color'),
-    '#description' => t('Enter the hexadecimal code for the background color (e.g. #FFF or #FFCE90).'),
+    '#description' => t('Enter the hexadecimal code for the background color (e.g. #FFF or #FFCE90). When using the PNG file format with transparent background, it is recommended to set this close to the underlying background color.'),
     '#default_value' => variable_get('image_captcha_background_color', '#ffffff'),
     '#maxlength' => 7,
     '#size' => 8,
@@ -173,7 +173,17 @@ function image_captcha_settings_form() {
     '#default_value' => (int) variable_get('image_captcha_foreground_color_randomness', 100),
     '#description' => t('The different characters will have randomized colors in the specified range around the text color.'),
   );
-
+  $form['image_captcha_color_settings']['image_captcha_file_format'] = array(
+    '#type' => 'select',
+    '#title' => t('File format'),
+    '#description' => t('Select the file format for the image. JPEG usually results in smaller files, PNG allows tranparency.'),
+    '#default_value' => variable_get('image_captcha_file_format', IMAGE_CAPTCHA_FILE_FORMAT_JPG),
+    '#options' => array(
+      IMAGE_CAPTCHA_FILE_FORMAT_JPG => t('JPEG'),
+      IMAGE_CAPTCHA_FILE_FORMAT_PNG => t('PNG'),
+      IMAGE_CAPTCHA_FILE_FORMAT_TRANSPARENT_PNG => t('PNG with transparent background'),
+    ),
+  );
 
   // distortion and noise settings
   $form['image_captcha_distortion_and_noise'] = array(
