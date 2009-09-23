@@ -92,9 +92,11 @@ function image_captcha_settings_form() {
     '#type' => 'select',
     '#title' => t('Font'),
     '#default_value' => $default_font,
-    '#description' => t('Select the font to use for the text in the image CAPTCHA. Apart from the provided defaults, you can also use your own TrueType font: put a TrueType font file (filename extension .ttf) in the "fonts" directory of the image CAPTCHA module (directory "%fontsdir") or in the Drupal "files" directory (directory "%filesdir").',
-      array('%fontsdir' => drupal_get_path('module', 'image_captcha') .'/fonts',
-        '%filesdir' => file_directory_path())
+    '#description' => t('Select the font to use for the text in the image CAPTCHA. Apart from the provided defaults, you can also use your own TrueType fonts (filename extension .ttf) by putting them in the Drupal "files" directory (directory %filesdir), %fonts_library_general or %fonts_library_specific.',
+      array('%filesdir' => file_directory_path(),
+        '%fonts_library_general' => 'sites/all/libraries/fonts',
+        '%fonts_library_specific' => conf_path() .'/libraries/fonts',
+      )
     ),
     '#options' => $available_fonts,
   );
