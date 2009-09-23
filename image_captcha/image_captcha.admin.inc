@@ -14,6 +14,8 @@ function _image_captcha_available_fonts() {
   $fontsdirectories = array(
     drupal_get_path('module', 'image_captcha') .'/fonts',
     file_directory_path(),
+    'sites/all/libraries/fonts',
+    conf_path() .'/libraries/fonts',
   );
   // Search through the folders and build a list of available fonts.
   $available_fonts = array();
