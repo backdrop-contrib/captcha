@@ -453,7 +453,7 @@ function captcha_examples($form_state, $module, $challenge) {
       '#value' => t('This page gives an overview of all available challenge types, generated with their current settings.'),
     );
     foreach (module_implements('captcha') as $mkey => $module) {
-      $challenges = call_user_func_array($module .'_captcha', 'list');
+      $challenges = call_user_func_array($module .'_captcha', array('list'));
       if ($challenges) {
         foreach ($challenges as $ckey => $challenge) {
           $form["captcha_{$mkey}_{$ckey}"] = array(
