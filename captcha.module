@@ -401,7 +401,6 @@ function captcha_validate_case_insensitive_equality($solution, $response) {
  * captcha_form_alter(), and subsequently don't include additional include
  * files).
  */
-
 function captcha_validate($element, &$form_state) {
   $captcha_info = $element['#captcha_info'];
   $form_id = $captcha_info['form_id'];
