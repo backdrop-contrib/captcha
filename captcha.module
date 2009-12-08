@@ -394,6 +394,26 @@ function captcha_validate_case_insensitive_equality($solution, $response) {
 }
 
 /**
+ * CAPTCHA validation function to tests equality while ignoring spaces.
+ * @param $solution the solution of the test.
+ * @param $response the response to the test.
+ * @return TRUE when equal (ignoring spaces), FALSE otherwise.
+ */
+function captcha_validate_ignore_spaces($solution, $response) {
+  return preg_replace('/\s/', '', $solution) == preg_replace('/\s/', '', $response);
+}
+
+/**
+ * CAPTCHA validation function to tests case insensitive equality while ignoring spaces.
+ * @param $solution the solution of the test.
+ * @param $response the response to the test.
+ * @return TRUE when equal (ignoring spaces), FALSE otherwise.
+ */
+function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
+  return preg_replace('/\s/', '', strtolower($solution)) == preg_replace('/\s/', '', strtolower($response));
+}
+
+/**
  * CAPTCHA validation handler.
  *
  * This function is placed in the main captcha.module file to make sure that

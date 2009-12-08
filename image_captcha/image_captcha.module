@@ -159,15 +159,6 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
         // build the result to return
         $result = array();
 
-        // Handle the case insesitivity option and change the code to lower case
-        // before saving it as solution.
-        if (CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE == variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
-          $description = t('Enter the characters shown in the image. Ignore spaces and be careful about upper and lower case.');
-        }
-        else {
-          $description = t('Enter the characters (without spaces) shown in the image.');
-        }
-
         $result['solution'] = $code;
         // Generate image source URL (add timestamp to avoid problems with
         // client side caching: subsequent images of the same CAPTCHA session
@@ -181,11 +172,23 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
         $result['form']['captcha_response'] = array(
           '#type' => 'textfield',
           '#title' => t('What code is in the image?'),
-          '#description' => $description,
+          '#description' => t('Enter the characters shown in the image.'),
           '#weight' => 0,
           '#required' => TRUE,
           '#size' => 15,
         );
+
+        // Handle the case insensitive validation option combined with ignoring spaces.
+        switch (variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
+          case CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE:
+            $result['captcha_validate'] = 'captcha_validate_ignore_spaces';
+            break;
+          case CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE:
+            $result['captcha_validate'] = 'captcha_validate_case_insensitive_ignore_spaces';
+            break;
+        }
+
+
         return $result;
       }
       break;

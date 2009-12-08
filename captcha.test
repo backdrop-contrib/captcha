@@ -12,6 +12,7 @@
 // TODO: test about placement (comment form, node forms, log in form, etc)
 // TODO: test if captcha_cron does it work right
 // TODO: test custom CAPTCHA validation stuff
+// TODO: test space ignoring validation of image CAPTCHA
 
 class CapchaTestCase extends DrupalWebTestCase {
 
