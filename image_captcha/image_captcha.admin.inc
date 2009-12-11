@@ -254,7 +254,10 @@ function image_captcha_settings_form() {
 
 /**
  * Pre render function for image_captcha_settings_form for providing
- * extra info about TTF fonts.
+ * extra info about TTF fonts. We add these warnings in the pre-render
+ * phase to avoid that these message whould show up twice after
+ * submitting the form because it is build twice (first for submitting
+ * the form and second for displaying the updated form).
  */
 function image_captcha_settings_form_pre_render($form) {
   $errno = _image_captcha_check_setup();
@@ -264,9 +267,6 @@ function image_captcha_settings_form_pre_render($form) {
       t('The Image CAPTCHA module can not use TrueType fonts because your PHP setup does not support it. You can only use a low quality built-in bitmap font.'),
       'warning'
     );
-  }
-  elseif ($form['image_captcha_font_settings']['image_captcha_font']['#default_value'] == 'BUILTIN') {
-    drupal_set_message(t('The usage of the built-in bitmap font it is not recommended because of its small size and missing UTF-8 support.'), 'warning');
   }
   return $form;
 }
