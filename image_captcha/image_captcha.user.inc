@@ -275,15 +275,25 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
     }
 
-    // determine print position: at what coordinate should the character be
-    // printed so that the bounding box would be nicely centered in the cage?
-    $pos_x = $center_x - .5 * ($bbox[0] + $bbox[2]);
-    $pos_y = $center_y - .5 * ($bbox[1] + $bbox[7]);
+    // Random (but small) rotation of the character.
+    // TODO: add a setting for this?
+    $angle = mt_rand(-10, 10);
 
-    // calculate available room to jitter: how much can the character be moved
+    // Determine print position: at what coordinate should the character be
+    // printed so that the bounding box would be nicely centered in the cage?
+    $bb_center_x = .5 * ($bbox[0] + $bbox[2]);
+    $bb_center_y = .5 * ($bbox[1] + $bbox[7]);
+    $angle_cos = cos($angle*3.1415/180);
+    $angle_sin = sin($angle*3.1415/180);
+    $pos_x = $center_x - ($angle_cos * $bb_center_x + $angle_sin * $bb_center_y);
+    $pos_y = $center_y - (-$angle_sin * $bb_center_x + $angle_cos * $bb_center_y);
+
+    // Calculate available room to jitter: how much can the character be moved
     // so that it stays inside its cage?
-    $dev_x = .5 * max(0, $ccage_width - ($bbox[2] - $bbox[0]));
-    $dev_y = .5 * max(0, $ccage_height - ($bbox[1] - $bbox[7]));
+    $bb_width = $bbox[2] - $bbox[0];
+    $bb_height = $bbox[1] - $bbox[7];
+    $dev_x = .5 * max(0, $ccage_width - abs($angle_cos) * $bb_width - abs($angle_sin) * $bb_height);
+    $dev_y = .5 * max(0, $ccage_height - abs($angle_cos) * $bb_height - abs($angle_sin) * $bb_width);
 
     // add jitter to position
     $pos_x = $pos_x + mt_rand(-$dev_x, $dev_x);
@@ -303,10 +313,10 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       imagestring($image, 5, $pos_x, $pos_y, $character, $color);
     }
     else {
-      imagettftext($image, $font_size, 0, $pos_x, $pos_y, $color, realpath($font), $character);
+      imagettftext($image, $font_size, $angle, $pos_x, $pos_y, $color, realpath($font), $character);
     }
 
-    // for debugging purposes: draw character bounding box
+    // For debugging purposes: draw character bounding box (only valid when rotation is disabled).
     // imagerectangle($image, $pos_x + $bbox[0], $pos_y + $bbox[1], $pos_x + $bbox[2], $pos_y + $bbox[7], $color);
 
   }
