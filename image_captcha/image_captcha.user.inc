@@ -62,17 +62,13 @@ function _image_captcha_hex_to_rgb($hex) {
   return $rgb;
 }
 
-
 /**
  * Base function for generating a image CAPTCHA.
  */
 function _image_captcha_generate_image($code) {
   // Get font.
-  list($font, $errno) = _image_captcha_get_font();
-  if ($errno != 0) {
-    watchdog('CAPTCHA', 'Could not find or read the configured font ("%font") for the image CAPTCHA.', array('%font' => $font), WATCHDOG_ERROR);
-    exit();
-  }
+  $fonts = _image_captcha_get_enabled_fonts();
+
   // get other settings
   $font_size = (int) variable_get('image_captcha_font_size', 30);
   $character_spacing = (float) variable_get('image_captcha_character_spacing', '1.2');
@@ -98,7 +94,7 @@ function _image_captcha_generate_image($code) {
   imagefilledrectangle($image, 0, 0, $width, $height, $background_color);
 
   // draw text
-  $result = _image_captcha_image_generator_print_string($image, $width, $height, $font, $font_size, $code);
+  $result = _image_captcha_image_generator_print_string($image, $width, $height, $fonts, $font_size, $code);
   if (!$result) {
     return FALSE;
   }
@@ -231,17 +227,10 @@ function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colo
 /**
  * Helper function for drawing text on the image.
  */
-function _image_captcha_image_generator_print_string(&$image, $width, $height, $font, $font_size, $text) {
+function _image_captcha_image_generator_print_string(&$image, $width, $height, $fonts, $font_size, $text) {
   // get characters
   $characters = _image_captcha_utf8_split($text);
   $character_quantity = count($characters);
-
-  // get character width for builtin font
-  if ($font == 'BUILTIN') {
-    $character_width = imagefontwidth(5);
-    $character_height = imagefontheight(5);
-    $bbox = array(0, $character_height, $character_width, $character_height, $character_width, 0, 0, 0);
-  }
 
   // get colors
   $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
@@ -270,9 +259,17 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
     $center_x = ($c + 0.5) * $ccage_width;
     $center_y = 0.5 * $height;
 
+    // Pick a random font from the list.
+    $font = array_rand($fonts);
+
     // get character dimensions for ttf fonts
     if ($font != 'BUILTIN') {
       $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
+    }
+    else {
+      $character_width = imagefontwidth(5);
+      $character_height = imagefontheight(5);
+      $bbox = array(0, $character_height, $character_width, $character_height, $character_width, 0, 0, 0);
     }
 
     // Random (but small) rotation of the character.

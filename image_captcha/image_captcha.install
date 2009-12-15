@@ -26,3 +26,20 @@ function image_captcha_uninstall() {
   db_query("DELETE FROM {variable} WHERE name LIKE 'image_captcha_%'");
   cache_clear_all('variables', 'cache');
 }
+
+/**
+ * Implementation of hook_update_N().
+ *
+ * Translate single font variable to multiple font variable.
+ */
+function image_captcha_update_6203() {
+  // Old single font variable.
+  $font = variable_get('image_captcha_font', NULL);
+  // If there was a valid value,
+  // save it as an array to the new multiple fonts variable.
+  if ($font != NULL) {
+    variable_set('image_captcha_fonts', array($font));
+  }
+  return array();
+}
+
