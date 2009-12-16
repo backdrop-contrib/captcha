@@ -7,6 +7,14 @@
  */
 
 /**
+ * On uninstall: remove module variables and clear variable cache
+ */
+function image_captcha_uninstall() {
+  db_query("DELETE FROM {variable} WHERE name LIKE 'image_captcha_%'");
+  cache_clear_all('variables', 'cache');
+}
+
+/**
  * Implementation of hook_update_N()
  */
 function image_captcha_update_6201() {
@@ -17,14 +25,6 @@ function image_captcha_update_6201() {
   variable_del($old);
   $items = array();
   return $items;
-}
-
-/**
- * On uninstall: remove module variables and clear variable cache
- */
-function image_captcha_uninstall() {
-  db_query("DELETE FROM {variable} WHERE name LIKE 'image_captcha_%'");
-  cache_clear_all('variables', 'cache');
 }
 
 /**
