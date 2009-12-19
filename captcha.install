@@ -257,3 +257,14 @@ function captcha_update_6200() {
 
   return $items;
 }
+
+/**
+ * Implementation of hook_update_N()
+ * Change the captcha points with the old text CAPTCHA, which was
+ * removed from the 6.x-2.x branch, to the simple math CAPTCHA.
+ */
+function captcha_update_6201() {
+  $items = array();
+  $items[] = update_sql("UPDATE {captcha_points} SET module = 'captcha', type = 'Math' WHERE module = 'text_captcha' AND type = 'Text';");
+  return $items;
+}
