@@ -260,7 +260,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
     $center_y = 0.5 * $height;
 
     // Pick a random font from the list.
-    $font = array_rand($fonts);
+    $font = $fonts[array_rand($fonts)];
 
     // Get character dimensions for TrueType fonts.
     if ($font != 'BUILTIN') {
