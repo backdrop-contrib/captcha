@@ -1,6 +1,8 @@
 <?php
 // $Id$
 
+// @todo: this is an old test file, can it be removed or is there still some stuff that needs porting?
+
 /**
 * @file Tests for the CAPTCHA administration.
 */

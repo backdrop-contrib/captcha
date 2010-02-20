@@ -80,7 +80,7 @@ core = 6.x
 
 More advanced CAPTCHA modules probably want some configuration page.
 To integrate nicely with the base CAPTCHA module you should offer your
-configuration page as a MENU_LOCAL_TASK menu entry under 'admin/user/captcha/'.
+configuration page as a MENU_LOCAL_TASK menu entry under 'admin/config/people/captcha/'.
 
 For our simple foo CAPTCHA module this would mean:
 
@@ -91,7 +91,7 @@ For our simple foo CAPTCHA module this would mean:
 function foo_captcha_menu($may_cache) {
   $items = array();
   if ($may_cache) {
-    $items['admin/user/captcha/foo_captcha'] = array(
+    $items['admin/config/people/captcha/foo_captcha'] = array(
       'title' => t('Foo CAPTCHA'),
       'page callback' => 'drupal_get_form',
       'page arguments' => array('foo_captcha_settings_form'),
@@ -120,7 +120,7 @@ For our simple foo CAPTCHA module this would mean:
  */
 function foo_captcha_help($path, $arg) {
   switch ($path) {
-    case 'admin/user/captcha/foo_captcha':
+    case 'admin/config/people/captcha/foo_captcha':
       return '<p>'. t('This is a very simple challenge, which requires users to enter "foo" in a textfield.') .'</p>';
   }
 }

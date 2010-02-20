@@ -113,12 +113,18 @@ function captcha_install() {
   $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
     'user_register', 'user_pass', 'user_login', 'user_login_block', 'forum_node_form');
   foreach ($form_ids as $form_id) {
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
+    db_insert('captcha_points')
+      ->fields(array(
+        'form_id' => $form_id,
+        'module' => NULL,
+        'type' => NULL,
+      ))
+      ->execute();
   }
 
   // what to do after install?
   drupal_set_message($t('You can now <a href="!captcha_admin">configure the CAPTCHA module</a> for your site.',
-    array('!captcha_admin' => url('admin/user/captcha'))), 'status');
+    array('!captcha_admin' => url('admin/config/people/captcha'))), 'status');
 }
 
 /**

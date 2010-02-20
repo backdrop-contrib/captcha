@@ -26,6 +26,6 @@ Conflicts/known issues:
   error: unknown CAPTCHA session ID'.
 
 Configuration:
-  The configuration page is at admin/user/captcha, here you can configure
+  The configuration page is at admin/config/people/captcha, here you can configure
   the CAPTCHA module and enable challenges for the desired forms.
   You can also tweak the image CAPTCHA to your liking.

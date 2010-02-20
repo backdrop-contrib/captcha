@@ -32,11 +32,11 @@ function image_captcha_image($captcha_sid=NULL) {
     // Send the image resource as an image file to the client.
     $file_format = variable_get('image_captcha_file_format', IMAGE_CAPTCHA_FILE_FORMAT_JPG);
     if ($file_format == IMAGE_CAPTCHA_FILE_FORMAT_JPG) {
-      drupal_set_header("Content-type: image/jpeg");
+      drupal_add_http_header('Content-Type', 'image/jpeg');
       imagejpeg($image);
     }
     else {
-      drupal_set_header("Content-type: image/png");
+      drupal_add_http_header('Content-Type', 'image/png');
       imagepng($image);
     }
     // Clean up the image resource.

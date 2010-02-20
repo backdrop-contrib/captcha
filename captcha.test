@@ -246,12 +246,12 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
    */
   function testAdminAccess() {
     $this->drupalLogin($this->normal_user);
-    $this->drupalGet('admin/user/captcha');
+    $this->drupalGet('admin/config/people/captcha');
     file_put_contents('tmp.simpletest.html', $this->drupalGetContent());
     $this->assertText(t('Access denied'), 'Normal users should not be able to access the CAPTCHA admin pages', 'CAPTCHA');
 
     $this->drupalLogin($this->admin_user);
-    $this->drupalGet('admin/user/captcha');
+    $this->drupalGet('admin/config/people/captcha');
     $this->assertNoText(t('Access denied'), 'Admin users should be able to access the CAPTCHA admin pages', 'CAPTCHA');
   }
 
@@ -328,7 +328,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $edit = array(
       'captcha_administration_mode' => TRUE,
     );
-    $this->drupalPost('admin/user/captcha', $edit, 'Save configuration');
+    $this->drupalPost('admin/config/people/captcha', $edit, 'Save configuration');
 
     // Create a node with comments enabled.
     $node_settings = array(

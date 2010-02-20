@@ -19,25 +19,38 @@
  * @return nothing
  */
 function captcha_set_form_id_setting($form_id, $captcha_type) {
+  // Handle 'none'.
   if ($captcha_type == 'none') {
-    db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, NULL)", $form_id);
+    db_merge('captcha_points')
+      ->key(array('form_id' => $form_id))
+      ->fields(array('module' => NULL, 'type' => NULL))
+      ->execute();
   }
+  // Handle 'default'.
   elseif ($captcha_type == 'default') {
-    db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', NULL, '%s')", $form_id, 'default');
+    db_merge('captcha_points')
+      ->key(array('form_id' => $form_id))
+      ->fields(array('module' => NULL, 'type' => 'default'))
+      ->execute();
   }
+  // Handle NULL.
   elseif ($captcha_type == NULL) {
-    db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
+    db_delete('captcha_points')->condition('form_id', $form_id)->execute();
   }
+  // Handle a captcha_type object.
   elseif (is_object($captcha_type) && isset($captcha_type->module) && isset($captcha_type->type)) {
-    db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', '%s', '%s')", $form_id, $captcha_type->module, $captcha_type->type);
+    db_merge('captcha_points')
+      ->key(array('form_id' => $form_id))
+      ->fields(array('module' => $captcha_type->module, 'type' => $captcha_type->type))
+      ->execute();
   }
+  // Handle a captcha_type string.
   elseif (is_string($captcha_type) && substr_count($captcha_type, '/') == 1) {
     list($module, $type) = explode('/', $captcha_type);
-    db_query("DELETE FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-    db_query("INSERT INTO {captcha_points} (form_id, module, type) VALUES ('%s', '%s', '%s')", $form_id, $module, $type);
+    db_merge('captcha_points')
+      ->key(array('form_id' => $form_id))
+      ->fields(array('module' => $module, 'type' => $type))
+      ->execute();
   }
   else {
     drupal_set_message(t('Failed to set a CAPTCHA type for form %form_id: could not interpret value "@captcha_type"',
@@ -57,11 +70,8 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  *   or in the form 'captcha/Math'.
  */
 function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
-  $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = '%s'", $form_id);
-  if (!$result) {
-    return NULL;
-  }
-  $captcha_point = db_fetch_object($result);
+  $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = :form_id", array(':form_id' =>  $form_id));
+  $captcha_point = $result->fetchObject();
   if (!$captcha_point) {
     $captcha_point = NULL;
   }
@@ -94,8 +104,19 @@ function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
  */
 function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS_UNSOLVED) {
   global $user;
-  db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), REQUEST_TIME, $form_id, 'undefined', $status, 0);
-  $captcha_sid = db_last_insert_id('captcha_sessions', 'csid');
+  // Insert an entry and thankfully receive the value of the autoincrement field 'csid'.
+  $captcha_sid = db_insert('captcha_sessions')
+  ->fields(array(
+    'uid' => $user->uid,
+    'sid' => session_id(),
+    'ip_address' => ip_address(),
+    'timestamp' => REQUEST_TIME,
+    'form_id' => $form_id,
+    'solution' => 'undefined',
+    'status' => $status,
+    'attempts' => 0,
+  ))
+  ->execute();
   return $captcha_sid;
 }
 
@@ -106,7 +127,13 @@ function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS
  * @param $solution the new solution to associate with the given CAPTCHA session.
  */
 function _captcha_update_captcha_session($captcha_sid, $solution) {
-  db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", REQUEST_TIME, $solution, $captcha_sid);
+  db_update('captcha_sessions')
+    ->condition('csid', $captcha_sid)
+    ->fields(array(
+      'timestamp' => REQUEST_TIME,
+      'solution' => $solution,
+    ))
+    ->execute();
 }
 
 /**
@@ -114,7 +141,7 @@ function _captcha_update_captcha_session($captcha_sid, $solution) {
  * based on CAPTCHA session ID and user session info.
  */
 function _captcha_required_for_user($captcha_sid, $form_id) {
-  $captcha_session_status = db_result(db_query("SELECT status FROM {captcha_sessions} WHERE csid = %d", $captcha_sid));
+  $captcha_session_status = db_query('SELECT status FROM {captcha_sessions} WHERE csid = :csid', array(':csid' => $captcha_sid))->fetchField();
 
   $captcha_success_form_ids = isset($_SESSION['captcha_success_form_ids']) ? (array)($_SESSION['captcha_success_form_ids']) : array();
 
@@ -148,7 +175,7 @@ function _captcha_get_description($lang_code=NULL) {
   global $language;
   $lang_code = isset($lang_code) ? $lang_code : $language->language;
   // The hardcoded but localizable default.
-  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.', array(), $lang_code);
+  $default = t('This question is for testing whether you are a human visitor and to prevent automated spam submissions.', array(), array('langcode' => $lang_code));
   // Look up the configured CAPTCHA description or fall back on the (localized) default.
   if (module_exists('locale')) {
     $description = variable_get("captcha_description_$lang_code", $default);
