@@ -1,5 +1,6 @@
 // $Id$
 
+// TODO: change this to Drupal.behaviors.captchaadmin = function (context) {}
 $(document).ready(function(){
 
 	// Add onclick handler to checkbox for adding a CAPTCHA description
