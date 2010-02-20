@@ -28,24 +28,24 @@ define('CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE', 1);
 function captcha_help($path, $arg) {
   switch ($path) {
     case 'admin/help#captcha':
-      $output = '<p>'. t('"CAPTCHA" is an acronym for "Completely Automated Public Turing test to tell Computers and Humans Apart". It is typically a challenge-response test to determine whether the user is human. The CAPTCHA module is a tool to fight automated submission by malicious users (spamming) of for example comments forms, user registration forms, guestbook forms, etc. You can extend the desired forms with an additional challenge, which should be easy for a human to solve correctly, but hard enough to keep automated scripts and spam bots out.') .'</p>';
-      $output .= '<p>'. t('Note that the CAPTCHA module interacts with page caching (see <a href="!performancesettings">performance settings</a>). Because the challenge should be unique for each generated form, the caching of the page it appears on is prevented. Make sure that these forms do not appear on too many pages or you will lose much caching efficiency. For example, if you put a CAPTCHA on the user login block, which typically appears on each page for anonymous visitors, caching will practically be disabled. The comment submission forms are another example. In this case you should set the "%commentlocation" to "%separatepage" in the comment settings of the relevant <a href="!contenttypes">content types</a> for better caching efficiency.' ,
+      $output = '<p>' . t('"CAPTCHA" is an acronym for "Completely Automated Public Turing test to tell Computers and Humans Apart". It is typically a challenge-response test to determine whether the user is human. The CAPTCHA module is a tool to fight automated submission by malicious users (spamming) of for example comments forms, user registration forms, guestbook forms, etc. You can extend the desired forms with an additional challenge, which should be easy for a human to solve correctly, but hard enough to keep automated scripts and spam bots out.') . '</p>';
+      $output .= '<p>' . t('Note that the CAPTCHA module interacts with page caching (see <a href="!performancesettings">performance settings</a>). Because the challenge should be unique for each generated form, the caching of the page it appears on is prevented. Make sure that these forms do not appear on too many pages or you will lose much caching efficiency. For example, if you put a CAPTCHA on the user login block, which typically appears on each page for anonymous visitors, caching will practically be disabled. The comment submission forms are another example. In this case you should set the "%commentlocation" to "%separatepage" in the comment settings of the relevant <a href="!contenttypes">content types</a> for better caching efficiency.' ,
         array(
           '!performancesettings' => url('admin/settings/performance'),
           '%commentlocation' => t('Location of comment submission form'),
           '%separatepage' => t('Display on separate page'),
           '!contenttypes' => url('admin/content/types'),
         )
-      ) .'</p>';
-      $output .= '<p>'. t('CAPTCHA is a trademark of Carnegie Mellon University.') .'</p>';
+      ) . '</p>';
+      $output .= '<p>' . t('CAPTCHA is a trademark of Carnegie Mellon University.') . '</p>';
       return $output;
     case 'admin/user/captcha':
     case 'admin/user/captcha/captcha':
     case 'admin/user/captcha/captcha/settings':
-      $output = '<p>'. t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.',
-        array('%adminlinks' => t('Add CAPTCHA administration links to forms'))) .'</p>';
-      $output .= '<p>'. t('Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).',
-        array('%skipcaptcha' => t('skip CAPTCHA'), '@perm' => url('admin/user/permissions'))) .'</p>';
+      $output = '<p>' . t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.',
+        array('%adminlinks' => t('Add CAPTCHA administration links to forms'))) . '</p>';
+      $output .= '<p>' . t('Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).',
+        array('%skipcaptcha' => t('skip CAPTCHA'), '@perm' => url('admin/user/permissions'))) . '</p>';
       return $output;
   }
 }
@@ -279,7 +279,7 @@ function theme_captcha($element) {
     return theme('fieldset', $fieldset);
   }
   else {
-    return '<div class="captcha">'. $element['#children'] .'</div>';
+    return '<div class="captcha">' . $element['#children'] . '</div>';
   }
 }
 
@@ -306,7 +306,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
         # Build CAPTCHA form element.
         $captcha_element = array(
           '#type' => 'captcha',
-          '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
+          '#captcha_type' => $captcha_point->module . '/' . $captcha_point->type,
         );
         // Add a CAPTCHA description if required.
         if (variable_get('captcha_add_captcha_description', TRUE)) {
@@ -319,7 +319,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
 
       }
     }
-    else if (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE)) {
+    elseif (user_access('administer CAPTCHA settings') && variable_get('captcha_administration_mode', FALSE)) {
       $captcha_point = captcha_get_form_id_setting($form_id);
       // For administrators: show CAPTCHA info and offer link to configure it
       $captcha_element = array(
@@ -359,11 +359,12 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
           );
           $captcha_element['example']['example_captcha'] = array(
             '#type' => 'captcha',
-            '#captcha_type' => $captcha_point->module .'/'. $captcha_point->type,
+            '#captcha_type' => $captcha_point->module . '/' . $captcha_point->type,
             '#captcha_admin_mode' => TRUE,
           );
         }
-      } else {
+      }
+      else {
         $captcha_element['#title'] = t('CAPTCHA: no challenge enabled');
         $captcha_element['add_captcha'] = array(
           '#value' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/user/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination()))
@@ -446,10 +447,10 @@ function _captcha_get_posted_captcha_info($element, $form_state) {
   if (isset($element['#post']) && count($element['#post'])) {
     $post_data = $element['#post'];
   }
-  else if (isset($form_state['clicked_button']['#post'])) {
+  elseif (isset($form_state['clicked_button']['#post'])) {
     $post_data = $form_state['clicked_button']['#post'];
   }
-  else if (isset($form_state['buttons']['button']['0']['#post'])) {
+  elseif (isset($form_state['buttons']['button']['0']['#post'])) {
     $post_data = $form_state['buttons']['button']['0']['#post'];
   }
   else {
