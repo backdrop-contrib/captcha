@@ -101,10 +101,18 @@ function captcha_menu() {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implementation of hook_permission().
  */
-function captcha_perm() {
-  return array('administer CAPTCHA settings', 'skip CAPTCHA');
+function captcha_permission() {
+  return array(
+    'administer CAPTCHA settings' => array(
+      'title' => t('Administer CAPTCHA settings'),
+    ),
+    'skip CAPTCHA' => array(
+      'title' => t('Skip CAPTCHA'),
+      'description' => t('Users with this permission will not be offered a CAPTCHA.'),
+    ),
+  );
 }
 
 /**
@@ -149,7 +157,7 @@ function captcha_theme() {
  */
 function captcha_cron() {
   // remove challenges older than 1 day
-  db_query('DELETE FROM {captcha_sessions} WHERE timestamp < %d', time() - 60*60*24);
+  db_query('DELETE FROM {captcha_sessions} WHERE timestamp < %d', REQUEST_TIME - 60*60*24);
 }
 
 
@@ -290,7 +298,7 @@ function theme_captcha($element) {
  * This function adds a CAPTCHA to forms for untrusted users if needed and adds
  * CAPTCHA administration links for site administrators if this option is enabled.
  */
-function captcha_form_alter(&$form, $form_state, $form_id) {
+function captcha_form_alter(&$form, &$form_state, $form_id) {
 
   if (arg(0) != 'admin' || variable_get('captcha_allow_on_admin_pages', FALSE)) {
 
@@ -303,7 +311,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
       $captcha_point = captcha_get_form_id_setting($form_id);
       if ($captcha_point && $captcha_point->type) {
         module_load_include('inc', 'captcha');
-        # Build CAPTCHA form element.
+        // Build CAPTCHA form element.
         $captcha_element = array(
           '#type' => 'captcha',
           '#captcha_type' => $captcha_point->module . '/' . $captcha_point->type,
@@ -313,7 +321,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
           $captcha_element['#description'] = _captcha_get_description();
         }
 
-        # Get placement in form and insert in form.
+        // Get placement in form and insert in form.
         $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
         _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
 
@@ -371,7 +379,7 @@ function captcha_form_alter(&$form, $form_state, $form_id) {
         );
 
       }
-      # Get placement in form and insert in form.
+      // Get placement in form and insert in form.
       $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
       _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
 

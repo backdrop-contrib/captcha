@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * General CAPTCHA functionality and helper functions.
+ */
+
+/**
  * Helper function for adding/updating a CAPTCHA point.
  *
  * @param $form_id the form ID to configure.
@@ -74,7 +79,7 @@ function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
     $captcha_point = 'none';
   }
   elseif ($symbolic) {
-    $captcha_point = $captcha_point->module .'/'. $captcha_point->type;
+    $captcha_point = $captcha_point->module . '/' . $captcha_point->type;
   }
   return $captcha_point;
 }
@@ -89,7 +94,7 @@ function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
  */
 function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS_UNSOLVED) {
   global $user;
-  db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), time(), $form_id, 'undefined', $status, 0);
+  db_query("INSERT into {captcha_sessions} (uid, sid, ip_address, timestamp, form_id, solution, status, attempts) VALUES (%d, '%s', '%s', %d, '%s', '%s', %d, %d)", $user->uid, session_id(), ip_address(), REQUEST_TIME, $form_id, 'undefined', $status, 0);
   $captcha_sid = db_last_insert_id('captcha_sessions', 'csid');
   return $captcha_sid;
 }
@@ -101,7 +106,7 @@ function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS
  * @param $solution the new solution to associate with the given CAPTCHA session.
  */
 function _captcha_update_captcha_session($captcha_sid, $solution) {
-  db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", time(), $solution, $captcha_sid);
+  db_query("UPDATE {captcha_sessions} SET timestamp=%d, solution='%s' WHERE csid=%d", REQUEST_TIME, $solution, $captcha_sid);
 }
 
 /**
@@ -323,7 +328,7 @@ function _captcha_insert_captcha_element(&$form, $placement, $captcha_element) {
       $offset = array_search($target_key, array_keys($form_stepper));
       $end = array_splice($form_stepper, $offset);
       $form_stepper['captcha'] =  $captcha_element;
-      foreach($end as $k => $v) {
+      foreach ($end as $k => $v) {
         $form_stepper[$k] = $v;
       }
     }

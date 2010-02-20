@@ -1,5 +1,7 @@
 // $Id$
 
+(function ($) {
+
 // TODO: change this to Drupal.behaviors.captchaadmin = function (context) {}
 $(document).ready(function(){
 
@@ -22,3 +24,5 @@ $(document).ready(function(){
 	}
 
 });
+
+})(jQuery);

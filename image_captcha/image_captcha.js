@@ -1,5 +1,8 @@
 // $Id$
 
+(function ($) {
+
+//TODO: change this to Drupal.behaviors.captchaadmin = function (context) {}
 $(document).ready(function(){
 
 	// Helper function to show/hide noise level widget.
@@ -34,3 +37,6 @@ $(document).ready(function(){
 	smooth_distortion_shower(0)
 
 });
+
+})(jQuery);
+

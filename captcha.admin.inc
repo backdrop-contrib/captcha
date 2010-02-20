@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * Functionality and helper functions for CAPTCHA administration.
+ */
+
+/**
  * Return an array with the available CAPTCHA types, for use as options array
  * for a select form elements.
  *
@@ -13,13 +18,13 @@
  */
 function _captcha_available_challenge_types($add_special_options=TRUE) {
   if ($add_special_options) {
-    $captcha_types['none'] = '['. t('none') .']';
-    $captcha_types['default'] = '['. t('default challenge type') .']';
+    $captcha_types['none'] = '[' . t('none') . ']';
+    $captcha_types['default'] = '[' . t('default challenge type') . ']';
   }
   // We do our own version of Drupal's module_invoke_all() here because
   // we want to build an array with custom keys and values.
   foreach (module_implements('captcha') as $module) {
-    $result = call_user_func_array($module .'_captcha', array('list'));
+    $result = call_user_func_array($module . '_captcha', array('list'));
     if (is_array($result)) {
       foreach ($result as $type) {
         $captcha_types["$module/$type"] = t('@type (from module @module)', array('@type' => $type, '@module' => $module));
@@ -36,7 +41,7 @@ function captcha_admin_settings() {
   module_load_include('inc', 'captcha');
 
   // Use javascript for some added usability on admin form.
-  drupal_add_js(drupal_get_path('module', 'captcha') .'/captcha.js');
+  drupal_add_js(drupal_get_path('module', 'captcha') . '/captcha.js');
 
   // Configuration of which forms to protect, with what challenge.
   $form['captcha_form_protection'] = array(
@@ -69,7 +74,7 @@ function captcha_admin_settings() {
     );
     // Select widget for CAPTCHA type.
     if (isset($captcha_point->module) && $captcha_point->module) {
-      $captcha_type = $captcha_point->module .'/'. $captcha_point->type;
+      $captcha_type = $captcha_point->module . '/' . $captcha_point->type;
     }
     elseif ($captcha_point->type == 'default') {
       $captcha_type = 'default';
@@ -424,7 +429,7 @@ function captcha_point_disable_confirm_submit($form, &$form_state) {
 function _captcha_generate_example_challenge($module, $type) {
   return array(
     '#type' => 'captcha',
-    '#captcha_type' => $module .'/'. $type,
+    '#captcha_type' => $module . '/' . $type,
     '#captcha_admin_mode' => TRUE,
   );
 }
@@ -453,7 +458,7 @@ function captcha_examples($form_state, $module, $challenge) {
       '#value' => t('This page gives an overview of all available challenge types, generated with their current settings.'),
     );
     foreach (module_implements('captcha') as $mkey => $module) {
-      $challenges = call_user_func_array($module .'_captcha', array('list'));
+      $challenges = call_user_func_array($module . '_captcha', array('list'));
       if ($challenges) {
         foreach ($challenges as $ckey => $challenge) {
           $form["captcha_{$mkey}_{$ckey}"] = array(

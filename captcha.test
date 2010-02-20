@@ -110,20 +110,20 @@ class CapchaTestCase extends DrupalWebTestCase {
     if ($should_pass) {
       // There should be no error message.
       $this->assertNoText(t('The answer you entered for the CAPTCHA was not correct.'),
-        $message .' Comment submission should pass.', 'CAPTCHA');
+        $message . ' Comment submission should pass.', 'CAPTCHA');
       // Get node page and check that comment shows up.
       $this->drupalGet('node/' . $node->nid);
       $this->assertText($edit['comment'],
-        $message .' Comment should show up on node page.', 'CAPTCHA');
+        $message . ' Comment should show up on node page.', 'CAPTCHA');
     }
     else {
       // Check for error message.
       $this->assertText(t('The answer you entered for the CAPTCHA was not correct.'),
-        $message .' Comment submission should be blocked.', 'CAPTCHA');
+        $message . ' Comment submission should be blocked.', 'CAPTCHA');
       // Get node page and check that comment is not present.
       $this->drupalGet('node/' . $node->nid);
       $this->assertNoText($edit['comment'],
-        $message .' Comment should not show up on node page.', 'CAPTCHA');
+        $message . ' Comment should not show up on node page.', 'CAPTCHA');
     }
   }
 

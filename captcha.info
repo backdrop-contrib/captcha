@@ -2,4 +2,9 @@
 name = CAPTCHA
 description = Base CAPTCHA module for adding challenges to arbitrary forms.
 package = "Spam control"
-core = 6.x
+core = 7.x
+
+files[] = captcha.module
+files[] = captcha.inc
+files[] = captcha.admin.inc
+files[] = captcha.install
