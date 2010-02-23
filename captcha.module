@@ -191,7 +191,7 @@ function captcha_element_info() {
 /**
  * Process callback for CAPTCHA form element.
  */
-function captcha_element_process($element, $edit, &$form_state, $complete_form) {
+function captcha_element_process($element, &$form_state, $complete_form) {
 
   module_load_include('inc', 'captcha');
 
@@ -265,7 +265,7 @@ function captcha_element_process($element, $edit, &$form_state, $complete_form) 
     'module' => $captcha_type_module,
     'type' => $captcha_type_challenge,
     'captcha_sid' => $captcha_sid,
-    'solution' => $captcha['solution'],
+    'solution' => (isset($captcha['solution']) ? $captcha['solution'] : NULL), //@todo: backport this line to DRUPAL-6--2
   );
 
   return $element;
@@ -454,18 +454,13 @@ function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
  *     if the values could not be found.
  */
 function _captcha_get_posted_captcha_info($element, $form_state) {
-  // Get the post data from where we can find it.
-  if (isset($element['#post']) && count($element['#post'])) {
-    $post_data = $element['#post'];
-  }
-  elseif (isset($form_state['clicked_button']['#post'])) {
-    $post_data = $form_state['clicked_button']['#post'];
-  }
-  elseif (isset($form_state['buttons']['button']['0']['#post'])) {
-    $post_data = $form_state['buttons']['button']['0']['#post'];
+  // @todo: is this enough? we had to use more in Drupal 6 (see over htere)
+  if (isset($form_state['input']) && count($form_state['input'])) {
+    $post_data = $form_state['input'];
   }
   else {
-    // TODO: raise a warning here?
+    // TODO: raise a warning here or leave that at caller?
+    drupal_set_message(t('Could not obtain CAPTCHA info from posted form.'), 'error');
   }
   // Return the posted form_id and CAPTCHA session ID.
   $posted_form_id = isset($post_data['form_id']) ? $post_data['form_id'] : NULL;
