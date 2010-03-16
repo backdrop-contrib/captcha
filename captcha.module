@@ -206,18 +206,15 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   // necessary the same form that is submitted (if any).
   $this_form_id = $complete_form['form_id']['#value'];
 
-  // Get the CAPTCHA session ID: start fresh with NULL.
-  $captcha_sid = NULL;
+  // Get the CAPTCHA session ID.
   // If there is a submitted form: try to retrieve and reuse the
   // CAPTCHA session ID from the posted data.
-  if ($form_state['submitted']) {
-    list($posted_form_id, $posted_captcha_sid) = _captcha_get_posted_captcha_info($element, $form_state);
-    if ($this_form_id == $posted_form_id && isset($posted_captcha_sid)) {
-      $captcha_sid = $posted_captcha_sid;
-    }
+  list($posted_form_id, $posted_captcha_sid) = _captcha_get_posted_captcha_info($element, $form_state);
+  if ($this_form_id == $posted_form_id && isset($posted_captcha_sid)) {
+    $captcha_sid = $posted_captcha_sid;
   }
-  // Generate a new CAPTCHA session if we could not reuse one from a posted form.
-  if (!isset($captcha_sid)) {
+  else {
+    // Generate a new CAPTCHA session if we could not reuse one from a posted form.
     $captcha_sid = _captcha_generate_captcha_session($this_form_id, CAPTCHA_STATUS_UNSOLVED);
   }
 
