@@ -226,14 +226,23 @@ function captcha_element_process($element, &$form_state, $complete_form) {
 
   // Get implementing module and challenge for CAPTCHA.
   list($captcha_type_module, $captcha_type_challenge) = _captcha_parse_captcha_type($element['#captcha_type']);
+
+  // Store CAPTCHA information (e.g. for usage in the validation and pre_render phases).
+  $element['#captcha_info'] = array(
+    'form_id' => $this_form_id,
+    'module' => $captcha_type_module,
+    'type' => $captcha_type_challenge,
+    'captcha_sid' => $captcha_sid,
+  );
+
   if (_captcha_required_for_user($captcha_sid, $this_form_id) || $element['#captcha_admin_mode']) {
     // Generate a CAPTCHA and its solution
     // (note that the CAPTCHA session ID is given as third argument).
     $captcha = module_invoke($captcha_type_module, 'captcha', 'generate', $captcha_type_challenge, $captcha_sid);
-    if (!$captcha) {
-      // The selected module returned nothing, maybe it is disabled or it's wrong, we should watchdog that and then quit.
+    if (!isset($captcha['form']) || !isset($captcha['solution'])) {
+      // The selected module did not return what we expected: log about it and quit.
       watchdog('CAPTCHA',
-        'CAPTCHA problem: hook_captcha() of module %module returned nothing when trying to retrieve challenge type %type for form %form_id.',
+        'CAPTCHA problem: unexpected result from hook_captcha() of module %module when trying to retrieve challenge type %type for form %form_id.',
         array('%type' => $captcha_type_challenge, '%module' => $captcha_type_module, '%form_id' => $this_form_id),
         WATCHDOG_ERROR);
       return $element;
@@ -254,16 +263,9 @@ function captcha_element_process($element, &$form_state, $complete_form) {
     // Add pre_render callback for additional CAPTCHA processing.
     $element['#pre_render'] = array('captcha_pre_render_process');
 
+    // Store the solution in the #captcha_info array.
+    $element['#captcha_info']['solution'] = $captcha['solution'];
   }
-
-  // Store information for usage in the validation and pre_render phase.
-  $element['#captcha_info'] = array(
-    'form_id' => $this_form_id,
-    'module' => $captcha_type_module,
-    'type' => $captcha_type_challenge,
-    'captcha_sid' => $captcha_sid,
-    'solution' => (isset($captcha['solution']) ? $captcha['solution'] : NULL), //@todo: backport this line to DRUPAL-6--2
-  );
 
   return $element;
 }
