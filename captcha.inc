@@ -183,7 +183,7 @@ function _captcha_get_description($lang_code=NULL) {
   else {
     $description = variable_get('captcha_description', $default);
   }
-  return $description;
+  return filter_xss_admin($description);
 }
 
 /**
