@@ -431,7 +431,7 @@ function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
 
 /**
  * Helper function for getting the posted CAPTCHA info (posted form_id and
- * CAPTCHA sessions ID) from the posted form.
+ * CAPTCHA sessions ID) from a form in case it is posted.
  *
  * This function hides the form processing mess for several use cases an
  * browser bug workarounds.
@@ -449,8 +449,8 @@ function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
  * @param $element the CAPTCHA element.
  * @param $form_state the form state structure to extract the info from.
  *
- * @return an array with $posted_form_id and $post_captcha_sid with NULL values
- *     if the values could not be found.
+ * @return an array with $posted_form_id and $post_captcha_sid (with NULL values
+ *     if the values could not be found, e.g. for a fresh form).
  */
 function _captcha_get_posted_captcha_info($element, $form_state) {
   // @todo: is this enough? we had to use more in Drupal 6 (see over htere)
@@ -458,8 +458,8 @@ function _captcha_get_posted_captcha_info($element, $form_state) {
     $post_data = $form_state['input'];
   }
   else {
-    // TODO: raise a warning here or leave that at caller?
-    drupal_set_message(t('Could not obtain CAPTCHA info from posted form.'), 'error');
+    // No posted CAPTCHA info found (probably a fresh form).
+    $post_data = array();
   }
   // Return the posted form_id and CAPTCHA session ID.
   $posted_form_id = isset($post_data['form_id']) ? $post_data['form_id'] : NULL;
