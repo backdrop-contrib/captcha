@@ -108,8 +108,12 @@ function captcha_schema() {
 function captcha_install() {
   $t = get_t();
   // Insert some default CAPTCHA points.
-  $form_ids = array('comment_form', 'contact_mail_user', 'contact_mail_page',
-    'user_register', 'user_pass', 'user_login', 'user_login_block', 'forum_node_form');
+  $form_ids = array(
+    'comment_form',
+    'contact_site_form', 'contact_personal_form',
+    'user_register_form', 'user_pass', 'user_login', 'user_login_block',
+    'forum_node_form'
+  );
   foreach ($form_ids as $form_id) {
     db_insert('captcha_points')
       ->fields(array(
@@ -277,3 +281,31 @@ function captcha_update_6201() {
   $items[] = update_sql("UPDATE {captcha_points} SET module = 'captcha', type = 'Math' WHERE module = 'text_captcha' AND type = 'Text';");
   return $items;
 }
+
+
+
+
+
+
+
+/**
+ * Migrate form configuration for changed form ids in Drupal 7.
+ */
+function captcha_update_7000() {
+  // 'user_register' became 'user_register_form'.
+  db_update('captcha_points')
+    ->fields(array('form_id' => 'user_register_form'))
+    ->condition('form_id', 'user_register')
+    ->execute();
+  // 'contact_mail_page' became 'contact_site_form'.
+  db_update('captcha_points')
+    ->fields(array('form_id' => 'contact_site_form'))
+    ->condition('form_id', 'contact_mail_page')
+    ->execute();
+  // 'contact_mail_user' became 'contact_personal_form'.
+  db_update('captcha_points')
+    ->fields(array('form_id' => 'contact_personal_form'))
+    ->condition('form_id', 'contact_mail_user')
+    ->execute();
+}
+
