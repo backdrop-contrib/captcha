@@ -70,7 +70,8 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  *   or in the form 'captcha/Math'.
  */
 function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
-  $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = :form_id", array(':form_id' =>  $form_id));
+  $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = :form_id",
+    array(':form_id' =>  $form_id));
   $captcha_point = $result->fetchObject();
   if (!$captcha_point) {
     $captcha_point = NULL;

@@ -319,7 +319,7 @@ function captcha_point_admin($captcha_point_form_id=NULL, $op=NULL) {
   return drupal_get_form('captcha_point_admin_form');
 }
 
-function captcha_point_admin_form($form_state, $captcha_point_form_id=NULL) {
+function captcha_point_admin_form($form, $form_state, $captcha_point_form_id=NULL) {
   $form = array();
   $default_captcha_type = 'none';
   if (isset($captcha_point_form_id)) {

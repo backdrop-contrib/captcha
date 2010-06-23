@@ -93,7 +93,7 @@ function captcha_menu() {
     'title' => 'CAPTCHA point administration',
     'file' => 'captcha.admin.inc',
     'page callback' => 'captcha_point_admin',
-    'page arguments' => array(5, 6),
+    'page arguments' => array(6, 7),
     'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_CALLBACK,
   );
