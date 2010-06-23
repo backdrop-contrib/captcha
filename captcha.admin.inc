@@ -386,7 +386,7 @@ function captcha_point_admin_form_submit($form, $form_state) {
 /**
  * Confirm dialog for disabling/deleting a CAPTCHA point
  */
-function captcha_point_disable_confirm(&$form_state, $captcha_point_form_id, $delete) {
+function captcha_point_disable_confirm($form, &$form_state, $captcha_point_form_id, $delete) {
   $form = array();
   $form['captcha_point_form_id'] = array(
     '#type' => 'value',
