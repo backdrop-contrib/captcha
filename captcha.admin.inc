@@ -443,7 +443,7 @@ function _captcha_generate_example_challenge($module, $type) {
  * If $module and $challenge are set, generate 10 examples of the concerning
  * CAPTCHA.
  */
-function captcha_examples($form_state, $module, $challenge) {
+function captcha_examples($form, $form_state, $module, $challenge) {
   module_load_include('inc', 'captcha');
 
   $form = array();
@@ -467,7 +467,7 @@ function captcha_examples($form_state, $module, $challenge) {
             '#title' => t('Challenge "%challenge" by module "%module"', array('%challenge' => $challenge, '%module' => $module)),
             'challenge' => _captcha_generate_example_challenge($module, $challenge),
             'more_examples' => array(
-              '#value' => l(t('10 more examples of this challenge.'), "admin/config/people/captcha/captcha/examples/$module/$challenge"),
+              '#markup' => l(t('10 more examples of this challenge.'), "admin/config/people/captcha/captcha/examples/$module/$challenge"),
             ),
           );
         }
