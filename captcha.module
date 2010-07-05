@@ -143,7 +143,7 @@ function captcha_cron() {
 
 
 /**
- * Implementation of hook_elements().
+ * Implementation of hook_element_info().
  */
 function captcha_element_info() {
   // Define the CAPTCHA form element with default properties.
