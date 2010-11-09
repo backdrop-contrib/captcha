@@ -130,7 +130,7 @@ function captcha_install() {
   $t = get_t();
   // Insert some default CAPTCHA points.
   $form_ids = array(
-    'comment_form',
+    'comment_node_page_form',
     'contact_site_form', 'contact_personal_form',
     'user_register_form', 'user_pass', 'user_login', 'user_login_block',
     'forum_node_form'
@@ -328,5 +328,7 @@ function captcha_update_7000() {
     ->fields(array('form_id' => 'contact_personal_form'))
     ->condition('form_id', 'contact_mail_user')
     ->execute();
+  // TODO: the general comment_form form_id is also split
+  // in comment_node_{type}_form, e.g. comment_node_page_form
 }
 
