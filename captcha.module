@@ -606,6 +606,7 @@ function captcha_captcha($op, $captcha_type = '') {
           '#size' => 4,
           '#maxlength' => 2,
           '#required' => TRUE,
+          '#attributes' => array('autocomplete' => 'off'),
         );
         return $result;
       }
