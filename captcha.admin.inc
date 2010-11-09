@@ -456,7 +456,7 @@ function captcha_examples($form, $form_state, $module, $challenge) {
   else {
     // generate a list with examples of the available CAPTCHA types
     $form['info'] = array(
-      '#value' => t('This page gives an overview of all available challenge types, generated with their current settings.'),
+      '#markup' => t('This page gives an overview of all available challenge types, generated with their current settings.'),
     );
     foreach (module_implements('captcha') as $mkey => $module) {
       $challenges = call_user_func_array($module . '_captcha', array('list'));
