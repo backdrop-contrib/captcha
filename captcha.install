@@ -148,6 +148,11 @@ function captcha_install() {
   // Be friendly to your users: what to do after install?
   drupal_set_message($t('You can now <a href="!captcha_admin">configure the CAPTCHA module</a> for your site.',
     array('!captcha_admin' => url('admin/config/people/captcha'))), 'status');
+
+  if (variable_get('cache', 0) != 0) {
+    drupal_set_message($t('Note that the CAPTCHA module disables <a href="!performance_admin">page caching</a> on pages that include a CAPTCHA challenge.', 
+      array('!performance_admin' => url('admin/config/development/performance'))), 'warning');
+  }
 }
 
 /**
