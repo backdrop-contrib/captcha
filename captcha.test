@@ -15,6 +15,9 @@
 // TODO: test if entry on status report (Already X blocked form submissions) works
 // TODO: test space ignoring validation of image CAPTCHA
 
+// TODO: refactor the 'comment_body[' . LANGUAGE_NONE . '][0][value]' stuff
+// TODO: make base class for CAPTCHA tests, split existing test cases in smaller cases?
+
 class CapchaTestCase extends DrupalWebTestCase {
 
   public static function getInfo() {
@@ -33,7 +36,7 @@ class CapchaTestCase extends DrupalWebTestCase {
     // Create a normal user that can post comments and pages,
     // but can not skip CAPTCHA.
     $permissions = array(
-      'access comments', 'post comments', 'post comments without approval',
+      'access comments', 'post comments', 'skip comment approval',
       'access content', 'create page content', 'edit own page content',
     );
     $this->normal_user = $this->drupalCreateUser($permissions);
@@ -83,7 +86,7 @@ class CapchaTestCase extends DrupalWebTestCase {
    *
    * Creates node with comment writing enabled, tries to post comment
    * with given CAPTCHA response (caller should enable the desired
-   * challenge on comment_form) and checks if the result is as expected.
+   * challenge on comment_node_page_form) and checks if the result is as expected.
    *
    * @param $captcha_response the response on the CAPTCHA
    * @param $should_pass boolean describing if the posting should pass or should be blocked
@@ -91,19 +94,19 @@ class CapchaTestCase extends DrupalWebTestCase {
    */
   function assertCommentPosting($captcha_response, $should_pass, $message) {
     // Make sure comments on pages can be saved directely without preview.
-    variable_set('comment_preview_page', COMMENT_PREVIEW_OPTIONAL);
+    variable_set('comment_preview_page', DRUPAL_OPTIONAL);
 
     // Create a node with comments enabled.
     $node_settings = array(
       'type' => 'page',
-      'comment' => COMMENT_NODE_READ_WRITE,
+      'comment' => COMMENT_NODE_OPEN,
     );
     $node = $this->drupalCreateNode($node_settings);
 
     // Post comment on node.
     $edit = array(
       'subject' => $this->randomName(32, 'subject_'),
-      'comment' =>  $this->randomName(256, 'comment_body'),
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' =>  $this->randomName(256, 'comment_body'),
       'captcha_response' => $captcha_response,
     );
     $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Save'));
@@ -114,7 +117,7 @@ class CapchaTestCase extends DrupalWebTestCase {
         $message . ' Comment submission should pass.', 'CAPTCHA');
       // Get node page and check that comment shows up.
       $this->drupalGet('node/' . $node->nid);
-      $this->assertText($edit['comment'],
+      $this->assertText($edit['comment_body[' . LANGUAGE_NONE . '][0][value]'],
         $message . ' Comment should show up on node page.', 'CAPTCHA');
     }
     else {
@@ -123,7 +126,7 @@ class CapchaTestCase extends DrupalWebTestCase {
         $message . ' Comment submission should be blocked.', 'CAPTCHA');
       // Get node page and check that comment is not present.
       $this->drupalGet('node/' . $node->nid);
-      $this->assertNoText($edit['comment'],
+      $this->assertNoText($edit['comment_body[' . LANGUAGE_NONE . '][0][value]'],
         $message . ' Comment should not show up on node page.', 'CAPTCHA');
     }
   }
@@ -133,7 +136,7 @@ class CapchaTestCase extends DrupalWebTestCase {
    */
   function testCaseInsensitiveValidation() {
     // Set Test CAPTCHA on comment form
-    captcha_set_form_id_setting('comment_form', 'captcha/Test');
+    captcha_set_form_id_setting('comment_node_page_form', 'captcha/Test');
 
     // Log in as normal user.
     $this->drupalLogin($this->normal_user);
@@ -162,18 +165,18 @@ class CapchaTestCase extends DrupalWebTestCase {
    */
   function testCaptchaDescriptionAfterCommentPreview() {
     // Set Test CAPTCHA on comment form.
-    captcha_set_form_id_setting('comment_form', 'captcha/Test');
+    captcha_set_form_id_setting('comment_node_page_form', 'captcha/Test');
 
     // Log in as normal user.
     $this->drupalLogin($this->normal_user);
 
     // Create a node with comments enabled.
-    $node = $this->drupalCreateNode(array('comment' => COMMENT_NODE_READ_WRITE));
+    $node = $this->drupalCreateNode(array('comment' => COMMENT_NODE_OPEN));
 
     // Preview comment with correct CAPTCHA answer.
     $edit = array(
       'subject' => $this->randomName(32, 'subject_'),
-      'comment' =>  $this->randomName(256, 'comment_body'),
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' =>  $this->randomName(256, 'comment_body'),
       'captcha_response' => 'Test 123',
     );
     $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
@@ -232,7 +235,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
 
     // Create a normal user.
     $permissions = array(
-      'access comments', 'post comments', 'post comments without approval',
+      'access comments', 'post comments', 'skip comment approval',
     );
     $this->normal_user = $this->drupalCreateUser($permissions);
     // Create an admin user.
@@ -261,46 +264,46 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
    */
   function testCaptchaPointSettingGetterAndSetter() {
     // Set to 'none'.
-    captcha_set_form_id_setting('comment_form', 'none');
-    $result = captcha_get_form_id_setting('comment_form');
+    captcha_set_form_id_setting('comment_node_page_form', 'none');
+    $result = captcha_get_form_id_setting('comment_node_page_form');
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $this->assertNull($result->module, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $this->assertNull($result->type, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
     $this->assertEqual($result, 'none', 'Setting and symbolic getting CAPTCHA point: "none"', 'CAPTCHA');
     // Set to 'default'
-    captcha_set_form_id_setting('comment_form', 'default');
+    captcha_set_form_id_setting('comment_node_page_form', 'default');
     variable_set('captcha_default_challenge', 'foo/bar');
-    $result = captcha_get_form_id_setting('comment_form');
+    $result = captcha_get_form_id_setting('comment_node_page_form');
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $this->assertEqual($result->module, 'foo', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $this->assertEqual($result->type, 'bar', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
     $this->assertEqual($result, 'default', 'Setting and symbolic getting CAPTCHA point: "default"', 'CAPTCHA');
     // Set to 'baz/boo'.
-    captcha_set_form_id_setting('comment_form', 'baz/boo');
-    $result = captcha_get_form_id_setting('comment_form');
+    captcha_set_form_id_setting('comment_node_page_form', 'baz/boo');
+    $result = captcha_get_form_id_setting('comment_node_page_form');
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $this->assertEqual($result->module, 'baz', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $this->assertEqual($result->type, 'boo', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
     $this->assertEqual($result, 'baz/boo', 'Setting and symbolic getting CAPTCHA point: "baz/boo"', 'CAPTCHA');
     // Set to NULL (which should delete the CAPTCHA point setting entry).
-    captcha_set_form_id_setting('comment_form', NULL);
-    $result = captcha_get_form_id_setting('comment_form');
+    captcha_set_form_id_setting('comment_node_page_form', NULL);
+    $result = captcha_get_form_id_setting('comment_node_page_form');
     $this->assertNull($result, 'Setting and getting CAPTCHA point: NULL', 'CAPTCHA');
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
     $this->assertNull($result, 'Setting and symbolic getting CAPTCHA point: NULL', 'CAPTCHA');
     // Set with object.
     $captcha_type = new stdClass;
     $captcha_type->module = 'baba';
     $captcha_type->type = 'fofo';
-    captcha_set_form_id_setting('comment_form', $captcha_type);
-    $result = captcha_get_form_id_setting('comment_form');
+    captcha_set_form_id_setting('comment_node_page_form', $captcha_type);
+    $result = captcha_get_form_id_setting('comment_node_page_form');
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
     $this->assertEqual($result->module, 'baba', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
     $this->assertEqual($result->type, 'fofo', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
     $this->assertEqual($result, 'baba/fofo', 'Setting and symbolic getting CAPTCHA point: "baba/fofo"', 'CAPTCHA');
 
   }
@@ -310,12 +313,15 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
    * Helper function for checking CAPTCHA setting of a form.
    *
    * @param $form_id the form_id of the form to investigate.
-   * @param $challenge_type what the challenge type shoul be:
+   * @param $challenge_type what the challenge type should be:
    *   NULL, 'none', 'default' or something like 'captcha/Math'
    */
   protected function assertCaptchaSetting($form_id, $challenge_type) {
-    $result = captcha_get_form_id_setting('comment_form', TRUE);
-    $this->assertEqual($result, $challenge_type, 'Check CAPTCHA setting for form.', 'CAPTCHA');
+    $result = captcha_get_form_id_setting('comment_node_page_form', TRUE);
+    $this->assertEqual($result, $challenge_type,
+      t('Check CAPTCHA setting for form: expected: @expected, received: @received.',
+      array('@expected' => var_export($challenge_type, TRUE), '@received' => var_export($result, TRUE))),
+      'CAPTCHA');
   }
 
   /**
@@ -334,7 +340,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     // Create a node with comments enabled.
     $node_settings = array(
       'type' => 'page',
-      'comment' => COMMENT_NODE_READ_WRITE,
+      'comment' => COMMENT_NODE_OPEN,
     );
     $node = $this->drupalCreateNode($node_settings);
 
@@ -344,6 +350,8 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     // Click the add new comment link
     $this->clickLink(t('Add new comment'));
     $add_comment_url = $this->getUrl();
+    // Remove fragment part of query
+    $add_comment_url = preg_replace('/#.*$/', '', $add_comment_url);
 
     ////////////////////////////////////////////////////////////
     // Click the CAPTCHA admin link to enable a challenge.
@@ -353,13 +361,14 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->drupalPost($this->getUrl(), $edit, t('Save'));
 
     // Check if returned to original comment form.
-    $this->assertEqual($add_comment_url, $this->getUrl(),
-      'After setting CAPTCHA with CAPTCHA admin links: should return to original form.', 'CAPTCHA');
+    $this->assertUrl($add_comment_url, array(),
+      'After setting CAPTCHA with CAPTCHA admin links: should return to original form.'.
+    "[$add_comment_url] [".$this->getUrl() ."]" , 'CAPTCHA');
     // Check if CAPTCHA was successfully enabled (on CAPTCHA admin links fieldset).
     $this->assertText(t('CAPTCHA: challenge "@type" enabled', array('@type' => 'Math')),
       'Enable a challenge through the CAPTCHA admin links', 'CAPTCHA');
     // Check if CAPTCHA was successfully enabled (through API).
-    $this->assertCaptchaSetting('comment_form', 'captcha/Math');
+    $this->assertCaptchaSetting('comment_node_page_form', 'captcha/Math');
 
     //////////////////////////////////////////////////////
     // Edit challenge type through CAPTCHA admin links.
@@ -377,7 +386,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->assertText(t('CAPTCHA: challenge "@type" enabled', array('@type' => 'Math')),
       'Enable a challenge through the CAPTCHA admin links', 'CAPTCHA');
     // Check if CAPTCHA was successfully edited (through API).
-    $this->assertCaptchaSetting('comment_form', 'default');
+    $this->assertCaptchaSetting('comment_node_page_form', 'default');
 
 
 
@@ -394,19 +403,19 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     $this->assertText(t('CAPTCHA: no challenge enabled'),
       'Disable challenge through the CAPTCHA admin links', 'CAPTCHA');
     // Check if CAPTCHA was successfully disabled (through API).
-    $this->assertCaptchaSetting('comment_form', 'none');
+    $this->assertCaptchaSetting('comment_node_page_form', 'none');
 
   }
 
 
   function testUntrustedUserPosting() {
     // Set CAPTCHA on comment form.
-    captcha_set_form_id_setting('comment_form', 'captcha/Math');
+    captcha_set_form_id_setting('comment_node_page_form', 'captcha/Math');
 
     // Create a node with comments enabled.
     $node_settings = array(
       'type' => 'page',
-      'comment' => COMMENT_NODE_READ_WRITE,
+      'comment' => COMMENT_NODE_OPEN,
     );
     $node = $this->drupalCreateNode($node_settings);
 
@@ -424,7 +433,7 @@ class CapchaAdminTestCase extends DrupalWebTestCase {
     // Try to post a comment with wrong answer.
     $edit = array(
       'subject' => 'check thiz out!',
-      'comment' => 'cool site u have',
+      'comment_body[' . LANGUAGE_NONE . '][0][value]' => 'cool site u have',
       'captcha_response' => 'xx',
     );
     $this->drupalPost($add_comment_url, $edit, t('Preview'));
