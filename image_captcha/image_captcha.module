@@ -3,7 +3,7 @@
 
 /**
  * @file
- * Implementation of image CAPTCHA for use with the CAPTCHA module
+ * Implements image CAPTCHA for use with the CAPTCHA module
  */
 
 define('IMAGE_CAPTCHA_ALLOWED_CHARACTERS', 'aAbBCdEeFfGHhijKLMmNPQRrSTtWXYZ23456789');
@@ -19,23 +19,23 @@ define('IMAGE_CAPTCHA_FILE_FORMAT_TRANSPARENT_PNG', 3);
 
 
 /**
- * Implementation of hook_help().
+ * Implements hook_help().
  */
 function image_captcha_help($path, $arg) {
   switch ($path) {
-    case 'admin/user/captcha/image_captcha':
-      $output = '<p>'. t('The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be careful with the size and computation related settings.') .'</p>';
+    case 'admin/config/people/captcha/image_captcha':
+      $output = '<p>' . t('The image CAPTCHA is a popular challenge where a random textual code is obfuscated in an image. The image is generated on the fly for each request, which is rather CPU intensive for the server. Be careful with the size and computation related settings.') . '</p>';
       return $output;
   }
 }
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function image_captcha_menu() {
   $items = array();
   // add an administration tab for image_captcha
-  $items['admin/user/captcha/image_captcha'] = array(
+  $items['admin/config/people/captcha/image_captcha'] = array(
     'title' => 'Image CAPTCHA',
     'file' => 'image_captcha.admin.inc',
     'page callback' => 'drupal_get_form',
@@ -44,7 +44,7 @@ function image_captcha_menu() {
     'type' => MENU_LOCAL_TASK,
   );
   // Menu path for generating font example.
-  $items['admin/user/captcha/image_captcha/font_preview'] = array(
+  $items['admin/config/people/captcha/image_captcha/font_preview'] = array(
     'title' => 'Font example',
     'file' => 'image_captcha.admin.inc',
     'page callback' => 'image_captcha_font_preview',
@@ -72,8 +72,8 @@ function _image_captcha_get_enabled_fonts() {
   }
   else {
     $default = array(
-      drupal_get_path('module', 'image_captcha') .'/fonts/Tesox/tesox.ttf',
-      drupal_get_path('module', 'image_captcha') .'/fonts/Tuffy/Tuffy.ttf',
+      drupal_get_path('module', 'image_captcha') . '/fonts/Tesox/tesox.ttf',
+      drupal_get_path('module', 'image_captcha') . '/fonts/Tuffy/Tuffy.ttf',
     );
     return variable_get('image_captcha_fonts', $default);
   }
@@ -179,7 +179,7 @@ function _image_captcha_check_setup($check_fonts=TRUE) {
 }
 
 /**
- * Implementation of hook_captcha().
+ * Implements hook_captcha().
  */
 function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
   switch ($op) {
@@ -217,10 +217,10 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
         // Generate image source URL (add timestamp to avoid problems with
         // client side caching: subsequent images of the same CAPTCHA session
         // have the same URL, but should display a different code).
-        $img_src = check_url(url("image_captcha/$captcha_sid/". time()));
+        $img_src = check_url(url("image_captcha/$captcha_sid/" . REQUEST_TIME));
         $result['form']['captcha_image'] = array(
           '#type' => 'markup',
-          '#value' => '<img src="'. $img_src .'" alt="'. t('Image CAPTCHA') .'" title="'. t('Image CAPTCHA') .'" />',
+          '#markup' => '<img src="' . $img_src . '" alt="' . t('Image CAPTCHA') . '" title="' . t('Image CAPTCHA') . '" />',
           '#weight' => -2,
         );
         $result['form']['captcha_response'] = array(
@@ -242,7 +242,6 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
             $result['captcha_validate'] = 'captcha_validate_case_insensitive_ignore_spaces';
             break;
         }
-
 
         return $result;
       }

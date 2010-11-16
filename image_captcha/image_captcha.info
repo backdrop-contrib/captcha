@@ -1,6 +1,6 @@
 ; $Id$
 name = "Image CAPTCHA"
-description = "Provides an image based CAPTCHA."
+description = "Provides an image based CAPTCHA. Warning: this module is not fully ported yet to Drupal 7. Do not use unless you know what you are doing"
 package = "Spam control"
 dependencies[] = captcha
 core = 7.x
