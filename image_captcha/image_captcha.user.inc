@@ -18,7 +18,9 @@ function image_captcha_image($captcha_sid=NULL) {
   }
 
   // Get solution (the code to show).
-  $code = db_result(db_query("SELECT solution FROM {captcha_sessions} WHERE csid = %d", (int)($captcha_sid)));
+  $code = db_query("SELECT solution FROM {captcha_sessions} WHERE csid = :csid",
+    array(':csid' => $captcha_sid)
+  )->fetchField();
 
   // Only generate captcha if code exists in the session.
   if ($code !== FALSE) {
@@ -264,7 +266,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
 
     // Get character dimensions for TrueType fonts.
     if ($font != 'BUILTIN') {
-      $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
+      $bbox = imagettfbbox($font_size, 0, drupal_realpath($font), $character);
       // In very rare cases with some versions of the GD library, the x-value
       // of the left side of the bounding box as returned by the first call of
       // imagettfbbox is corrupt (value -2147483648 = 0x80000000).
@@ -272,7 +274,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       // can be used as workaround.
       // This issue is discussed at http://drupal.org/node/349218.
       if ($bbox[2] < 0) {
-        $bbox = imagettfbbox($font_size, 0, realpath($font), $character);
+        $bbox = imagettfbbox($font_size, 0, drupal_realpath($font), $character);
       }
     }
     else {
@@ -319,7 +321,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       imagestring($image, 5, $pos_x, $pos_y, $character, $color);
     }
     else {
-      imagettftext($image, $font_size, $angle, $pos_x, $pos_y, $color, realpath($font), $character);
+      imagettftext($image, $font_size, $angle, $pos_x, $pos_y, $color, drupal_realpath($font), $character);
     }
 
     // For debugging purposes: draw character bounding box (only valid when rotation is disabled).
