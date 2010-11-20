@@ -248,7 +248,7 @@ function _image_captcha_settings_form_font_section() {
       ),
       '#options' => $available_fonts,
       '#attributes' => array('class' => array('image_captcha_admin_fonts_selection')),
-      '#process' => array('form_process_checkboxes', 'image_captcha_columnify_font_selection'),
+      '#process' => array('form_process_checkboxes'),
     );
 
 
@@ -322,22 +322,6 @@ function _image_captcha_get_available_fonts_from_directories($directories=NULL) 
 }
 
 
-/**
- * Additional processing (after Drupal core's expand_checkboxes)
- * to put the font previews in a multi-column layout.
- */
-function image_captcha_columnify_font_selection($element) {
-  // Get the fonts that get a preview.
-  $fonts = variable_get('image_captcha_fonts_preview_map_cache', array());
-  // And add some markup so we can put them in column layout.
-  foreach ($fonts as $font) {
-    $element[$font->filename]['#prefix'] = '<div class="image_captcha_admin_font_preview">';
-    $element[$font->filename]['#suffix'] = '</div>';
-  }
-
-  return $element;
-
-}
 /**
  * Validation function for image_captcha configuration form
  */

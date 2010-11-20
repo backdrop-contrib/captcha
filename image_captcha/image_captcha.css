@@ -9,16 +9,18 @@
  * Float the fonts with preview (with a fixed width)
  * to create a multi-column layout.
  */
-.image_captcha_admin_font_preview {
+.image_captcha_admin_fonts_selection .form-item {
   float: left;
   width: 160px;
 }
 
 /**
- * Fonts without a preview should not follow the column layout.
+ * Stop floating with the item for the built in font.
  */
-.image_captcha_admin_fonts_selection .form-item {
+.image_captcha_admin_fonts_selection .form-item-image-captcha-fonts-BUILTIN {
   clear: both;
+  float: none;
+  width: 100%;
 }
 
 /**
@@ -27,5 +29,4 @@
 .image_captcha_admin_fonts_selection img {
   vertical-align: middle;
 }
-
 
