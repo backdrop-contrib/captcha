@@ -195,11 +195,11 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
 
     case 'generate':
       if ($captcha_type == 'Image') {
-        // In offline mode, the image CAPTCHA does not work because the request
+        // In maintenance mode, the image CAPTCHA does not work because the request
         // for the image itself won't succeed (only ?q=user is permitted for
         // unauthenticated users). We fall back to the Math CAPTCHA in that case.
         global $user;
-        if (variable_get('site_offline', FALSE) && $user->uid == 0) {
+        if (variable_get('maintenance_mode', FALSE) && $user->uid == 0) {
           return captcha_captcha('generate', 'Math');
         }
         // generate a CAPTCHA code
