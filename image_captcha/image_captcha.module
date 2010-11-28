@@ -199,7 +199,7 @@ function image_captcha_captcha($op, $captcha_type='', $captcha_sid=NULL) {
         // for the image itself won't succeed (only ?q=user is permitted for
         // unauthenticated users). We fall back to the Math CAPTCHA in that case.
         global $user;
-        if (variable_get('maintenance_mode', FALSE) && $user->uid == 0) {
+        if (variable_get('maintenance_mode', 0) && $user->uid == 0) {
           return captcha_captcha('generate', 'Math');
         }
         // generate a CAPTCHA code
