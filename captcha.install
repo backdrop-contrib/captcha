@@ -42,6 +42,12 @@ function captcha_schema() {
         'type' => 'serial',
         'not null' => TRUE,
       ),
+      'token' => array(
+        'description' => 'One time CAPTCHA token.',
+        'type' => 'varchar',
+        'length' => 64,
+        'not null' => FALSE,
+      ),
       'uid' => array(
         'description' => "User's {users}.uid.",
         'type' => 'int',
@@ -311,9 +317,15 @@ function captcha_update_6201() {
 }
 
 
-
-
-
+/**
+ * Implementation of hook_update_N()
+ * Add a CAPTCHA token column to captcha_sessions table.
+ */
+function captcha_update_6202() {
+  $ret = array();
+  db_add_column($ret, 'captcha_sessions', 'token', 'varchar(64)');
+  return $ret;
+}
 
 
 /**
