@@ -263,6 +263,9 @@ function captcha_element_process($element, &$form_state, $complete_form) {
       $element['#captcha_validate'] = $captcha['captcha_validate'];
     }
 
+    // Set the theme function.
+    $element['#theme'] = 'captcha';
+
     // Add pre_render callback for additional CAPTCHA processing.
     $element['#pre_render'] = array('captcha_pre_render_process');
 
@@ -280,19 +283,20 @@ function captcha_element_process($element, &$form_state, $complete_form) {
  * Render it in a fieldset if a description of the CAPTCHA
  * is available. Render it as is otherwise.
  */
-function theme_captcha($element) {
+function theme_captcha($variables) {
+  $element = $variables['element'];
   if (!empty($element['#description']) && isset($element['captcha_widgets'])) {
     $fieldset = array(
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA'),
       '#description' => $element['#description'],
-      '#children' => $element['#children'],
-      '#attributes' => array('class' => 'captcha'),
+      '#children' => drupal_render_children($element),
+      '#attributes' => array('class' => array('captcha')),
     );
-    return theme('fieldset', $fieldset);
+    return theme('fieldset', array('element' => $fieldset));
   }
   else {
-    return '<div class="captcha">' . $element['#children'] . '</div>';
+    return '<div class="captcha">foo' . drupal_render_children($element) . '</div>';
   }
 }
 
