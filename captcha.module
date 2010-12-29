@@ -296,7 +296,7 @@ function theme_captcha($variables) {
     return theme('fieldset', array('element' => $fieldset));
   }
   else {
-    return '<div class="captcha">foo' . drupal_render_children($element) . '</div>';
+    return '<div class="captcha">' . drupal_render_children($element) . '</div>';
   }
 }
 
