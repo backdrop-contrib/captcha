@@ -10,9 +10,20 @@
  *
  */
 
+/**
+ * Constants for CAPTCHA persistence.
+ * TODO: change these integers to strings because the CAPTCHA settings form saves them as strings in the variables table anyway?
+ */
 
-define('CAPTCHA_PERSISTENCE_SHOW_ALWAYS', 1);
-define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM', 2);
+// Always add a CAPTCHA (even on every page of a multipage workflow).
+define('CAPTCHA_PERSISTENCE_SHOW_ALWAYS', 0);
+// Only one CAPTCHA has to be solved per form instance/multi-step workflow.
+define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE', 1);
+// Once the user answered correctly for a CAPTCHA on a certain form type,
+// no more CAPTCHAs will be offered anymore for that form.
+define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_TYPE', 2);
+// Once the user answered correctly for a CAPTCHA on the site,
+// no more CAPTCHAs will be offered anymore.
 define('CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL', 3);
 
 define('CAPTCHA_STATUS_UNSOLVED', 0);
@@ -546,8 +557,8 @@ function captcha_validate($element, &$form_state) {
   $csid = $captcha_info['captcha_sid'];
 
   $solution = db_query(
-    'SELECT solution FROM {captcha_sessions} WHERE csid = :csid AND status = :status',
-    array(':csid' => $csid, ':status' => CAPTCHA_STATUS_UNSOLVED)
+    'SELECT solution FROM {captcha_sessions} WHERE csid = :csid',
+    array(':csid' => $csid)
     )
     ->fetchField();
 
