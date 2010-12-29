@@ -105,6 +105,8 @@ function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
  */
 function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS_UNSOLVED) {
   global $user;
+  // Initialize solution with random data.
+  $solution = md5(mt_rand());
   // Insert an entry and thankfully receive the value of the autoincrement field 'csid'.
   $captcha_sid = db_insert('captcha_sessions')
   ->fields(array(
@@ -113,7 +115,7 @@ function _captcha_generate_captcha_session($form_id=NULL, $status=CAPTCHA_STATUS
     'ip_address' => ip_address(),
     'timestamp' => REQUEST_TIME,
     'form_id' => $form_id,
-    'solution' => 'undefined',
+    'solution' => $solution,
     'status' => $status,
     'attempts' => 0,
   ))
