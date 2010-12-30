@@ -136,11 +136,14 @@ function captcha_install() {
   $t = get_t();
   // Insert some default CAPTCHA points.
   $form_ids = array(
-    'comment_node_page_form',
     'contact_site_form', 'contact_personal_form',
     'user_register_form', 'user_pass', 'user_login', 'user_login_block',
     'forum_node_form'
   );
+  // Add form_ids of all currently known node types too.
+  foreach (node_type_get_names() as $type => $name) {
+    $form_ids[] = 'comment_node_' . $type . '_form';
+  }
   foreach ($form_ids as $form_id) {
     db_insert('captcha_points')
       ->fields(array(
@@ -359,6 +362,31 @@ function captcha_update_7000() {
     ->fields(array('form_id' => 'contact_personal_form'))
     ->condition('form_id', 'contact_mail_user')
     ->execute();
-  // TODO: the general comment_form form_id is also split
-  // in comment_node_{type}_form, e.g. comment_node_page_form
+
+  // The D6-style comment_form form_id is split per node type
+  // in D7: comment_node_{type}_form, e.g. comment_node_page_form.
+  // Get the current settings for 'comment_form'.
+  $captcha_point = db_query(
+    "SELECT * FROM {captcha_points} WHERE form_id = :comment_form_id",
+    array(':comment_form_id' => 'comment_form')
+  )->fetchObject();
+  if ($captcha_point !== FALSE) {
+    // Create entries for D7-style node form IDs.
+    $module = $captcha_point->module;
+    $captcha_type = $captcha_point->captcha_type;
+    foreach (node_type_get_names() as $type => $name) {
+      $form_id = 'comment_node_' . $type . '_form';
+      db_insert('captcha_points')
+        ->fields(array(
+          'form_id' => $form_id,
+          'module' => $module,
+          'captcha_type' => $captcha_type,
+        ))
+        ->execute();
+    }
+    // Delete outdated entry.
+    db_delete('captcha_points')
+      ->condition('form_id', 'comment_form')
+      ->execute();
+  }
 }
