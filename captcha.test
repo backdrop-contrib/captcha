@@ -6,7 +6,6 @@
  * Tests for CAPTCHA module.
  */
 
-// TODO: write test to check persistence
 // TODO: write test for CAPTCHAs on admin pages
 // TODO: test for default challenge type
 // TODO: test about placement (comment form, node forms, log in form, etc)
@@ -14,7 +13,6 @@
 // TODO: test custom CAPTCHA validation stuff
 // TODO: test if entry on status report (Already X blocked form submissions) works
 // TODO: test space ignoring validation of image CAPTCHA
-// TODO: DrupalWebTestCase::randomName() does not accept a second argument anymore
 
 // TODO: refactor the 'comment_body[' . LANGUAGE_NONE . '][0][value]' stuff
 
@@ -619,7 +617,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
   function testCaptchaPointAdministration() {
     // Generate CAPTCHA point data:
     // Drupal form ID should consist of lowercase alphanumerics and underscore)
-    $captcha_point_form_id = strtolower($this->randomName(32, 'a_form_id'));
+    $captcha_point_form_id = 'form_' . strtolower($this->randomName(32));
     // the Math CAPTCHA by the CAPTCHA module is always available, so let's use it
     $captcha_point_module = 'captcha';
     $captcha_point_type = 'Math';
@@ -685,7 +683,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
   function testCaptchaPointAdministrationByNonAdmin() {
     // First add a CAPTCHA point (as admin)
     $this->drupalLogin($this->admin_user);
-    $captcha_point_form_id = strtolower($this->randomName(32, 'a_form_id'));
+    $captcha_point_form_id = 'form_' . strtolower($this->randomName(32));
     $captcha_point_module = 'captcha';
     $captcha_point_type = 'Math';
     $form_values = array(
@@ -707,7 +705,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
       'Non admin should not be able to set a CAPTCHA point');
 
     // Try to set CAPTCHA point through admin/user/captcha/captcha/captcha_point/$form_id
-    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. strtolower($this->randomName(32, 'a_form_id')));
+    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/' . 'form_' . strtolower($this->randomName(32)));
     $this->assertText(t('You are not authorized to access this page.'),
       'Non admin should not be able to set a CAPTCHA point');
 
