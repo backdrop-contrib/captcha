@@ -25,7 +25,7 @@ function captcha_schema() {
         'type' => 'varchar',
         'length' => 64,
       ),
-      'type' => array(
+      'captcha_type' => array(
         'description' => 'The challenge type to use.',
         'type' => 'varchar',
         'length' => 64,
@@ -146,7 +146,7 @@ function captcha_install() {
       ->fields(array(
         'form_id' => $form_id,
         'module' => NULL,
-        'type' => NULL,
+        'captcha_type' => NULL,
       ))
       ->execute();
   }
@@ -328,6 +328,18 @@ function captcha_update_6202() {
 }
 
 
+
+/**
+ * Implementation of hook_update_N()
+ * Rename the type field to captcha_type in captcha_points.
+ */
+function captcha_update_6203() {
+  $ret = array();
+  db_change_field($ret, 'captcha_points', 'type', 'captcha_type', array('type' => 'varchar', 'length' => 64));
+  return $ret;
+}
+
+
 /**
  * Migrate form configuration for changed form ids in Drupal 7.
  */
@@ -350,4 +362,3 @@ function captcha_update_7000() {
   // TODO: the general comment_form form_id is also split
   // in comment_node_{type}_form, e.g. comment_node_page_form
 }
-

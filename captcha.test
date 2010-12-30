@@ -414,7 +414,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = captcha_get_form_id_setting($comment_form_id);
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $this->assertNull($result->module, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
-    $this->assertNull($result->type, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
+    $this->assertNull($result->captcha_type, 'Setting and getting CAPTCHA point: none', 'CAPTCHA');
     $result = captcha_get_form_id_setting($comment_form_id, TRUE);
     $this->assertEqual($result, 'none', 'Setting and symbolic getting CAPTCHA point: "none"', 'CAPTCHA');
     // Set to 'default'
@@ -423,7 +423,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = captcha_get_form_id_setting($comment_form_id);
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $this->assertEqual($result->module, 'foo', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
-    $this->assertEqual($result->type, 'bar', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
+    $this->assertEqual($result->captcha_type, 'bar', 'Setting and getting CAPTCHA point: default', 'CAPTCHA');
     $result = captcha_get_form_id_setting($comment_form_id, TRUE);
     $this->assertEqual($result, 'default', 'Setting and symbolic getting CAPTCHA point: "default"', 'CAPTCHA');
     // Set to 'baz/boo'.
@@ -431,7 +431,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = captcha_get_form_id_setting($comment_form_id);
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $this->assertEqual($result->module, 'baz', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
-    $this->assertEqual($result->type, 'boo', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
+    $this->assertEqual($result->captcha_type, 'boo', 'Setting and getting CAPTCHA point: baz/boo', 'CAPTCHA');
     $result = captcha_get_form_id_setting($comment_form_id, TRUE);
     $this->assertEqual($result, 'baz/boo', 'Setting and symbolic getting CAPTCHA point: "baz/boo"', 'CAPTCHA');
     // Set to NULL (which should delete the CAPTCHA point setting entry).
@@ -443,12 +443,12 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     // Set with object.
     $captcha_type = new stdClass;
     $captcha_type->module = 'baba';
-    $captcha_type->type = 'fofo';
+    $captcha_type->captcha_type = 'fofo';
     captcha_set_form_id_setting($comment_form_id, $captcha_type);
     $result = captcha_get_form_id_setting($comment_form_id);
     $this->assertNotNull($result, 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
     $this->assertEqual($result->module, 'baba', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
-    $this->assertEqual($result->type, 'fofo', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
+    $this->assertEqual($result->captcha_type, 'fofo', 'Setting and getting CAPTCHA point: baba/fofo', 'CAPTCHA');
     $result = captcha_get_form_id_setting($comment_form_id, TRUE);
     $this->assertEqual($result, 'baba/fofo', 'Setting and symbolic getting CAPTCHA point: "baba/fofo"', 'CAPTCHA');
 
@@ -638,7 +638,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = $this->getCaptchaPointSettingFromDatabase($captcha_point_form_id);
     $this->assertEqual($result->module, $captcha_point_module,
       'Enabled CAPTCHA point should have module set');
-    $this->assertEqual($result->type, $captcha_point_type,
+    $this->assertEqual($result->captcha_type, $captcha_point_type,
       'Enabled CAPTCHA point should have type set');
 
     // Disable CAPTCHA point again
@@ -649,7 +649,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = $this->getCaptchaPointSettingFromDatabase($captcha_point_form_id);
     $this->assertNull($result->module,
       'Disabled CAPTCHA point should have NULL as module');
-    $this->assertNull($result->type,
+    $this->assertNull($result->captcha_type,
       'Disabled CAPTCHA point should have NULL as type');
 
     // Set CAPTCHA point through admin/user/captcha/captcha/captcha_point/$form_id
@@ -664,7 +664,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = $this->getCaptchaPointSettingFromDatabase($captcha_point_form_id);
     $this->assertEqual($result->module, $captcha_point_module,
       'Enabled CAPTCHA point should have module set');
-    $this->assertEqual($result->type, $captcha_point_type,
+    $this->assertEqual($result->captcha_type, $captcha_point_type,
       'Enabled CAPTCHA point should have type set');
 
     // Delete CAPTCHA point
@@ -727,7 +727,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $result = $this->getCaptchaPointSettingFromDatabase($captcha_point_form_id);
     $this->assertEqual($result->module, $captcha_point_module,
       'Enabled CAPTCHA point should still have module set');
-    $this->assertEqual($result->type, $captcha_point_type,
+    $this->assertEqual($result->captcha_type, $captcha_point_type,
       'Enabled CAPTCHA point should still have type set');
 
     // Delete CAPTCHA point

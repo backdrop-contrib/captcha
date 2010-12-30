@@ -15,7 +15,7 @@
  *   - 'default' to use the default challenge type
  *   - NULL to remove the entry for the CAPTCHA type
  *   - something of the form 'image_captcha/Image'
- *   - an object with attributes $captcha_type->module and $captcha_type->type
+ *   - an object with attributes $captcha_type->module and $captcha_type->captcha_type
  * @return nothing
  */
 function captcha_set_form_id_setting($form_id, $captcha_type) {
@@ -23,14 +23,14 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
   if ($captcha_type == 'none') {
     db_merge('captcha_points')
       ->key(array('form_id' => $form_id))
-      ->fields(array('module' => NULL, 'type' => NULL))
+      ->fields(array('module' => NULL, 'captcha_type' => NULL))
       ->execute();
   }
   // Handle 'default'.
   elseif ($captcha_type == 'default') {
     db_merge('captcha_points')
       ->key(array('form_id' => $form_id))
-      ->fields(array('module' => NULL, 'type' => 'default'))
+      ->fields(array('module' => NULL, 'captcha_type' => 'default'))
       ->execute();
   }
   // Handle NULL.
@@ -38,10 +38,10 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
     db_delete('captcha_points')->condition('form_id', $form_id)->execute();
   }
   // Handle a captcha_type object.
-  elseif (is_object($captcha_type) && isset($captcha_type->module) && isset($captcha_type->type)) {
+  elseif (is_object($captcha_type) && isset($captcha_type->module) && isset($captcha_type->captcha_type)) {
     db_merge('captcha_points')
       ->key(array('form_id' => $form_id))
-      ->fields(array('module' => $captcha_type->module, 'type' => $captcha_type->type))
+      ->fields(array('module' => $captcha_type->module, 'captcha_type' => $captcha_type->captcha_type))
       ->execute();
   }
   // Handle a captcha_type string.
@@ -49,7 +49,7 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
     list($module, $type) = explode('/', $captcha_type);
     db_merge('captcha_points')
       ->key(array('form_id' => $form_id))
-      ->fields(array('module' => $module, 'type' => $type))
+      ->fields(array('module' => $module, 'captcha_type' => $type))
       ->execute();
   }
   else {
@@ -65,32 +65,32 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  * @param $symbolic flag to return as (symbolic) strings instead of object.
  *
  * @return NULL if no setting is known
- *   or a captcha_point object with fields 'module' and 'type'.
+ *   or a captcha_point object with fields 'module' and 'captcha_type'.
  *   If argument $symbolic is true, returns (symbolic) as 'none', 'default'
  *   or in the form 'captcha/Math'.
  */
 function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
-  $result = db_query("SELECT module, type FROM {captcha_points} WHERE form_id = :form_id",
+  $result = db_query("SELECT module, captcha_type FROM {captcha_points} WHERE form_id = :form_id",
     array(':form_id' =>  $form_id));
   $captcha_point = $result->fetchObject();
   if (!$captcha_point) {
     $captcha_point = NULL;
   }
-  elseif ($captcha_point->type == 'default') {
+  elseif ($captcha_point->captcha_type == 'default') {
     if (!$symbolic) {
       list($module, $type) = explode('/', variable_get('captcha_default_challenge', 'captcha/Math'));
       $captcha_point->module = $module;
-      $captcha_point->type = $type;
+      $captcha_point->captcha_type = $type;
     }
     else {
       $captcha_point = 'default';
     }
   }
-  elseif ($captcha_point->module == NULL && $captcha_point->type == NULL && $symbolic) {
+  elseif ($captcha_point->module == NULL && $captcha_point->captcha_type == NULL && $symbolic) {
     $captcha_point = 'none';
   }
   elseif ($symbolic) {
-    $captcha_point = $captcha_point->module . '/' . $captcha_point->type;
+    $captcha_point = $captcha_point->module . '/' . $captcha_point->captcha_type;
   }
   return $captcha_point;
 }

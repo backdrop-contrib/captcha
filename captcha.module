@@ -241,7 +241,7 @@ function captcha_element_process($element, &$form_state, $complete_form) {
     'form_id' => $posted_form_id,
     'captcha_sid' => $captcha_sid,
     'module' => $captcha_type_module,
-    'type' => $captcha_type_challenge,
+    'captcha_type' => $captcha_type_challenge,
   );
   $element['#captcha_info'] = array(
     'form_id' => $this_form_id,
@@ -329,12 +329,12 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
 
       // Get CAPTCHA type and module for given form_id.
       $captcha_point = captcha_get_form_id_setting($form_id);
-      if ($captcha_point && $captcha_point->type) {
+      if ($captcha_point && $captcha_point->captcha_type) {
         module_load_include('inc', 'captcha');
         // Build CAPTCHA form element.
         $captcha_element = array(
           '#type' => 'captcha',
-          '#captcha_type' => $captcha_point->module . '/' . $captcha_point->type,
+          '#captcha_type' => $captcha_point->module . '/' . $captcha_point->captcha_type,
         );
         // Add a CAPTCHA description if required.
         if (variable_get('captcha_add_captcha_description', TRUE)) {
@@ -356,8 +356,8 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
       );
-      if ($captcha_point !== NULL && $captcha_point->type) {
-        $captcha_element['#title'] = t('CAPTCHA: challenge "@type" enabled', array('@type' => $captcha_point->type));
+      if ($captcha_point !== NULL && $captcha_point->captcha_type) {
+        $captcha_element['#title'] = t('CAPTCHA: challenge "@type" enabled', array('@type' => $captcha_point->captcha_type));
         $captcha_element['#description'] = t('Untrusted users will see a CAPTCHA here (!settings).',
           array('!settings' => l(t('general CAPTCHA settings'), 'admin/config/people/captcha'))
         );
@@ -365,7 +365,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
           '#type' => 'item',
           '#title' => t('Enabled challenge'),
           '#markup' => t('"@type" by module "@module" (!change, !disable)', array(
-            '@type' => $captcha_point->type,
+            '@type' => $captcha_point->captcha_type,
             '@module' => $captcha_point->module,
             '!change' => l(t('change'), "admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination())),
             '!disable' => l(t('disable'), "admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
@@ -387,7 +387,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
           );
           $captcha_element['example']['example_captcha'] = array(
             '#type' => 'captcha',
-            '#captcha_type' => $captcha_point->module . '/' . $captcha_point->type,
+            '#captcha_type' => $captcha_point->module . '/' . $captcha_point->captcha_type,
             '#captcha_admin_mode' => TRUE,
           );
         }
@@ -608,7 +608,7 @@ function captcha_validate($element, &$form_state) {
           '%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
           array('%form_id' => $form_id,
             '%response' => $captcha_response, '%solution' => $solution,
-            '%challenge' => $captcha_info['type'], '%module' => $captcha_info['module'],
+            '%challenge' => $captcha_info['captcha_type'], '%module' => $captcha_info['module'],
           ),
           WATCHDOG_NOTICE);
       }
