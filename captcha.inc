@@ -239,7 +239,6 @@ function _captcha_get_captcha_placement($form_id, $form) {
   if ($placement_map === NULL) {
     // If first level cache missed: try second level cache.
     $placement_map = variable_get('captcha_placement_map_cache', NULL);
-    // TODO: add UI in admin UI for flushing this cache.
 
     if ($placement_map === NULL) {
       // If second level cache missed: start from a fresh placement map.
