@@ -19,6 +19,7 @@ function captcha_schema() {
         'type' => 'varchar',
         'length' => 128,
         'not null' => TRUE,
+        'default' => '',
       ),
       'module' => array(
         'description' => 'The module that provides the challenge.',
