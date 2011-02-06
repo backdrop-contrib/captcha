@@ -2,8 +2,20 @@
 
 (function ($) {
 
+Drupal.behaviors.captcha = {
+  attach: function (context) {
+
+    // Turn off autocompletion for the CAPTCHA response field.
+    // We do it here with Javascript (instead of directly in the markup)
+    // because this autocomplete attribute is not standard and
+    // it would break (X)HTML compliance.
+    $("#edit-captcha-response").attr("autocomplete", "off");
+
+  }
+};
+
 Drupal.behaviors.captchaAdmin = {
-  attach: function(context) {
+  attach: function (context) {
   	// Add onclick handler to checkbox for adding a CAPTCHA description
   	// so that the textfields for the CAPTCHA description are hidden
   	// when no description should be added.
