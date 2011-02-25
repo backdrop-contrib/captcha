@@ -1,4 +1,3 @@
-// $Id$
 
 This directory contains a subset (Regular and Bold) of the Tuffy typeface
 created by Thatcher Ulrich (http://tulrich.com/fonts) and released in the

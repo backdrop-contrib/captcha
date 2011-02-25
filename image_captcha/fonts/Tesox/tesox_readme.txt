@@ -1,4 +1,3 @@
-// $Id$
 
 The Tesox typeface
 ==================

@@ -1,4 +1,3 @@
-; $Id$
 name = CAPTCHA
 description = Base CAPTCHA module for adding challenges to arbitrary forms.
 package = "Spam control"

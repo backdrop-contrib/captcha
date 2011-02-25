@@ -1,4 +1,3 @@
-// $Id$
 
 It possible to put your own fonts for the Image CAPTCHA in this folder.
 However, this is not the recommended way, as they can get lost easily during

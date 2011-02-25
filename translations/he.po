@@ -1,4 +1,3 @@
-# $Id$
 #
 # Hebrew translation of Drupal (general)
 # Copyright YEAR NAME <EMAIL@ADDRESS>
