@@ -1,4 +1,3 @@
-
 Readme file for the CAPTCHA module for Drupal
 ---------------------------------------------
 
