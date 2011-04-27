@@ -12,6 +12,11 @@
  * Menu callback function that generates the CAPTCHA image.
  */
 function image_captcha_image($captcha_sid=NULL) {
+  // If output buffering is on: discard current content and disable further buffering
+  if (ob_get_level()) {
+    ob_end_clean();
+  }
+  
   if (!$captcha_sid) {
     exit();
   }
