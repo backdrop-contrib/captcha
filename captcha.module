@@ -208,6 +208,8 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   else {
     // Generate a new CAPTCHA session if we could not reuse one from a posted form.
     $captcha_sid = _captcha_generate_captcha_session($this_form_id, CAPTCHA_STATUS_UNSOLVED);
+    // Set $posted_form_id during the first rendering of the form.
+    $posted_form_id = $this_form_id;
   }
 
   // Store CAPTCHA session ID as hidden field.
