@@ -359,6 +359,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
         '#title' => t('CAPTCHA'),
         '#collapsible' => TRUE,
         '#collapsed' => TRUE,
+        '#attributes' => array('class' => array('captcha-admin-links')),
       );
       if ($captcha_point !== NULL && $captcha_point->captcha_type) {
         $captcha_element['#title'] = t('CAPTCHA: challenge "@type" enabled', array('@type' => $captcha_point->captcha_type));
