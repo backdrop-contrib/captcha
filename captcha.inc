@@ -247,7 +247,12 @@ function _captcha_get_captcha_placement($form_id, $form) {
       // The comment form can have a 'Preview' button, or both a 'Submit' and 'Preview' button,
       // which is tricky for automatic placement detection. Luckily, Drupal core sets their
       // weight (19 and 20), so we just have to specify a slightly smaller weight.
-      $placement_map['comment_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
+      // There's a different comment form for each node type, so we need to set the placement
+      // for each and every comment form.
+      $node_types = array_keys(node_type_get_types());
+      foreach($node_types as $node_type) {
+        $placement_map['comment_node_' . $node_type . '_form'] = array('path' => array(), 'key' => NULL, 'weight' => 18.9);
+      }
       // Additional note: the node forms also have the posibility to only show a 'Preview' button.
       // However, the 'Submit' button is always present, but is just not rendered ('#access' = FALSE)
       // in those cases. The the automatic button detection should be sufficient for node forms.
