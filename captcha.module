@@ -286,6 +286,10 @@ function captcha_element_process($element, &$form_state, $complete_form) {
 
     // Store the solution in the #captcha_info array.
     $element['#captcha_info']['solution'] = $captcha['solution'];
+
+    // Make sure we can use a top level form value $form_state['values']['captcha_response'], even if the form has #tree=true.
+    $element['#tree'] = FALSE;
+
   }
 
   return $element;
