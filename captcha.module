@@ -619,14 +619,6 @@ function captcha_validate($element, &$form_state) {
           ),
           WATCHDOG_NOTICE);
       }
-      // If CAPTCHA was on a login form: stop validating, quit the current request
-      // and forward to the current page (like a reload) to prevent loging in.
-      // We do that because the log in procedure, which happens after
-      // captcha_validate(), does not check error conditions of extra form
-      // elements like the CAPTCHA.
-      if ($form_id == 'user_login' || $form_id == 'user_login_block') {
-        drupal_goto($_GET['q']);
-      }
     }
   }
 }
