@@ -240,7 +240,8 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   // - $element['#captcha_info'], for post processing functions that do not
   //   receive a $form_state argument (e.g. the pre_render callback).
   $form_state['captcha_info'] = array(
-    'form_id' => $posted_form_id,
+    'this_form_id' => $this_form_id,
+    'posted_form_id' => $posted_form_id,
     'captcha_sid' => $captcha_sid,
     'module' => $captcha_type_module,
     'captcha_type' => $captcha_type_challenge,
@@ -483,7 +484,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
   if (isset($form_state['captcha_info'])) {
     // We already determined the posted form ID and CAPTCHA session ID
     // for this form, so we reuse this info
-    $posted_form_id = $form_state['captcha_info']['form_id'];
+    $posted_form_id = $form_state['captcha_info']['posted_form_id'];
     $posted_captcha_sid = $form_state['captcha_info']['captcha_sid'];
   }
   else {
@@ -554,7 +555,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
 function captcha_validate($element, &$form_state) {
 
   $captcha_info = $form_state['captcha_info'];
-  $form_id = $captcha_info['form_id'];
+  $form_id = $captcha_info['this_form_id'];
 
   // Get CAPTCHA response.
   $captcha_response = $form_state['values']['captcha_response'];
