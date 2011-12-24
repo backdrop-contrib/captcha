@@ -481,9 +481,10 @@ function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
  *     if the values could not be found, e.g. for a fresh form).
  */
 function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) {
-  if (isset($form_state['captcha_info'])) {
-    // We already determined the posted form ID and CAPTCHA session ID
-    // for this form, so we reuse this info
+  if ($form_state['submitted'] && isset($form_state['captcha_info'])) {
+    // We are handling (or rebuilding) an already submitted form,
+    // so we already determined the posted form ID and CAPTCHA session ID
+    // for this form (from before submitting). Reuse this info.
     $posted_form_id = $form_state['captcha_info']['posted_form_id'];
     $posted_captcha_sid = $form_state['captcha_info']['captcha_sid'];
   }
