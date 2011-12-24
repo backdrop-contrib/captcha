@@ -491,25 +491,16 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
   else {
     // We have to determine the posted form ID and CAPTCHA session ID
     // from the post data.
-    // TODO: is this enough? We had to check more sources in Drupal 6 (see over there).
-    if (isset($form_state['input']) && count($form_state['input'])) {
-      $post_data = $form_state['input'];
-    }
-    else {
-      // No posted CAPTCHA info found (probably a fresh form).
-      $post_data = array();
-    }
-    // Get the posted form_id and CAPTCHA session ID.
     // Because we possibly use raw post data here,
     // we should be extra cautious and filter this data.
-    $posted_form_id = isset($post_data['form_id']) ?
-      preg_replace("/[^a-z0-9_]/", "", (string) $post_data['form_id'])
+    $posted_form_id = isset($form_state['input']['form_id']) ?
+      preg_replace("/[^a-z0-9_]/", "", (string) $form_state['input']['form_id'])
       : NULL;
-    $posted_captcha_sid = isset($post_data['captcha_sid']) ?
-      (int) $post_data['captcha_sid']
+    $posted_captcha_sid = isset($form_state['input']['captcha_sid']) ?
+      (int) $form_state['input']['captcha_sid']
       : NULL;
-    $posted_captcha_token = isset($post_data['captcha_token']) ?
-      preg_replace("/[^a-zA-Z0-9]/", "", (string) $post_data['captcha_token'])
+    $posted_captcha_token = isset($form_state['input']['captcha_token']) ?
+      preg_replace("/[^a-zA-Z0-9]/", "", (string) $form_state['input']['captcha_token'])
       : NULL;
 
     if ($posted_form_id == $this_form_id) {
