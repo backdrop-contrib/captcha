@@ -413,6 +413,20 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
 
     }
   }
+
+  // Add a warning about caching on the Perfomance settings page.
+  if ($form_id == 'system_performance_settings') {
+    $icon = theme('image', array('path' => 'misc/watchdog-warning.png', 'width' => 18, 'height' => 18, 'alt' => t('warning'), 'title' => t('warning')));
+    $form['caching']['captcha'] = array(
+      '#type' => 'item',
+      '#title' => t('CAPTCHA'),
+      '#markup' => t('!icon The CAPTCHA module will disable the caching of pages that contain a CAPTCHA element.', array(
+        '!icon' => '<span class="icon">' . $icon . '</span>')
+      ),
+      '#attributes' => array('class' => array('warning')),
+    );
+  }
+
 }
 
 /**
