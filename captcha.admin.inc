@@ -75,7 +75,7 @@ function captcha_admin_settings() {
     if (isset($captcha_point->module) && $captcha_point->module) {
       $captcha_type = $captcha_point->module . '/' . $captcha_point->captcha_type;
     }
-    elseif ($captcha_point->captcha_type == 'default') {
+    elseif (isset($captcha_point->captcha_type) && ($captcha_point->captcha_type == 'default')) {
       $captcha_type = 'default';
     }
     else {
