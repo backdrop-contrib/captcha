@@ -11,15 +11,16 @@
 /**
  * Menu callback function that generates the CAPTCHA image.
  */
-function image_captcha_image($captcha_sid=NULL) {
+function image_captcha_image() {
   // If output buffering is on: discard current content and disable further buffering
   if (ob_get_level()) {
     ob_end_clean();
   }
-  
-  if (!$captcha_sid) {
+
+  if (!isset($_GET['sid'])) {
     exit();
   }
+  $captcha_sid = $_GET['sid'];
 
   // Get solution (the code to show).
   $code = db_query("SELECT solution FROM {captcha_sessions} WHERE csid = :csid",
