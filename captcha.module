@@ -375,11 +375,11 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
       $captcha_element['challenge'] = array(
         '#type' => 'item',
         '#title' => t('Enabled challenge'),
-        '#markup' => t('"@type" by module "@module" (!change, !disable)', array(
-          '@type' => $captcha_point->captcha_type,
-          '@module' => $captcha_point->module,
-          '!change' => l(t('change'), "admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination())),
-          '!disable' => l(t('disable'), "admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
+        '#markup' => t('%type by module %module (<a href="@change">change</a>, <a href="@disable">disable</a>)', array(
+          '%type' => $captcha_point->captcha_type,
+          '%module' => $captcha_point->module,
+          '@change' => url("admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination())),
+          '@disable' => url("admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
         )),
       );
       // Add an example challenge with solution.

@@ -149,7 +149,7 @@ function captcha_admin_settings() {
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA description'),
-      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description.'),
+      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description to default.'),
       '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
     );
     foreach ($langs as $lang_code => $lang_name) {
@@ -165,7 +165,7 @@ function captcha_admin_settings() {
     $form['captcha_description'] = array(
       '#type' => 'textfield',
       '#title' => t('Challenge description'),
-      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description.'),
+      '#description' => t('Configurable description of the CAPTCHA. An empty entry will reset the description to default.'),
       '#default_value' => _captcha_get_description(),
       '#maxlength' => 256,
       '#attributes' => array('id' => 'edit-captcha-description-wrapper'),
@@ -313,7 +313,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
   variable_set('captcha_persistence', $form_state['values']['captcha_persistence']);
   variable_set('captcha_log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
 
-  drupal_set_message(t('The CAPTCHA settings were saved.'), 'status');
+  drupal_set_message(t('The CAPTCHA settings have been saved.'), 'status');
 }
 
 
@@ -378,7 +378,7 @@ function captcha_point_admin_form($form, $form_state, $captcha_point_form_id=NUL
   $form['captcha_type'] = array(
     '#type' => 'select',
     '#title' => t('Challenge type'),
-    '#description' => t('The CAPTCHA type to use for this form'),
+    '#description' => t('The CAPTCHA type to use for this form.'),
     '#default_value' => $default_captcha_type,
     '#options' => _captcha_available_challenge_types(),
   );
