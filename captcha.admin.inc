@@ -123,17 +123,17 @@ function captcha_admin_settings() {
     '#description' => t('This option makes it possible to add CAPTCHAs to forms on administrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on administrative pages.'),
   );
 
-  // Button for flushing the CAPTCHA placement cache.
+  // Button for clearing the CAPTCHA placement cache.
   // Based on Drupal core's "Clear all caches" (performance settings page).
   $form['captcha_form_protection']['captcha_placement_caching'] = array(
     '#type' => 'item',
     '#title' => t('CAPTCHA placement caching'),
-    '#description' => t('For efficiency, the positions of the CAPTCHA elements in each of the configured forms are cached. Most of the time, the structure of a form does not change and it would be a waste to recalculate the positions every time. Occasionally however, the form structure can change (e.g. during site building) and flushing the CAPTCHA placement cache can be required to fix the CAPTCHA placement.'),
+    '#description' => t('For efficiency, the positions of the CAPTCHA elements in each of the configured forms are cached. Most of the time, the structure of a form does not change and it would be a waste to recalculate the positions every time. Occasionally however, the form structure can change (e.g. during site building) and clearing the CAPTCHA placement cache can be required to fix the CAPTCHA placement.'),
   );
-  $form['captcha_form_protection']['captcha_placement_caching']['captcha_placement_cache_flush'] = array(
+  $form['captcha_form_protection']['captcha_placement_caching']['captcha_placement_cache_clear'] = array(
     '#type' => 'submit',
-    '#value' => t('Flush the CAPTCHA placement cache'),
-    '#submit' => array('captcha_flush_captcha_placement_cache_submit'),
+    '#value' => t('Clear the CAPTCHA placement cache'),
+    '#submit' => array('captcha_clear_captcha_placement_cache_submit'),
   );
 
   // Configuration option for adding a CAPTCHA description.
@@ -322,9 +322,9 @@ function captcha_admin_settings_submit($form, &$form_state) {
 /**
  * Submit callback; clear CAPTCHA placement cache.
  */
-function captcha_flush_captcha_placement_cache_submit($form, &$form_state) {
+function captcha_clear_captcha_placement_cache_submit($form, &$form_state) {
   variable_del('captcha_placement_map_cache');
-  drupal_set_message(t('Flushed the CAPTCHA placement cache.'));
+  drupal_set_message(t('Cleared the CAPTCHA placement cache.'));
 }
 
 
