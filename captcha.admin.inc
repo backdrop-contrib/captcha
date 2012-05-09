@@ -47,9 +47,7 @@ function captcha_admin_settings() {
   $form['captcha_form_protection'] = array(
     '#type' => 'fieldset',
     '#title' => t('Form protection'),
-    '#description' => t('Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>\'s). You can easily add arbitrary forms with textfield at the bottom of the table or with the help of the \'%CAPTCHA_admin_links\' option below.',
-      array('%CAPTCHA_admin_links' => t('Add CAPTCHA administration links to forms'))
-      ),
+    '#description' => t("Select the challenge type you want for each of the listed forms (identified by their so called <em>form_id</em>'s). You can easily add arbitrary forms with the textfield at the bottom of the table or with the help of the option <em>Add CAPTCHA administration links to forms</em> below."),
   );
   $form['captcha_form_protection']['captcha_default_challenge'] = array(
     '#type' => 'select',
@@ -113,14 +111,14 @@ function captcha_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Add CAPTCHA administration links to forms'),
     '#default_value' => variable_get('captcha_administration_mode', FALSE),
-    '#description' => t('This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the "%admincaptcha" permission will see a fieldset with CAPTCHA administration links on all forms, except on administrative pages.', array('%admincaptcha' => t('administer CAPTCHA settings'))),
+    '#description' => t('This option makes it easy to manage CAPTCHA settings on forms. When enabled, users with the <em>administer CAPTCHA settings</em> permission will see a fieldset with CAPTCHA administration links on all forms, except on administrative pages.'),
   );
   // Field for the CAPTCHAs on admin pages.
   $form['captcha_form_protection']['captcha_allow_on_admin_pages'] = array(
     '#type' => 'checkbox',
     '#title' => t('Allow CAPTCHAs and CAPTCHA administration links on administrative pages'),
     '#default_value' => variable_get('captcha_allow_on_admin_pages', FALSE),
-    '#description' => t('This option makes it possible to add CAPTCHAs to forms on administrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn\'t be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on administrative pages.'),
+    '#description' => t("This option makes it possible to add CAPTCHAs to forms on administrative pages. CAPTCHAs are disabled by default on administrative pages (which shouldn't be accessible to untrusted users normally) to avoid the related overhead. In some situations, e.g. in the case of demo sites, it can be usefull to allow CAPTCHAs on administrative pages."),
   );
 
   // Button for clearing the CAPTCHA placement cache.
@@ -495,7 +493,7 @@ function captcha_examples($form, $form_state, $module, $challenge) {
         foreach ($challenges as $ckey => $challenge) {
           $form["captcha_{$mkey}_{$ckey}"] = array(
             '#type' => 'fieldset',
-            '#title' => t('Challenge "%challenge" by module "%module"', array('%challenge' => $challenge, '%module' => $module)),
+            '#title' => t('Challenge %challenge by module %module', array('%challenge' => $challenge, '%module' => $module)),
             'challenge' => _captcha_generate_example_challenge($module, $challenge),
             'more_examples' => array(
               '#markup' => l(t('10 more examples of this challenge.'), "admin/config/people/captcha/captcha/examples/$module/$challenge"),

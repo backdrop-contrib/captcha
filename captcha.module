@@ -39,11 +39,9 @@ function captcha_help($path, $arg) {
   switch ($path) {
     case 'admin/help#captcha':
       $output = '<p>' . t('"CAPTCHA" is an acronym for "Completely Automated Public Turing test to tell Computers and Humans Apart". It is typically a challenge-response test to determine whether the user is human. The CAPTCHA module is a tool to fight automated submission by malicious users (spamming) of for example comments forms, user registration forms, guestbook forms, etc. You can extend the desired forms with an additional challenge, which should be easy for a human to solve correctly, but hard enough to keep automated scripts and spam bots out.') . '</p>';
-      $output .= '<p>' . t('Note that the CAPTCHA module interacts with page caching (see <a href="!performancesettings">performance settings</a>). Because the challenge should be unique for each generated form, the caching of the page it appears on is prevented. Make sure that these forms do not appear on too many pages or you will lose much caching efficiency. For example, if you put a CAPTCHA on the user login block, which typically appears on each page for anonymous visitors, caching will practically be disabled. The comment submission forms are another example. In this case you should set the "%commentlocation" to "%separatepage" in the comment settings of the relevant <a href="!contenttypes">content types</a> for better caching efficiency.' ,
+      $output .= '<p>' . t('Note that the CAPTCHA module interacts with page caching (see <a href="!performancesettings">performance settings</a>). Because the challenge should be unique for each generated form, the caching of the page it appears on is prevented. Make sure that these forms do not appear on too many pages or you will lose much caching efficiency. For example, if you put a CAPTCHA on the user login block, which typically appears on each page for anonymous visitors, caching will practically be disabled. The comment submission forms are another example. In this case you should set the <em>Location of comment submission form</em> to <em>Display on separate page</em> in the comment settings of the relevant <a href="!contenttypes">content types</a> for better caching efficiency.',
         array(
           '!performancesettings' => url('admin/settings/performance'),
-          '%commentlocation' => t('Location of comment submission form'),
-          '%separatepage' => t('Display on separate page'),
           '!contenttypes' => url('admin/content/types'),
         )
       ) . '</p>';
@@ -52,10 +50,8 @@ function captcha_help($path, $arg) {
     case 'admin/config/people/captcha':
     case 'admin/config/people/captcha/captcha':
     case 'admin/config/people/captcha/captcha/settings':
-      $output = '<p>' . t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option "%adminlinks" is enabled.',
-        array('%adminlinks' => t('Add CAPTCHA administration links to forms'))) . '</p>';
-      $output .= '<p>' . t('Users with the "%skipcaptcha" <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the "%skipcaptcha" permission (e.g. as anonymous user).',
-        array('%skipcaptcha' => t('skip CAPTCHA'), '@perm' => url('admin/user/permissions'))) . '</p>';
+      $output = '<p>' . t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option <em>Add CAPTCHA administration links to forms</em> is enabled.') . '</p>';
+      $output .= '<p>' . t('Users with the <em>Skip CAPTCHA</em> <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the <em>Skip CAPTCHA</em> permission (e.g. as anonymous user).', array('@perm' => url('admin/user/permissions'))) . '</p>';
       return $output;
   }
 }
@@ -369,8 +365,8 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
     );
     if ($captcha_point !== NULL && $captcha_point->captcha_type) {
       $captcha_element['#title'] = t('CAPTCHA: challenge "@type" enabled', array('@type' => $captcha_point->captcha_type));
-      $captcha_element['#description'] = t('Untrusted users will see a CAPTCHA here (!settings).',
-        array('!settings' => l(t('general CAPTCHA settings'), 'admin/config/people/captcha'))
+      $captcha_element['#description'] = t('Untrusted users will see a CAPTCHA here (<a href="@settings">general CAPTCHA settings</a>).',
+        array('@settings' => url('admin/config/people/captcha'))
       );
       $captcha_element['challenge'] = array(
         '#type' => 'item',
@@ -621,9 +617,9 @@ function captcha_validate($element, &$form_state) {
       // log to watchdog if needed
       if (variable_get('captcha_log_wrong_responses', FALSE)) {
         watchdog('CAPTCHA',
-          '%form_id post blocked by CAPTCHA module: challenge "%challenge" (by module "%module"), user answered "%response", but the solution was "%solution".',
+          '%form_id post blocked by CAPTCHA module: challenge %challenge (by module %module), user answered "@response", but the solution was "@solution".',
           array('%form_id' => $form_id,
-            '%response' => $captcha_response, '%solution' => $solution,
+            '@response' => $captcha_response, '@solution' => $solution,
             '%challenge' => $captcha_info['captcha_type'], '%module' => $captcha_info['module'],
           ),
           WATCHDOG_NOTICE);
