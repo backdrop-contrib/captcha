@@ -638,6 +638,8 @@ function captcha_validate($element, &$form_state) {
  * @return the manipulated element
  */
 function captcha_pre_render_process($element) {
+  module_load_include('inc', 'captcha');
+
   // Get form and CAPTCHA information.
   $captcha_info = $element['#captcha_info'];
   $form_id = $captcha_info['form_id'];
