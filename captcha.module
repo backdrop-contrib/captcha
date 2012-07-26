@@ -444,7 +444,7 @@ function captcha_validate_strict_equality($solution, $response) {
  * @return TRUE when case insensitive equal, FALSE otherwise.
  */
 function captcha_validate_case_insensitive_equality($solution, $response) {
-  return strtolower($solution) === strtolower($response);
+  return drupal_strtolower($solution) === drupal_strtolower($response);
 }
 
 /**
@@ -464,7 +464,7 @@ function captcha_validate_ignore_spaces($solution, $response) {
  * @return TRUE when equal (ignoring spaces), FALSE otherwise.
  */
 function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
-  return preg_replace('/\s/', '', strtolower($solution)) === preg_replace('/\s/', '', strtolower($response));
+  return preg_replace('/\s/', '', drupal_strtolower($solution)) === preg_replace('/\s/', '', drupal_strtolower($response));
 }
 
 /**
