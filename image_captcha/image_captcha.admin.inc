@@ -59,6 +59,17 @@ function image_captcha_settings_form() {
     '#default_value' => (int) variable_get('image_captcha_code_length', 5),
     '#description' => t('The code length influences the size of the image. Note that larger values make the image generation more CPU intensive.'),
   );
+  // RTL support option (only show this option when there are RTL languages).
+  $languages = language_list('direction');
+  if (isset($languages[LANGUAGE_RTL])) {
+    $form['image_captcha_code_settings']['image_captcha_rtl_support'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('RTL support'),
+      '#default_value' => variable_get('image_captcha_rtl_support', 0),
+      '#description' => t('Enable this option to render the code from right to left for right to left languages.'),
+    );
+  }
+
 
   // Font related stuff.
   $form['image_captcha_font_settings'] = _image_captcha_settings_form_font_section();
