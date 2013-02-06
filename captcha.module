@@ -277,7 +277,10 @@ function captcha_element_process($element, &$form_state, $complete_form) {
     $element['#theme'] = 'captcha';
 
     // Add pre_render callback for additional CAPTCHA processing.
-    $element['#pre_render'] = array('captcha_pre_render_process');
+    if (!isset($element['#pre_render'])) {
+      $element['#pre_render'] = array();
+    }
+    $element['#pre_render'][] = 'captcha_pre_render_process';
 
     // Store the solution in the #captcha_info array.
     $element['#captcha_info']['solution'] = $captcha['solution'];
