@@ -201,6 +201,14 @@ function captcha_admin_settings() {
     '#description' => t('Define if challenges should be omitted during the rest of a session once the user successfully responds to a challenge.'),
   );
 
+  // Enable wrong response counter.
+  $form['captcha_enable_stats'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable statistics'),
+    '#description' => t('Keep CAPTCHA related counters in the <a href="!statusreport">status report</a>. Note that this comes with a performance penalty as updating the counters results in clearing the variable cache.', array('!statusreport' => url('admin/reports/status'))),
+    '#default_value' => variable_get('captcha_enable_stats', FALSE),
+  );
+
   // Option for logging wrong responses.
   $form['captcha_log_wrong_responses'] = array(
     '#type' => 'checkbox',
@@ -309,6 +317,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
 
   variable_set('captcha_default_validation', $form_state['values']['captcha_default_validation']);
   variable_set('captcha_persistence', $form_state['values']['captcha_persistence']);
+  variable_set('captcha_enable_stats', $form_state['values']['captcha_enable_stats']);
   variable_set('captcha_log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
 
   drupal_set_message(t('The CAPTCHA settings have been saved.'), 'status');

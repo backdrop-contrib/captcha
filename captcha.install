@@ -114,7 +114,7 @@ function captcha_schema() {
 function captcha_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  if ($phase == 'runtime') {
+  if ($phase == 'runtime' && variable_get('captcha_enable_stats', FALSE)) {
     // Show the wrong response counter in the status report.
     $requirements['captcha_wrong_response_counter'] = array(
       'title' => $t('CAPTCHA'),

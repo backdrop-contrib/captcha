@@ -616,7 +616,9 @@ function captcha_validate($element, &$form_state) {
       // set form error
       form_set_error('captcha_response', t('The answer you entered for the CAPTCHA was not correct.'));
       // update wrong response counter
-      variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
+      if (variable_get('captcha_enable_stats', FALSE)) {
+        variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
+      }
       // log to watchdog if needed
       if (variable_get('captcha_log_wrong_responses', FALSE)) {
         watchdog('CAPTCHA',
