@@ -599,7 +599,13 @@ function captcha_validate($element, &$form_state) {
     // we also provide the CAPTCHA $element and $form_state arrays for more advanced use cases.
     if ($captcha_validate($solution, $captcha_response, $element, $form_state)) {
       // Correct answer.
-      $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
+
+      // Store form_id in session (but only if it is useful to do so, avoid setting stuff in session unnecessarily).
+      $captcha_persistence = variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
+      if ($captcha_persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL || $captcha_persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_TYPE) {
+        $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
+      }
+
       // Record success.
       db_update('captcha_sessions')
         ->condition('csid', $csid)
