@@ -56,6 +56,12 @@ function captcha_admin_settings() {
     '#options' => _captcha_available_challenge_types(FALSE),
     '#default_value' => variable_get('captcha_default_challenge', 'captcha/Math'),
   );
+  $form['captcha_form_protection']['captcha_all_forms'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Add default CAPTCHA to all forms not listed below'),
+    '#default_value' => variable_get('captcha_all_forms', FALSE),
+    '#description' => t('Choose this option to have the default CAPTCHA added to all forms not in the list below.'),
+  );
   // List known form_ids.
   $form['captcha_form_protection']['captcha_form_id_overview'] = array(
     '#theme' => 'captcha_admin_settings_captcha_points',
@@ -272,6 +278,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
   variable_set('captcha_allow_on_admin_pages', $form_state['values']['captcha_allow_on_admin_pages']);
 
   variable_set('captcha_default_challenge', $form_state['values']['captcha_default_challenge']);
+  variable_set('captcha_all_forms', $form_state['values']['captcha_all_forms']);
 
   // Process CAPTCHA points
   if (isset($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'])) {
