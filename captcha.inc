@@ -69,22 +69,23 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  *   or in the form 'captcha/Math'.
  */
 function captcha_get_form_id_setting($form_id, $symbolic=FALSE) {
+  // Fetch setting from database.
   $result = db_query("SELECT module, captcha_type FROM {captcha_points} WHERE form_id = :form_id",
     array(':form_id' =>  $form_id));
   $captcha_point = $result->fetchObject();
 
-  // If captcha_all_forms is TRUE, apply the default to any form that does
-  // not have a CAPTCHA specified.
-  if (!$captcha_point) {
-    if (variable_get('captcha_all_forms', FALSE)) {
-      $captcha_point = (object) array('captcha_type' => 'default');
-    }
-    else {
-      return NULL;
-    }
+  // If no setting is available in database for the given form,
+  // but 'captcha_default_challenge_on_nonlisted_forms' is enabled, pick the default type anyway
+  if (!$captcha_point && variable_get('captcha_default_challenge_on_nonlisted_forms', FALSE))
+  {
+    $captcha_point = (object) array('captcha_type' => 'default');
   }
 
-  if ($captcha_point->captcha_type == 'default') {
+  // Handle (default) settings and symbolic mode.
+  if (!$captcha_point) {
+    $captcha_point = NULL;
+  }
+  elseif ($captcha_point->captcha_type == 'default') {
     if (!$symbolic) {
       list($module, $type) = explode('/', variable_get('captcha_default_challenge', 'captcha/Math'));
       $captcha_point->module = $module;
