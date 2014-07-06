@@ -6,7 +6,6 @@
  * administrators can add a CAPTCHA to desired forms that users without
  * the 'skip CAPTCHA' permission (typically anonymous visitors) have
  * to solve.
- *
  */
 
 /**
