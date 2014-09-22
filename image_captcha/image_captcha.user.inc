@@ -17,7 +17,7 @@ function image_captcha_image() {
     ob_end_clean();
   }
 
-  if (!isset($_GET['sid'])) {
+  if (!isset($_GET['sid']) || is_array($_GET['sid'])) {
     exit();
   }
   $captcha_sid = $_GET['sid'];
