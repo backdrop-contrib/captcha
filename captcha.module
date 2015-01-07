@@ -304,6 +304,54 @@ function captcha_element_process($element, &$form_state, $complete_form) {
 }
 
 /**
+ * Implementation of hook_captcha_default_points_alter().
+ *
+ * Provide some default captchas only if defaults are not already
+ * provided by other modules.
+ */
+function captcha_captcha_default_points_alter(&$items) {
+  $modules = array(
+    'comment' => array(
+    ),
+    'contact' => array(
+      'contact_site_form',
+      'contact_personal_form'
+    ),
+    'forum' => array(
+      'forum_node_form',
+    ),
+    'user' => array(
+      'user_register_form',
+      'user_pass',
+      'user_login',
+      'user_login_block',
+    ),
+  );
+  // Add comment form_ids of all currently known node types.
+  foreach (node_type_get_names() as $type => $name) {
+    $modules['comment'][] = 'comment_node_' . $type . '_form';
+  }
+
+  foreach ($modules as $module => $form_ids) {
+    // Only give defaults if the module exists.
+    if (module_exists($module)) {
+      foreach ($form_ids as $form_id) {
+        // Ensure a default has not been provided already.
+        if (!isset($items[$form_id])) {
+          $captcha = new stdClass;
+          $captcha->disabled = FALSE;
+          $captcha->api_version = 1;
+          $captcha->form_id = $form_id;
+          $captcha->module = '';
+          $captcha->captcha_type = 'default';
+          $items[$form_id] = $captcha;
+        }
+      }
+    }
+  }
+}
+
+/**
  * Theme function for a CAPTCHA element.
  *
  * Render it in a fieldset if a description of the CAPTCHA
