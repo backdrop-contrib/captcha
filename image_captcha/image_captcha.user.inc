@@ -42,13 +42,13 @@ function image_captcha_image() {
       exit();
     }
     // Send the image resource as an image file to the client.
-    $file_format = variable_get('image_captcha_file_format', IMAGE_CAPTCHA_FILE_FORMAT_JPG);
+    $file_format = config_get('image_captcha.settings', 'file_format', IMAGE_CAPTCHA_FILE_FORMAT_JPG);
     if ($file_format == IMAGE_CAPTCHA_FILE_FORMAT_JPG) {
-      drupal_add_http_header('Content-Type', 'image/jpeg');
+      backdrop_add_http_header('Content-Type', 'image/jpeg');
       imagejpeg($image);
     }
     else {
-      drupal_add_http_header('Content-Type', 'image/png');
+      backdrop_add_http_header('Content-Type', 'image/png');
       imagepng($image);
     }
     // Clean up the image resource.
@@ -81,7 +81,7 @@ function _image_captcha_generate_image($code) {
   $fonts = _image_captcha_get_enabled_fonts();
 
   // Get other settings.
-  $font_size = (int) variable_get('image_captcha_font_size', 30);
+  $font_size = (int) config_get('image_captcha.settings', 'font_size');
   list($width, $height) = _image_captcha_image_size($code);
 
   // Create image resource.
@@ -91,10 +91,10 @@ function _image_captcha_generate_image($code) {
   }
 
   // Get the background color and paint the background.
-  $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
+  $background_rgb = _image_captcha_hex_to_rgb(config_get('image_captcha.settings', 'background_color'));
   $background_color = imagecolorallocate($image, $background_rgb[0], $background_rgb[1], $background_rgb[2]);
   // Set transparency if needed.
-  $file_format = variable_get('image_captcha_file_format', IMAGE_CAPTCHA_FILE_FORMAT_JPG);
+  $file_format = config_get('image_captcha.settings', 'file_format');
   if ($file_format == IMAGE_CAPTCHA_FILE_FORMAT_TRANSPARENT_PNG) {
     imagecolortransparent($image, $background_color);
   }
@@ -102,7 +102,7 @@ function _image_captcha_generate_image($code) {
 
   // Do we need to draw in RTL mode?
   global $language;
-  $rtl = $language->direction && ((bool) variable_get('image_captcha_rtl_support', 0));
+  $rtl = $language->direction && ((bool) config_get('image_captcha.settings', 'rtl_support'));
 
   // Draw text.
   $result = _image_captcha_image_generator_print_string($image, $width, $height, $fonts, $font_size, $code, $rtl);
@@ -116,15 +116,15 @@ function _image_captcha_generate_image($code) {
     $noise_colors[] = imagecolorallocate($image, mt_rand(0, 255), mt_rand(0, 255), mt_rand(0, 255));
   }
   // Add additional noise.
-  if (variable_get('image_captcha_dot_noise', 0)) {
+  if (config_get('image_captcha.settings', 'dot_noise')) {
     _image_captcha_image_generator_add_dots($image, $width, $height, $noise_colors);
   }
-  if (variable_get('image_captcha_line_noise', 0)) {
+  if (config_get('image_captcha.settings', 'line_noise')) {
     _image_captcha_image_generator_add_lines($image, $width, $height, $noise_colors);
   }
 
   // Distort the image.
-  $distortion_amplitude = .25 * $font_size * variable_get('image_captcha_distortion_amplitude', 0) / 10.0;
+  $distortion_amplitude = .25 * $font_size * config_get('image_captcha.settings', 'distortion_amplitude') / 10.0;
   if ($distortion_amplitude > 1) {
     // Distortion parameters.
     $wavelength_xr = (2 + 3 * mt_rand(0, 1000) / 1000) * $font_size;
@@ -144,7 +144,7 @@ function _image_captcha_generate_image($code) {
       return FALSE;
     }
 
-    if (variable_get('image_captcha_bilinear_interpolation', FALSE)) {
+    if (config_get('image_captcha.settings', 'bilinear_interpolation')) {
       // Distortion with bilinear interpolation.
       for ($x = 0; $x < $width; $x++) {
         for ($y = 0; $y < $height; $y++) {
@@ -225,7 +225,7 @@ function _image_captcha_generate_image($code) {
  * Add lines.
  */
 function _image_captcha_image_generator_add_lines(&$image, $width, $height, $colors) {
-  $line_quantity = $width * $height / 200.0 * ((int) variable_get('image_captcha_noise_level', 5)) / 10.0;
+  $line_quantity = $width * $height / 200.0 * ((int) config_get('image_captcha.settings', 'noise_level')) / 10.0;
   for ($i = 0; $i < $line_quantity; $i++) {
     imageline($image, mt_rand(0, $width), mt_rand(0, $height), mt_rand(0, $width), mt_rand(0, $height), $colors[array_rand($colors)]);
   }
@@ -235,7 +235,7 @@ function _image_captcha_image_generator_add_lines(&$image, $width, $height, $col
  * Add dots.
  */
 function _image_captcha_image_generator_add_dots(&$image, $width, $height, $colors) {
-  $noise_quantity = $width * $height * ((int) variable_get('image_captcha_noise_level', 5)) / 10.0;
+  $noise_quantity = $width * $height * ((int) config_get('image_captcha.settings', 'noise_level')) / 10.0;
   for ($i = 0; $i < $noise_quantity; $i++) {
     imagesetpixel($image, mt_rand(0, $width), mt_rand(0, $height), $colors[array_rand($colors)]);
   }
@@ -250,12 +250,12 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
   $character_quantity = count($characters);
 
   // Get colors.
-  $background_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_background_color', '#ffffff'));
-  $foreground_rgb = _image_captcha_hex_to_rgb(variable_get('image_captcha_foreground_color', '#000000'));
+  $background_rgb = _image_captcha_hex_to_rgb(config_get('image_captcha.settings', 'background_color'));
+  $foreground_rgb = _image_captcha_hex_to_rgb(config_get('image_captcha.settings', 'foreground_color'));
   $background_color = imagecolorallocate($image, $background_rgb[0], $background_rgb[1], $background_rgb[2]);
   $foreground_color = imagecolorallocate($image, $foreground_rgb[0], $foreground_rgb[1], $foreground_rgb[2]);
   // Precalculate the value ranges for color randomness.
-  $foreground_randomness = (int) (variable_get('image_captcha_foreground_color_randomness', 100));
+  $foreground_randomness = (int) (config_get('image_captcha.settings', 'foreground_color_randomness'));
   if ($foreground_randomness) {
     $foreground_color_range = array();
     for ($i = 0; $i < 3; $i++) {
@@ -287,7 +287,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
 
     // Get character dimensions for TrueType fonts.
     if ($font != 'BUILTIN') {
-      $bbox = imagettfbbox($font_size, 0, drupal_realpath($font), $character);
+      $bbox = imagettfbbox($font_size, 0, backdrop_realpath($font), $character);
       // In very rare cases with some versions of the GD library, the x-value
       // of the left side of the bounding box as returned by the first call of
       // imagettfbbox is corrupt (value -2147483648 = 0x80000000).
@@ -295,7 +295,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       // can be used as workaround.
       // This issue is discussed at http://drupal.org/node/349218.
       if ($bbox[2] < 0) {
-        $bbox = imagettfbbox($font_size, 0, drupal_realpath($font), $character);
+        $bbox = imagettfbbox($font_size, 0, backdrop_realpath($font), $character);
       }
     }
     else {
@@ -351,7 +351,7 @@ function _image_captcha_image_generator_print_string(&$image, $width, $height, $
       imagestring($image, 5, $pos_x, $pos_y, $character, $color);
     }
     else {
-      imagettftext($image, $font_size, $angle, $pos_x, $pos_y, $color, drupal_realpath($font), $character);
+      imagettftext($image, $font_size, $angle, $pos_x, $pos_y, $color, backdrop_realpath($font), $character);
     }
 
     // For debugging purposes: draw character bounding box (only valid when rotation is disabled).

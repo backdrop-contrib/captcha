@@ -32,17 +32,17 @@ define('CAPTCHA_UNKNOWN_CSID_ERROR_MESSAGE',
  *
  * Provides common setup stuff and various helper functions
  */
-abstract class CaptchaBaseWebTestCase extends DrupalWebTestCase {
+abstract class CaptchaBaseWebTestCase extends BackdropWebTestCase {
 
   /**
    * User with various administrative permissions.
-   * @var Drupal user
+   * @var Backdrop user
    */
   protected $admin_user;
 
   /**
    * Normal visitor with limited permissions
-   * @var Drupal user;
+   * @var Backdrop user;
    */
   protected $normal_user;
 
@@ -53,7 +53,7 @@ abstract class CaptchaBaseWebTestCase extends DrupalWebTestCase {
   const COMMENT_FORM_ID = 'comment_node_page_form';
 
   /**
-   * Drupal path of the (general) CAPTCHA admin page
+   * Backdrop path of the (general) CAPTCHA admin page
    */
   const CAPTCHA_ADMIN_PATH = 'admin/config/people/captcha';
 
@@ -652,21 +652,21 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
    */
   function testCaptchaPointAdministration() {
     // Generate CAPTCHA point data:
-    // Drupal form ID should consist of lowercase alphanumerics and underscore)
+    // Backdrop form ID should consist of lowercase alphanumerics and underscore)
     $captcha_point_form_id = 'form_' . strtolower($this->randomName(32));
     // the Math CAPTCHA by the CAPTCHA module is always available, so let's use it
     $captcha_point_module = 'captcha';
     $captcha_point_type = 'Math';
 
     // Log in as admin
-    $this->drupalLogin($this->admin_user);
+    $this->backdropLogin($this->admin_user);
 
     // Set CAPTCHA point through admin/user/captcha/captcha/captcha_point
     $form_values = array(
       'captcha_point_form_id' => $captcha_point_form_id,
       'captcha_type' => $captcha_point_module .'/'. $captcha_point_type,
     );
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point', $form_values, t('Save'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point', $form_values, t('Save'));
     $this->assertText(t('Saved CAPTCHA point settings.'),
       'Saving of CAPTCHA point settings');
 
@@ -678,7 +678,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
       'Enabled CAPTCHA point should have type set');
 
     // Disable CAPTCHA point again
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/disable', array(), t('Disable'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/disable', array(), t('Disable'));
     $this->assertRaw(t('Disabled CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)), 'Disabling of CAPTCHA point');
 
     // Check in database
@@ -692,7 +692,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
     $form_values = array(
       'captcha_type' => $captcha_point_module .'/'. $captcha_point_type,
     );
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id, $form_values, t('Save'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id, $form_values, t('Save'));
     $this->assertText(t('Saved CAPTCHA point settings.'),
       'Saving of CAPTCHA point settings');
 
@@ -704,7 +704,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
       'Enabled CAPTCHA point should have type set');
 
     // Delete CAPTCHA point
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete', array(), t('Delete'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete', array(), t('Delete'));
     $this->assertRaw(t('Deleted CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)),
       'Deleting of CAPTCHA point');
 
@@ -718,7 +718,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
    */
   function testCaptchaPointAdministrationByNonAdmin() {
     // First add a CAPTCHA point (as admin)
-    $this->drupalLogin($this->admin_user);
+    $this->backdropLogin($this->admin_user);
     $captcha_point_form_id = 'form_' . strtolower($this->randomName(32));
     $captcha_point_module = 'captcha';
     $captcha_point_type = 'Math';
@@ -726,38 +726,38 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
       'captcha_point_form_id' => $captcha_point_form_id,
       'captcha_type' => $captcha_point_module .'/'. $captcha_point_type,
     );
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/', $form_values, t('Save'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/', $form_values, t('Save'));
     $this->assertText(t('Saved CAPTCHA point settings.'),
       'Saving of CAPTCHA point settings');
 
     // Switch from admin to nonadmin
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
-    $this->drupalLogin($this->normal_user);
+    $this->backdropGet(url('logout', array('absolute' => TRUE)));
+    $this->backdropLogin($this->normal_user);
 
 
     // Try to set CAPTCHA point through admin/user/captcha/captcha/captcha_point
-    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point');
+    $this->backdropGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point');
     $this->assertText(t('You are not authorized to access this page.'),
       'Non admin should not be able to set a CAPTCHA point');
 
     // Try to set CAPTCHA point through admin/user/captcha/captcha/captcha_point/$form_id
-    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/' . 'form_' . strtolower($this->randomName(32)));
+    $this->backdropGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/' . 'form_' . strtolower($this->randomName(32)));
     $this->assertText(t('You are not authorized to access this page.'),
       'Non admin should not be able to set a CAPTCHA point');
 
     // Try to disable the CAPTCHA point
-    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/disable');
+    $this->backdropGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/disable');
     $this->assertText(t('You are not authorized to access this page.'),
       'Non admin should not be able to disable a CAPTCHA point');
 
     // Try to delete the CAPTCHA point
-    $this->drupalGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete');
+    $this->backdropGet(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete');
     $this->assertText(t('You are not authorized to access this page.'),
       'Non admin should not be able to delete a CAPTCHA point');
 
     // Switch from nonadmin to admin again
-    $this->drupalGet(url('logout', array('absolute' => TRUE)));
-    $this->drupalLogin($this->admin_user);
+    $this->backdropGet(url('logout', array('absolute' => TRUE)));
+    $this->backdropLogin($this->admin_user);
 
     // Check if original CAPTCHA point still exists in database
     $result = $this->getCaptchaPointSettingFromDatabase($captcha_point_form_id);
@@ -767,7 +767,7 @@ class CaptchaAdminTestCase extends CaptchaBaseWebTestCase {
       'Enabled CAPTCHA point should still have type set');
 
     // Delete CAPTCHA point
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete', array(), t('Delete'));
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH . '/captcha/captcha_point/'. $captcha_point_form_id .'/delete', array(), t('Delete'));
     $this->assertRaw(t('Deleted CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)),
       'Deleting of CAPTCHA point');
   }
@@ -794,12 +794,12 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
    */
   private function setUpPersistence($persistence) {
     // Log in as admin
-    $this->drupalLogin($this->admin_user);
+    $this->backdropLogin($this->admin_user);
     // Set persistence.
     $edit = array('captcha_persistence' => $persistence);
-    $this->drupalPost(self::CAPTCHA_ADMIN_PATH, $edit, 'Save configuration');
+    $this->backdropPost(self::CAPTCHA_ADMIN_PATH, $edit, 'Save configuration');
     // Log admin out.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Set the Test123 CAPTCHA on user register and comment form.
     // We have to do this with the function captcha_set_form_id_setting()
@@ -807,10 +807,10 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     // We also have to do this after all usage of the CAPTCHA admin form
     // (because posting the CAPTCHA admin form would set the CAPTCHA to 'none').
     captcha_set_form_id_setting('user_login', 'captcha/Test');
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     captcha_set_form_id_setting('user_register_form', 'captcha/Test');
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertCaptchaPresence(TRUE);
   }
 
@@ -831,7 +831,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->setUpPersistence(CAPTCHA_PERSISTENCE_SHOW_ALWAYS);
 
     // Go to login form and check if there is a CAPTCHA on the login form (look for the title).
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     $captcha_sid_initial = $this->getCaptchaSidFromForm();
 
@@ -841,7 +841,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
       'pass' => 'bazlaz',
       'captcha_response' => 'Test 123',
     );
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     // Check that there was no error message for the CAPTCHA.
     $this->assertCaptchaResponseAccepted();
 
@@ -850,7 +850,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->assertPreservedCsid($captcha_sid_initial);
 
     // Post from again.
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     // Check that there was no error message for the CAPTCHA.
     $this->assertCaptchaResponseAccepted();
     $this->assertPreservedCsid($captcha_sid_initial);
@@ -862,7 +862,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->setUpPersistence(CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
 
     // Go to login form and check if there is a CAPTCHA on the login form.
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     $captcha_sid_initial = $this->getCaptchaSidFromForm();
 
@@ -872,7 +872,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
       'pass' => 'bazlaz',
       'captcha_response' => 'Test 123',
     );
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     // Check that there was no error message for the CAPTCHA.
     $this->assertCaptchaResponseAccepted();
     // There shouldn't be a CAPTCHA on the new form.
@@ -880,13 +880,13 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->assertPreservedCsid($captcha_sid_initial);
 
     // Start a new form instance/session
-    $this->drupalGet('node');
-    $this->drupalGet('user');
+    $this->backdropGet('node');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     $this->assertDifferentCsid($captcha_sid_initial);
 
     // Check another form
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertCaptchaPresence(TRUE);
     $this->assertDifferentCsid($captcha_sid_initial);
 
@@ -897,7 +897,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->setUpPersistence(CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_TYPE);
 
     // Go to login form and check if there is a CAPTCHA on the login form.
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     $captcha_sid_initial = $this->getCaptchaSidFromForm();
 
@@ -907,7 +907,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
       'pass' => 'bazlaz',
       'captcha_response' => 'Test 123',
     );
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     // Check that there was no error message for the CAPTCHA.
     $this->assertCaptchaResponseAccepted();
     // There shouldn't be a CAPTCHA on the new form.
@@ -915,13 +915,13 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->assertPreservedCsid($captcha_sid_initial);
 
     // Start a new form instance/session
-    $this->drupalGet('node');
-    $this->drupalGet('user');
+    $this->backdropGet('node');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(FALSE);
     $this->assertDifferentCsid($captcha_sid_initial);
 
     // Check another form
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertCaptchaPresence(TRUE);
     $this->assertDifferentCsid($captcha_sid_initial);
   }
@@ -931,7 +931,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->setUpPersistence(CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL);
 
     // Go to login form and check if there is a CAPTCHA on the login form.
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
     $captcha_sid_initial = $this->getCaptchaSidFromForm();
 
@@ -941,7 +941,7 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
       'pass' => 'bazlaz',
       'captcha_response' => 'Test 123',
     );
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     // Check that there was no error message for the CAPTCHA.
     $this->assertCaptchaResponseAccepted();
     // There shouldn't be a CAPTCHA on the new form.
@@ -949,13 +949,13 @@ class CaptchaPersistenceTestCase extends CaptchaBaseWebTestCase {
     $this->assertPreservedCsid($captcha_sid_initial);
 
     // Start a new form instance/session
-    $this->drupalGet('node');
-    $this->drupalGet('user');
+    $this->backdropGet('node');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(FALSE);
     $this->assertDifferentCsid($captcha_sid_initial);
 
     // Check another form
-    $this->drupalGet('user/register');
+    $this->backdropGet('user/register');
     $this->assertCaptchaPresence(FALSE);
     $this->assertDifferentCsid($captcha_sid_initial);
   }
@@ -994,10 +994,10 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     variable_set('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
 
     // Log in as normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->backdropLogin($this->normal_user);
 
     // Go to comment form of commentable node.
-    $this->drupalGet('comment/reply/' . $node->nid);
+    $this->backdropGet('comment/reply/' . $node->nid);
     $this->assertCaptchaPresence(TRUE);
 
     // Get CAPTCHA session ID and solution of the challenge.
@@ -1008,7 +1008,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     // Post the form with the solution.
     $edit = $this->getCommentFormValues();
     $edit['captcha_response'] = $solution;
-    $this->drupalPost(NULL, $edit, t('Preview'));
+    $this->backdropPost(NULL, $edit, t('Preview'));
     // Answer should be accepted and further CAPTCHA ommitted.
     $this->assertCaptchaResponseAccepted();
     $this->assertCaptchaPresence(FALSE);
@@ -1018,7 +1018,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     $edit['captcha_sid'] = $captcha_sid;
     $edit['captcha_token'] = $captcha_token;
     $edit['captcha_response'] = $solution;
-    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
+    $this->backdropPost('comment/reply/' . $node->nid, $edit, t('Preview'));
     // CAPTCHA session reuse attack should be detected.
     $this->assertCaptchaSessionIdReuseAttackDetection();
     // There should be a CAPTCHA.
@@ -1032,10 +1032,10 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     variable_set('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
 
     // Log in as normal user.
-    $this->drupalLogin($this->normal_user);
+    $this->backdropLogin($this->normal_user);
 
     // Go to node add form.
-    $this->drupalGet('node/add/page');
+    $this->backdropGet('node/add/page');
     $this->assertCaptchaPresence(TRUE);
 
     // Get CAPTCHA session ID and solution of the challenge.
@@ -1047,7 +1047,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     $edit = $this->getNodeFormValues();
     $edit['captcha_response'] = $solution;
     // Preview the node
-    $this->drupalPost(NULL, $edit, t('Preview'));
+    $this->backdropPost(NULL, $edit, t('Preview'));
     // Answer should be accepted.
     $this->assertCaptchaResponseAccepted();
     // Check that there is no CAPTCHA after preview.
@@ -1058,7 +1058,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     $edit['captcha_sid'] = $captcha_sid;
     $edit['captcha_token'] = $captcha_token;
     $edit['captcha_response'] = $solution;
-    $this->drupalPost('node/add/page', $edit, t('Preview'));
+    $this->backdropPost('node/add/page', $edit, t('Preview'));
     // CAPTCHA session reuse attack should be detected.
     $this->assertCaptchaSessionIdReuseAttackDetection();
     // There should be a CAPTCHA.
@@ -1072,7 +1072,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     variable_set('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
 
     // Go to log in form.
-    $this->drupalGet('user');
+    $this->backdropGet('user');
     $this->assertCaptchaPresence(TRUE);
 
     // Get CAPTCHA session ID and solution of the challenge.
@@ -1086,7 +1086,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
       'pass' => $this->normal_user->pass_raw,
       'captcha_response' => $solution,
     );
-    $this->drupalPost(NULL, $edit, t('Log in'));
+    $this->backdropPost(NULL, $edit, t('Log in'));
     $this->assertCaptchaResponseAccepted();
     $this->assertCaptchaPresence(FALSE);
     // If a "log out" link appears on the page, it is almost certainly because
@@ -1094,14 +1094,14 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     $pass = $this->assertLink(t('Log out'), 0, t('User %name successfully logged in.', array('%name' => $this->normal_user->name)), t('User login'));
 
     // Log out again.
-    $this->drupalLogout();
+    $this->backdropLogout();
 
     // Try to log in again, reusing the previous CAPTCHA session.
     $edit += array(
       'captcha_sid' => $captcha_sid,
       'captcha_token' => $captcha_token,
     );
-    $this->drupalPost('user', $edit, t('Log in'));
+    $this->backdropPost('user', $edit, t('Log in'));
     // CAPTCHA session reuse attack should be detected.
     $this->assertCaptchaSessionIdReuseAttackDetection();
     // There should be a CAPTCHA.
@@ -1123,7 +1123,7 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
     $edit = $this->getCommentFormValues();
     $comment_subject = $edit['subject'];
     $edit['captcha_response'] = 'Test 123';
-    $this->drupalPost('comment/reply/' . $node->nid, $edit, t('Preview'));
+    $this->backdropPost('comment/reply/' . $node->nid, $edit, t('Preview'));
     // Post should be accepted: no warnings,
     // no CAPTCHA reuse detection (which could be used by user log in block).
     $this->assertCaptchaResponseAccepted();
@@ -1135,5 +1135,5 @@ class CaptchaSessionReuseAttackTestCase extends CaptchaBaseWebTestCase {
 
 
 // Some tricks to debug:
-// drupal_debug($data) // from devel module
-// file_put_contents('tmp.simpletest.html', $this->drupalGetContent());
+// backdrop_debug($data) // from devel module
+// file_put_contents('tmp.simpletest.html', $this->backdropGetContent());

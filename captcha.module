@@ -50,10 +50,21 @@ function captcha_help($path, $arg) {
     case 'admin/config/people/captcha':
     case 'admin/config/people/captcha/captcha':
     case 'admin/config/people/captcha/captcha/settings':
-      $output = '<p>' . t('A CAPTCHA can be added to virtually each Drupal form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option <em>Add CAPTCHA administration links to forms</em> is enabled.') . '</p>';
+      $output = '<p>' . t('A CAPTCHA can be added to virtually each Backdrop form. Some default forms are already provided in the form list, but arbitrary forms can be easily added and managed when the option <em>Add CAPTCHA administration links to forms</em> is enabled.') . '</p>';
       $output .= '<p>' . t('Users with the <em>Skip CAPTCHA</em> <a href="@perm">permission</a> won\'t be offered a challenge. Be sure to grant this permission to the trusted users (e.g. site administrators). If you want to test a protected form, be sure to do it as a user without the <em>Skip CAPTCHA</em> permission (e.g. as anonymous user).', array('@perm' => url('admin/people/permissions'))) . '</p>';
       return $output;
   }
+}
+
+/**
+* Implements hook_config_info().
+*/
+function captcha_config_info() {
+  $prefixes['captcha.settings'] = array(
+    'label' => t('Settings'),
+    'group' => t('Captcha'),
+  );
+  return $prefixes;
 }
 
 /**
@@ -66,7 +77,7 @@ function captcha_menu() {
     'title' => 'CAPTCHA',
     'description' => 'Administer how and where CAPTCHAs are used.',
     'file' => 'captcha.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('captcha_admin_settings'),
     'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_NORMAL_ITEM,
@@ -89,7 +100,7 @@ function captcha_menu() {
     'title' => 'Examples',
     'description' => 'An overview of the available challenge types with examples.',
     'file' => 'captcha.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('captcha_examples', 6, 7),
     'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_LOCAL_TASK,
@@ -166,7 +177,7 @@ function captcha_element_info() {
   );
   // Override the default CAPTCHA validation function for case insensitive validation.
   // TODO: shouldn't this be done somewhere else, e.g. in form_alter?
-  if (CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE == variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
+  if (CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE == config_get('captcha.settings', 'default_validation')) {
     $captcha_element['#captcha_validate'] = 'captcha_validate_case_insensitive_equality';
   }
   return array('captcha' => $captcha_element);
@@ -180,10 +191,10 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   module_load_include('inc', 'captcha');
 
   // Add Javascript for general CAPTCHA functionality.
-  drupal_add_js(drupal_get_path('module', 'captcha') . '/captcha.js');
+  backdrop_add_js(backdrop_get_path('module', 'captcha') . '/captcha.js');
 
   // Prevent caching of the page with CAPTCHA elements.
-  // This needs to be done even if the CAPTCHA will be ommitted later:
+  // This needs to be done even if the CAPTCHA will be omitted later:
   // other untrusted users should not get a cached page when
   // the current untrusted user can skip the current CAPTCHA.
   global $conf;
@@ -364,13 +375,13 @@ function theme_captcha($variables) {
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA'),
       '#description' => $element['#description'],
-      '#children' => drupal_render_children($element),
+      '#children' => backdrop_render_children($element),
       '#attributes' => array('class' => array('captcha')),
     );
     return theme('fieldset', array('element' => $fieldset));
   }
   else {
-    return '<div class="captcha">' . drupal_render_children($element) . '</div>';
+    return '<div class="captcha">' . backdrop_render_children($element) . '</div>';
   }
 }
 
@@ -396,7 +407,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
         '#captcha_type' => $captcha_point->module . '/' . $captcha_point->captcha_type,
       );
       // Add a CAPTCHA description if required.
-      if (variable_get('captcha_add_captcha_description', TRUE)) {
+      if (config_get('captcha.settings', 'add_captcha_description')) {
         $captcha_element['#description'] = _captcha_get_description();
       }
 
@@ -406,9 +417,9 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
     }
   }
   elseif (
-    variable_get('captcha_administration_mode', FALSE)
+    config_get('captcha.settings', 'administration_mode')
     && user_access('administer CAPTCHA settings')
-    && (arg(0) != 'admin' || variable_get('captcha_allow_on_admin_pages', FALSE))
+    && (arg(0) != 'admin' || config_get('captcha.settings', 'allow_on_admin_pages'))
   ) {
     // Add CAPTCHA administration tools.
     module_load_include('inc', 'captcha');
@@ -433,8 +444,8 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
         '#markup' => t('%type by module %module (<a href="@change">change</a>, <a href="@disable">disable</a>)', array(
           '%type' => $captcha_point->captcha_type,
           '%module' => $captcha_point->module,
-          '@change' => url("admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination())),
-          '@disable' => url("admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
+          '@change' => url("admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => backdrop_get_destination())),
+          '@disable' => url("admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => backdrop_get_destination())),
         )),
       );
       // Add an example challenge with solution.
@@ -461,7 +472,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
     else {
       $captcha_element['#title'] = t('CAPTCHA: no challenge enabled');
       $captcha_element['add_captcha'] = array(
-        '#markup' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination()))
+        '#markup' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => backdrop_get_destination()))
       );
 
     }
@@ -524,7 +535,7 @@ function captcha_validate_strict_equality($solution, $response) {
  *   TRUE when equal (ignoring spaces), FALSE otherwise.
  */
 function captcha_validate_case_insensitive_equality($solution, $response) {
-  return drupal_strtolower($solution) === drupal_strtolower($response);
+  return backdrop_strtolower($solution) === backdrop_strtolower($response);
 }
 
 /**
@@ -556,7 +567,7 @@ function captcha_validate_ignore_spaces($solution, $response) {
  *   TRUE when equal (ignoring spaces), FALSE otherwise.
  */
 function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
-  return preg_replace('/\s/', '', drupal_strtolower($solution)) === preg_replace('/\s/', '', drupal_strtolower($response));
+  return preg_replace('/\s/', '', backdrop_strtolower($solution)) === preg_replace('/\s/', '', backdrop_strtolower($response));
 }
 
 /**
@@ -620,7 +631,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
           array(':csid' => $posted_captcha_sid)
         )->fetchField();
         if ($expected_captcha_token !== $posted_captcha_token) {
-          drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+          backdrop_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
           // Invalidate the CAPTCHA session.
           $posted_captcha_sid = NULL;
         }
@@ -689,7 +700,7 @@ function captcha_validate($element, &$form_state) {
       // Correct answer.
 
       // Store form_id in session (but only if it is useful to do so, avoid setting stuff in session unnecessarily).
-      $captcha_persistence = variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
+      $captcha_persistence = config_get('captcha.settings', 'persistence');
       if ($captcha_persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL || $captcha_persistence == CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_TYPE) {
         $_SESSION['captcha_success_form_ids'][$form_id] = $form_id;
       }
@@ -710,11 +721,11 @@ function captcha_validate($element, &$form_state) {
       // Set form error.
       form_set_error('captcha_response', t('The answer you entered for the CAPTCHA was not correct.'));
       // Update wrong response counter.
-      if (variable_get('captcha_enable_stats', FALSE)) {
-        variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
+      if (config_get('captcha.settings', 'enable_stats')) {
+        config_set('captcha.settings', 'wrong_response_counter', config_get('captcha.settings', 'wrong_response_counter') + 1);
       }
       // Log to watchdog if needed.
-      if (variable_get('captcha_log_wrong_responses', FALSE)) {
+      if (config_get('captcha.setings', 'log_wrong_responses')) {
         watchdog('CAPTCHA',
           '%form_id post blocked by CAPTCHA module: challenge %challenge (by module %module), user answered "@response", but the solution was "@solution".',
           array(
@@ -830,5 +841,5 @@ function captcha_captcha($op, $captcha_type = '') {
 function captcha_modules_enabled() {
   // When new modules are enabled: clear the CAPTCHA placement cache, so that
   // new hook_captcha_placement_map hooks can be triggered.
-  variable_del('captcha_placement_map_cache');
+  state_set('captcha_placement_map_cache', NULL);
 }

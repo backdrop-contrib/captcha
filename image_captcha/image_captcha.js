@@ -1,6 +1,6 @@
 (function($) {
 
-  Drupal.behaviors.captchaAdmin = {
+  Backdrop.behaviors.captchaAdmin = {
     attach : function(context) {
 
       // Helper function to show/hide noise level widget.

@@ -54,7 +54,7 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
       ->execute();
   }
   else {
-    drupal_set_message(
+    backdrop_set_message(
       t('Failed to set a CAPTCHA type for form %form_id: could not interpret value "@captcha_type"',
       array(
         '%form_id' => $form_id,
@@ -96,7 +96,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
 
   // If no setting is available in database for the given form,
   // but 'captcha_default_challenge_on_nonlisted_forms' is enabled, pick the default type anyway.
-  if (!$captcha_point && variable_get('captcha_default_challenge_on_nonlisted_forms', FALSE)) {
+  if (!$captcha_point && config_get('captcha.settings', 'default_challenge_on_nonlisted_forms')) {
     $captcha_point = (object) array('captcha_type' => 'default');
   }
 
@@ -106,7 +106,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
   }
   elseif ($captcha_point->captcha_type == 'default') {
     if (!$symbolic) {
-      list($module, $type) = explode('/', variable_get('captcha_default_challenge', 'captcha/Math'));
+      list($module, $type) = explode('/', config_get('captcha.settings', 'default_challenge'));
       $captcha_point->module = $module;
       $captcha_point->captcha_type = $type;
     }
@@ -202,7 +202,7 @@ function _captcha_update_captcha_session($captcha_sid, $solution) {
  */
 function _captcha_required_for_user($captcha_sid, $form_id) {
   // Get the CAPTCHA persistence setting.
-  $captcha_persistence = variable_get('captcha_persistence', CAPTCHA_PERSISTENCE_SKIP_ONCE_SUCCESSFUL_PER_FORM_INSTANCE);
+  $captcha_persistence = config_get('captcha.settings', 'persistence');
 
   // First check: should we always add a CAPTCHA?
   if ($captcha_persistence == CAPTCHA_PERSISTENCE_SHOW_ALWAYS) {
@@ -252,15 +252,15 @@ function _captcha_required_for_user($captcha_sid, $form_id) {
 function _captcha_get_description($lang_code = NULL) {
   // If no language code is given: use the language of the current page.
   global $language;
-  $lang_code = isset($lang_code) ? $lang_code : $language->language;
+  $lang_code = isset($lang_code) ? $lang_code : $language->langcode;
   // The hardcoded but localizable default.
   $default = t('This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.', array(), array('langcode' => $lang_code));
   // Look up the configured CAPTCHA description or fall back on the (localized) default.
   if (module_exists('locale')) {
-    $description = variable_get("captcha_description_$lang_code", $default);
+    $description = config_get("captcha.settings", "description_$lang_code");
   }
   else {
-    $description = variable_get('captcha_description', $default);
+    $description = config_get('captcha.settings', 'description');
   }
   return filter_xss_admin($description);
 }
@@ -280,7 +280,7 @@ function _captcha_parse_captcha_type($captcha_type) {
     return array(NULL, NULL);
   }
   if ($captcha_type == 'default') {
-    $captcha_type = variable_get('captcha_default_challenge', 'captcha/Math');
+    $captcha_type = config_get('captcha.settings', 'default_challenge');
   }
   return explode('/', $captcha_type);
 }
@@ -307,12 +307,12 @@ function _captcha_get_captcha_placement($form_id, $form) {
   // Try first level cache.
   if ($placement_map === NULL) {
     // If first level cache missed: try second level cache.
-    $placement_map = variable_get('captcha_placement_map_cache', NULL);
+    $placement_map = state_get('captcha_placement_map_cache');
 
     if ($placement_map === NULL) {
       // If second level cache missed: initialize the placement map
       // and let other modules hook into this with the hook_captcha_placement_map hook.
-      // By default however, probably all Drupal core forms are already correctly
+      // By default however, probably all Backdrop core forms are already correctly
       // handled with the best effort guess based on the 'actions' element (see below).
       $placement_map = module_invoke_all('captcha_placement_map');
     }
@@ -349,7 +349,7 @@ function _captcha_get_captcha_placement($form_id, $form) {
 
     // Store calculated placement in cache.
     $placement_map[$form_id] = $placement;
-    variable_set('captcha_placement_map_cache', $placement_map);
+    state_set('captcha_placement_map_cache', $placement_map);
   }
 
   return $placement;

@@ -28,6 +28,17 @@ function image_captcha_help($path, $arg) {
 }
 
 /**
+* Implements hook_config_info().
+*/
+function image_captcha_config_info() {
+  $prefixes['image_captcha.settings'] = array(
+    'label' => t('Settings'),
+    'group' => t('Image Captcha'),
+  );
+  return $prefixes;
+}
+
+/**
  * Implements hook_menu().
  */
 function image_captcha_menu() {
@@ -36,7 +47,7 @@ function image_captcha_menu() {
   $items['admin/config/people/captcha/image_captcha'] = array(
     'title' => 'Image CAPTCHA',
     'file' => 'image_captcha.admin.inc',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('image_captcha_settings_form'),
     'access arguments' => array('administer CAPTCHA settings'),
     'type' => MENU_LOCAL_TASK,
@@ -71,10 +82,10 @@ function _image_captcha_get_enabled_fonts() {
   }
   else {
     $default = array(
-      drupal_get_path('module', 'image_captcha') . '/fonts/Tesox/tesox.ttf',
-      drupal_get_path('module', 'image_captcha') . '/fonts/Tuffy/Tuffy.ttf',
+      backdrop_get_path('module', 'image_captcha') . '/fonts/Tesox/tesox.ttf',
+      backdrop_get_path('module', 'image_captcha') . '/fonts/Tuffy/Tuffy.ttf',
     );
-    return variable_get('image_captcha_fonts', $default);
+    return config_get('image_captcha.settings', 'fonts', $default);
   }
 }
 
@@ -187,8 +198,9 @@ function _image_captcha_check_setup($check_fonts = TRUE) {
  */
 function _image_captcha_image_size($code) {
   // Get settings.
-  $font_size = (int) variable_get('image_captcha_font_size', 30);
-  $character_spacing = (float) variable_get('image_captcha_character_spacing', '1.2');
+  $config = config('image_captcha.settings');
+  $font_size = (int) $config->get('font_size');
+  $character_spacing = (float) $config->get('character_spacing');
   $characters = _image_captcha_utf8_split($code);
   $character_quantity = count($characters);
 
@@ -203,6 +215,8 @@ function _image_captcha_image_size($code) {
  * Implements hook_captcha().
  */
 function image_captcha_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
+  $config = config('image_captcha.settings');
+
   switch ($op) {
     case 'list':
       // Only offer the image CAPTCHA if it is possible to generate an image on this setup.
@@ -220,12 +234,12 @@ function image_captcha_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
         // for the image itself won't succeed (only ?q=user is permitted for
         // unauthenticated users). We fall back to the Math CAPTCHA in that case.
         global $user;
-        if (variable_get('maintenance_mode', 0) && $user->uid == 0) {
+        if (state_get('maintenance_mode', 0) && $user->uid == 0) {
           return captcha_captcha('generate', 'Math');
         }
         // Generate a CAPTCHA code.
-        $allowed_chars = _image_captcha_utf8_split(variable_get('image_captcha_image_allowed_chars', IMAGE_CAPTCHA_ALLOWED_CHARACTERS));
-        $code_length = (int) variable_get('image_captcha_code_length', 5);
+        $allowed_chars = _image_captcha_utf8_split($config->get('image_allowed_chars'));
+        $code_length = (int) $config->get('code_length');
         $code = '';
         for ($i = 0; $i < $code_length; $i++) {
           $code .= $allowed_chars[array_rand($allowed_chars)];
@@ -264,7 +278,7 @@ function image_captcha_captcha($op, $captcha_type = '', $captcha_sid = NULL) {
         );
 
         // Handle the case insensitive validation option combined with ignoring spaces.
-        switch (variable_get('captcha_default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
+        switch (config_get('captcha.settings', 'default_validation', CAPTCHA_DEFAULT_VALIDATION_CASE_INSENSITIVE)) {
           case CAPTCHA_DEFAULT_VALIDATION_CASE_SENSITIVE:
             $result['captcha_validate'] = 'captcha_validate_ignore_spaces';
             break;

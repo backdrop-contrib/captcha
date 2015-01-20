@@ -1,0 +1,14 @@
+{
+    "_config_name": "captcha.settings",
+    "administration_mode": 0,
+    "allow_on_admin_pages": 0,
+    "default_challenge": "captcha/Math",
+    "default_challenge_on_nonlisted_forms": 0,
+    "add_captcha_description": 1,
+    "description": "",
+    "default_validation": 1,
+    "persistence": 1,
+    "enable_stats": 0,
+    "wrong_response_counter": 0,
+    "log_wrong_responses": 0
+}

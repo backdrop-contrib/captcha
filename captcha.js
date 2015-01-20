@@ -1,6 +1,6 @@
 (function ($) {
 
-  Drupal.behaviors.captcha = {
+  Backdrop.behaviors.captcha = {
     attach: function (context) {
 
       // Turn off autocompletion for the CAPTCHA response field.
@@ -12,7 +12,7 @@
     }
   };
 
-  Drupal.behaviors.captchaAdmin = {
+  Backdrop.behaviors.captchaAdmin = {
     attach: function (context) {
       // Add onclick handler to checkbox for adding a CAPTCHA description
       // so that the textfields for the CAPTCHA description are hidden
