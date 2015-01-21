@@ -406,7 +406,6 @@ function image_captcha_settings_form_submit($form, &$form_state) {
  * Menu handler for font preview request.
  */
 function image_captcha_font_preview($font_token) {
-  debug($font_token);
   // Get the font from the given font token.
   if ($font_token == 'BUILTIN') {
     $font = 'BUILTIN';
@@ -414,7 +413,6 @@ function image_captcha_font_preview($font_token) {
   else {
     // Get the mapping of font tokens to font file objects.
     $fonts = state_get('image_captcha_fonts_preview_map_cache');
-    debug($fonts);
     if (!isset($fonts[$font_token])) {
       echo ('bad token');
       exit();
