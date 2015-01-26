@@ -9,3 +9,5 @@ files[] = captcha.inc
 files[] = captcha.admin.inc
 files[] = captcha.install
 files[] = captcha.test
+
+version = 1.x-1.x
