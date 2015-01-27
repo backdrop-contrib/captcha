@@ -23,7 +23,7 @@ complete text.
 Current Maintainers
 -------------------
 
-This module is currently maintained by Herb v/d Dool.
+This module is currently seeking maintainers. In the meanwhile it will be maintained by Herb v/d Dool.
 
 Credits
 -------
