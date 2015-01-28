@@ -5,7 +5,7 @@
     "default_challenge": "captcha/Math",
     "default_challenge_on_nonlisted_forms": 0,
     "add_captcha_description": 1,
-    "description": "",
+    "description": "This question is for testing whether or not you are a human visitor and to prevent automated spam submissions.",
     "default_validation": 1,
     "persistence": 1,
     "enable_stats": 0,

@@ -38,7 +38,7 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
   $config = config('captcha.settings');
   $captcha_points = $config->get('captcha_points');
 
-  if ((is_string($captcha_type) || ($captcha_type == NULL)) {
+  if (is_string($captcha_type) || ($captcha_type == NULL)) {
     // Handle 'none'.
     if ($captcha_type == 'none') {
 
