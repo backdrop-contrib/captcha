@@ -1,5 +1,19 @@
 <?php
 
+/*
+ * ==================HACK=============
+ * may need to borrow from layout.module to see how they
+ * deal with arrays before storing in config.
+ * also, do we need caching like layout does?
+ *
+ *  // Sort the configs by path and weight.
+    backdrop_sort($configs, array(
+      'path' => SORT_STRING,
+      'weight' => SORT_NUMERIC,
+    ));
+ *
+ */
+
 /**
  * @file
  * General CAPTCHA functionality and helper functions.
@@ -20,38 +34,35 @@
  *   - an object with attributes $captcha_type->module and $captcha_type->captcha_type
  */
 function captcha_set_form_id_setting($form_id, $captcha_type) {
-  // Handle 'none'.
-  if ($captcha_type == 'none') {
-    db_merge('captcha_points')
-      ->key(array('form_id' => $form_id))
-      ->fields(array('module' => NULL, 'captcha_type' => NULL))
-      ->execute();
-  }
-  // Handle 'default'.
-  elseif ($captcha_type == 'default') {
-    db_merge('captcha_points')
-      ->key(array('form_id' => $form_id))
-      ->fields(array('module' => NULL, 'captcha_type' => 'default'))
-      ->execute();
-  }
-  // Handle NULL.
-  elseif ($captcha_type == NULL) {
-    db_delete('captcha_points')->condition('form_id', $form_id)->execute();
-  }
-  // Handle a captcha_type object.
-  elseif (is_object($captcha_type) && isset($captcha_type->module) && isset($captcha_type->captcha_type)) {
-    db_merge('captcha_points')
-      ->key(array('form_id' => $form_id))
-      ->fields(array('module' => $captcha_type->module, 'captcha_type' => $captcha_type->captcha_type))
-      ->execute();
-  }
-  // Handle a captcha_type string.
-  elseif (is_string($captcha_type) && substr_count($captcha_type, '/') == 1) {
-    list($module, $type) = explode('/', $captcha_type);
-    db_merge('captcha_points')
-      ->key(array('form_id' => $form_id))
-      ->fields(array('module' => $module, 'captcha_type' => $type))
-      ->execute();
+
+  $config = config('captcha.settings');
+  $captcha_points = $config->get('captcha_points');
+
+  if ((is_string($captcha_type) || ($captcha_type == NULL)) {
+    // Handle 'none'.
+    if ($captcha_type == 'none') {
+
+      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => NULL);
+    }
+    // Handle 'default'.
+    elseif ($captcha_type == 'default') {
+
+      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => 'default');
+    }
+    // Handle NULL.
+    elseif ($captcha_type == NULL) {
+
+      unset($captcha_points[$form_id]);
+    }
+    // Handle a captcha_type string.
+    elseif (is_string($captcha_type) && substr_count($captcha_type, '/') == 1) {
+      list($module, $type) = explode('/', $captcha_type);
+
+      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => $module, 'captcha_type' => $type);
+    }
+
+    $config->set('captcha_points',$captcha_points);
+    $config->save();
   }
   else {
     backdrop_set_message(
@@ -82,43 +93,36 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  *   or in the form 'captcha/Math'.
  */
 function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
-  // Fetch setting from database.
-  if (module_exists('ctools')) {
-    ctools_include('export');
-    $object = ctools_export_load_object('captcha_points', 'names', array($form_id));
-    $captcha_point = array_pop($object);
-  }
-  else {
-    $result = db_query("SELECT module, captcha_type FROM {captcha_points} WHERE form_id = :form_id",
-      array(':form_id' =>  $form_id));
-    $captcha_point = $result->fetchObject();
-  }
+
+  $captcha_points = config_get('captcha.settings','captcha_points');
+
+  $captcha_point = $captcha_points[$form_id];
 
   // If no setting is available in database for the given form,
   // but 'captcha_default_challenge_on_nonlisted_forms' is enabled, pick the default type anyway.
   if (!$captcha_point && config_get('captcha.settings', 'default_challenge_on_nonlisted_forms')) {
-    $captcha_point = (object) array('captcha_type' => 'default');
+    $captcha_point = array('captcha_type' => 'default');
   }
 
   // Handle (default) settings and symbolic mode.
   if (!$captcha_point) {
     $captcha_point = NULL;
   }
-  elseif ($captcha_point->captcha_type == 'default') {
+  elseif ($captcha_point['captcha_type'] == 'default') {
     if (!$symbolic) {
       list($module, $type) = explode('/', config_get('captcha.settings', 'default_challenge'));
-      $captcha_point->module = $module;
-      $captcha_point->captcha_type = $type;
+      $captcha_point['module'] = $module;
+      $captcha_point['captcha_type'] = $type;
     }
     else {
       $captcha_point = 'default';
     }
   }
-  elseif ($captcha_point->module == NULL && $captcha_point->captcha_type == NULL && $symbolic) {
+  elseif ($captcha_point['module'] == NULL && $captcha_point['captcha_type'] == NULL && $symbolic) {
     $captcha_point = 'none';
   }
   elseif ($symbolic) {
-    $captcha_point = $captcha_point->module . '/' . $captcha_point->captcha_type;
+    $captcha_point = $captcha_point['module'] . '/' . $captcha_point['captcha_type'];
   }
   return $captcha_point;
 }
@@ -129,17 +133,16 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
  * @return array of all captcha_points
  */
 function captcha_get_captcha_points() {
-  if (module_exists('ctools')) {
-    ctools_include('export');
-    $captcha_points = ctools_export_load_object('captcha_points', 'all');
-  }
-  else {
-    $captcha_points = array();
-    $result = db_select('captcha_points', 'cp')->fields('cp')->orderBy('form_id')->execute();
-    foreach ($result as $captcha_point) {
-      $captcha_points[] = $captcha_point;
-    }
-  }
+
+  $config = config('captcha.settings');
+
+  $captcha_points = $config->get('captcha_points');
+
+  // Sort the configs by path and weight.
+  backdrop_sort($captcha_points, array(
+    'form_id' => SORT_STRING,
+  ));
+
   return $captcha_points;
 }
 
@@ -285,6 +288,23 @@ function _captcha_parse_captcha_type($captcha_type) {
   return explode('/', $captcha_type);
 }
 
+/*
+ * Formats _captcha_parse_captcha_type for config
+ *
+ * @param string $form_id
+ *   string representation of the form Id
+ * @param string $captcha_type
+ *   string representation of the CAPTCHA type,
+ *      e.g. 'default', 'none', 'captcha/Math', 'image_captcha/Image'
+ *
+ *  @return array
+ */
+function _captcha_format_captcha_point($form_id, $captcha_type) {
+  $parsed = _captcha_parse_captcha_type($captcha_type);
+  $point = array('form_id' => $form_id, 'module' => $parsed[0], 'captcha_type' => $parsed[1]);
+  return $point;
+}
+
 /**
  * Helper function to get placement information for a given form_id.
  *
@@ -338,7 +358,7 @@ function _captcha_get_captcha_placement($form_id, $form) {
       $buttons = _captcha_search_buttons($form);
       if (count($buttons)) {
         // Pick first button.
-        // TODO: make this more sofisticated? Use cases needed.
+        // TODO: make this more sophisticated? Use cases needed.
         $placement = $buttons[0];
       }
       else {

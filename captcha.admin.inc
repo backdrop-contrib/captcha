@@ -67,16 +67,17 @@ function captcha_admin_settings() {
   $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'] = array();
   $captcha_type_options = _captcha_available_challenge_types();
   $captcha_points = captcha_get_captcha_points();
+
   foreach ($captcha_points as $captcha_point) {
     $elem = array();
     $elem['form_id'] = array(
-      '#markup' => $captcha_point->form_id,
+      '#markup' => $captcha_point['form_id'],
     );
     // Select widget for CAPTCHA type.
-    if (isset($captcha_point->module) && $captcha_point->module) {
-      $captcha_type = $captcha_point->module . '/' . $captcha_point->captcha_type;
+    if (isset($captcha_point['module']) && $captcha_point['module']) {
+      $captcha_type = $captcha_point['module'] . '/' . $captcha_point['captcha_type'];
     }
-    elseif (isset($captcha_point->captcha_type) && ($captcha_point->captcha_type == 'default')) {
+    elseif (isset($captcha_point['captcha_type']) && ($captcha_point['captcha_type'] == 'default')) {
       $captcha_type = 'default';
     }
     else {
@@ -88,18 +89,12 @@ function captcha_admin_settings() {
       '#options' => $captcha_type_options,
     );
     $ops = array();
-    if (module_exists('ctools') && $captcha_point->export_type & EXPORT_IN_CODE) {
-      if ($captcha_point->export_type & EXPORT_IN_DATABASE) {
-        $ops[] = l(t('revert'), "admin/config/people/captcha/captcha/captcha_point/{$captcha_point->form_id}/delete");
-      }
-      // TODO Disable exported points.
-    }
-    else {
-      $ops[] = l(t('delete'), "admin/config/people/captcha/captcha/captcha_point/{$captcha_point->form_id}/delete");
-    }
+
+    $ops[] = l(t('delete'), "admin/config/people/captcha/captcha/captcha_point/{$captcha_point['form_id']}/delete");
+
     $elem['operations'] = array('#markup' => implode(", ", $ops));
 
-    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point->form_id] = $elem;
+    $form['captcha_form_protection']['captcha_form_id_overview']['captcha_captcha_points'][$captcha_point['form_id']] = $elem;
   }
 
   // Form items for new form_id.
@@ -281,45 +276,12 @@ function captcha_admin_settings_validate($form, $form_state) {
  * Submission function for captcha_admin_settings form.
  */
 function captcha_admin_settings_submit($form, &$form_state) {
+
   $config = config('captcha.settings');
   $config->set('administration_mode', $form_state['values']['captcha_administration_mode']);
   $config->set('allow_on_admin_pages', $form_state['values']['captcha_allow_on_admin_pages']);
   $config->set('default_challenge', $form_state['values']['captcha_default_challenge']);
   $config->set('default_challenge_on_nonlisted_forms', $form_state['values']['captcha_default_challenge_on_nonlisted_forms']);
-
-  // Process CAPTCHA points.
-  if (isset($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'])) {
-    // Load existing data.
-    $captcha_points = captcha_get_captcha_points();
-    foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
-      // If this is an in-code captcha point and its settings are unchanged,
-      // don't save to the database.
-      if (module_exists('ctools') && isset($captcha_points[$captcha_point_form_id])) {
-        // Parse module and captcha_type from submitted values.
-        if (is_string($data['captcha_type']) && substr_count($data['captcha_type'], '/') == 1) {
-          list($module, $captcha_type) = explode('/', $data['captcha_type']);
-        }
-        else {
-          $module = '';
-          $captcha_type = $data['captcha_type'];
-        }
-
-        $point = $captcha_points[$captcha_point_form_id];
-        if ($point->export_type & EXPORT_IN_CODE && !($point->export_type & EXPORT_IN_DATABASE) && $point->module == $module && $point->captcha_type == $captcha_type) {
-          continue;
-        }
-      }
-      captcha_set_form_id_setting($captcha_point_form_id, $data['captcha_type']);
-    }
-  }
-
-  // Add new CAPTCHA point?
-  $captcha_point_form_id = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['form_id'];
-  if (!empty($captcha_point_form_id)) {
-    $captcha_type = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'];
-    captcha_set_form_id_setting($captcha_point_form_id, $captcha_type);
-    backdrop_set_message(t('Added CAPTCHA point.'), 'status');
-  }
 
   // CAPTCHA description stuff.
   $config->set('add_captcha_description', $form_state['values']['captcha_add_captcha_description']);
@@ -332,7 +294,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
         $config->set("description_$lang_code", $description);
       }
       else {
-        $config->set("description_$lang_code", ''); // HOW TO DELETE CONFIG?
+        $config->clear("description_$lang_code");
         backdrop_set_message(t('Reset of CAPTCHA description for language %language.', array('%language' => $lang_name)), 'status');
       }
     }
@@ -343,7 +305,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
       $config->set('description', $description);
     }
     else {
-      $config->set('description', ''); // "DELETE"
+      $config->set('description', '');
       backdrop_set_message(t('Reset of CAPTCHA description.'), 'status');
     }
   }
@@ -354,8 +316,36 @@ function captcha_admin_settings_submit($form, &$form_state) {
   $config->set('log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
   $config->save();
 
+  // Process CAPTCHA points.
+  if (isset($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'])) {
+
+    $captcha_points = array();
+
+    foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
+
+      $captcha_points[$captcha_point_form_id] = _captcha_format_captcha_point($captcha_point_form_id, $data['captcha_type']);
+
+    }
+
+  }
+
+  // Add new CAPTCHA point?
+  // Process at same time as editing other form_ids
+  $captcha_point_form_id = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['form_id'];
+  if (!empty($captcha_point_form_id)) {
+    $captcha_type = $form_state['values']['captcha_form_id_overview']['captcha_new_captcha_point']['captcha_type'];
+
+    $captcha_points[$captcha_point_form_id] = _captcha_format_captcha_point($captcha_point_form_id, $captcha_type);
+
+    backdrop_set_message(t('Added CAPTCHA point.'), 'status');
+  }
+
+  config_set('captcha.points', 'captcha_points', $captcha_points);
+
   backdrop_set_message(t('The CAPTCHA settings have been saved.'), 'status');
 }
+
+
 
 /**
  * Submit callback; clear CAPTCHA placement cache.
@@ -373,12 +363,8 @@ function captcha_point_admin($captcha_point_form_id = NULL, $op = NULL) {
 
   // If $captcha_point_form_id and action $op given: do the action.
   if ($captcha_point_form_id) {
-    switch ($op) {
-      case 'disable':
-        return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, FALSE);
-
-      case 'delete':
-        return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, TRUE);
+    if($op == 'delete') {
+      return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, TRUE);
     }
     // Return edit form for CAPTCHA point.
     return backdrop_get_form('captcha_point_admin_form', $captcha_point_form_id);
@@ -404,7 +390,7 @@ function captcha_point_admin_form($form, $form_state, $captcha_point_form_id = N
     );
     $captcha_point = captcha_get_form_id_setting($captcha_point_form_id);
     if ($captcha_point) {
-      $default_captcha_type = "{$captcha_point->module}/{$captcha_point->captcha_type}";
+      $default_captcha_type = "{$captcha_point['module']}/{$captcha_point['captcha_type']}";
     }
   }
   else {
@@ -454,7 +440,7 @@ function captcha_point_admin_form_submit($form, $form_state) {
 }
 
 /**
- * Confirm dialog for disabling/deleting a CAPTCHA point.
+ * Confirm dialog for deleting a CAPTCHA point.
  */
 function captcha_point_disable_confirm($form, &$form_state, $captcha_point_form_id, $delete) {
   $form = array();
@@ -470,10 +456,6 @@ function captcha_point_disable_confirm($form, &$form_state, $captcha_point_form_
     $message = t('Are you sure you want to delete the CAPTCHA for form_id %form_id?', array('%form_id' => $captcha_point_form_id));
     $yes = t('Delete');
   }
-  else {
-    $message = t('Are you sure you want to disable the CAPTCHA for form_id %form_id?', array('%form_id' => $captcha_point_form_id));
-    $yes = t('Disable');
-  }
   return confirm_form($form, $message, 'admin/config/people/captcha/captcha', '', $yes);
 }
 
@@ -486,10 +468,6 @@ function captcha_point_disable_confirm_submit($form, &$form_state) {
   if ($delete) {
     captcha_set_form_id_setting($captcha_point_form_id, NULL);
     backdrop_set_message(t('Deleted CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)));
-  }
-  else {
-    captcha_set_form_id_setting($captcha_point_form_id, 'none');
-    backdrop_set_message(t('Disabled CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)));
   }
   $form_state['redirect'] = 'admin/config/people/captcha/captcha';
 }

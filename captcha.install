@@ -9,42 +9,6 @@
  * Implementation of hook_schema().
  */
 function captcha_schema() {
-  // Table for positions and types of the challenges.
-  $schema['captcha_points'] = array(
-    'description' => 'This table describes which challenges should be added to which forms.',
-    'export' => array(
-      'key' => 'form_id',
-      'identifier' => 'captcha',
-      'default hook' => 'captcha_default_points',  // Function hook name.
-      'status' => 'mark_status',
-      'api' => array(
-        'owner' => 'captcha',
-        'api' => 'captcha',  // Base name for api include files.
-        'minimum_version' => 1,
-        'current_version' => 1,
-      ),
-    ),
-    'fields' => array(
-      'form_id' => array(
-        'description' => 'The form_id of the form to add a CAPTCHA to.',
-        'type' => 'varchar',
-        'length' => 128,
-        'not null' => TRUE,
-        'default' => '',
-      ),
-      'module' => array(
-        'description' => 'The module that provides the challenge.',
-        'type' => 'varchar',
-        'length' => 64,
-      ),
-      'captcha_type' => array(
-        'description' => 'The challenge type to use.',
-        'type' => 'varchar',
-        'length' => 64,
-      ),
-    ),
-    'primary key' => array('form_id'),
-  );
   // Table for the CAPTCHA sessions.
   $schema['captcha_sessions'] = array(
     'description' => 'Stores the data about CAPTCHA sessions (solution, IP address, timestamp, ...).',
@@ -187,9 +151,6 @@ function captcha_update_1000() {
   $config->set('default_challenge_on_nonlisted_forms', update_variable_get('captcha_default_challenge_on_nonlisted_forms', 0));
   $config->set('captcha_default_challenge', update_variable_get('captcha_default_challenge', 'captcha/Math'));
   $config->set('administration_mode', update_variable_get('captcha_administration_mode', 0));
-
-
-//"captcha_description_$lang_code", $default
 
   $config->save();
 
