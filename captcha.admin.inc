@@ -314,7 +314,6 @@ function captcha_admin_settings_submit($form, &$form_state) {
   $config->set('persistence', $form_state['values']['captcha_persistence']);
   $config->set('enable_stats', $form_state['values']['captcha_enable_stats']);
   $config->set('log_wrong_responses', $form_state['values']['captcha_log_wrong_responses']);
-  $config->save();
 
   // Process CAPTCHA points.
   if (isset($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'])) {
@@ -322,11 +321,8 @@ function captcha_admin_settings_submit($form, &$form_state) {
     $captcha_points = array();
 
     foreach ($form_state['values']['captcha_form_id_overview']['captcha_captcha_points'] as $captcha_point_form_id => $data) {
-
       $captcha_points[$captcha_point_form_id] = _captcha_format_captcha_point($captcha_point_form_id, $data['captcha_type']);
-
     }
-
   }
 
   // Add new CAPTCHA point?
@@ -340,7 +336,9 @@ function captcha_admin_settings_submit($form, &$form_state) {
     backdrop_set_message(t('Added CAPTCHA point.'), 'status');
   }
 
-  config_set('captcha.points', 'captcha_points', $captcha_points);
+  $config->set('captcha_points', $captcha_points);
+
+  $config->save();
 
   backdrop_set_message(t('The CAPTCHA settings have been saved.'), 'status');
 }
