@@ -1,24 +1,5 @@
 <?php
 
-/*
- * ==================HACK=============
- * may need to borrow from layout.module to see how they
- * deal with arrays before storing in config.
- * also, do we need caching like layout does?
- *
- *  // Sort the configs by path and weight.
-    backdrop_sort($configs, array(
-      'path' => SORT_STRING,
-      'weight' => SORT_NUMERIC,
-    ));
- *
- */
-
-/**
- * @file
- * General CAPTCHA functionality and helper functions.
- */
-
 /**
  * Helper function for adding/updating a CAPTCHA point.
  *
@@ -39,13 +20,8 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
   $captcha_points = $config->get('captcha_points');
 
   if (is_string($captcha_type) || ($captcha_type == NULL)) {
-    // Handle 'none'.
-    if ($captcha_type == 'none') {
-
-      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => NULL);
-    }
     // Handle 'default'.
-    elseif ($captcha_type == 'default') {
+    if ($captcha_type == 'default') {
 
       $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => 'default');
     }
@@ -94,13 +70,17 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
  */
 function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
 
-  $captcha_points = config_get('captcha.settings','captcha_points');
+  $config = config('captcha.settings');
+  $captcha_points = $config->get('captcha_points');
+  $captcha_point = NULL;
 
-  $captcha_point = $captcha_points[$form_id];
+  if (isset($captcha_points[$form_id])) {
+    $captcha_point = $captcha_points[$form_id];
+  }
 
   // If no setting is available in database for the given form,
   // but 'captcha_default_challenge_on_nonlisted_forms' is enabled, pick the default type anyway.
-  if (!$captcha_point && config_get('captcha.settings', 'default_challenge_on_nonlisted_forms')) {
+  if (!$captcha_point && $config->get('default_challenge_on_nonlisted_forms')) {
     $captcha_point = array('captcha_type' => 'default');
   }
 
@@ -124,6 +104,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
   elseif ($symbolic) {
     $captcha_point = $captcha_point['module'] . '/' . $captcha_point['captcha_type'];
   }
+
   return $captcha_point;
 }
 
@@ -328,7 +309,6 @@ function _captcha_get_captcha_placement($form_id, $form) {
   if ($placement_map === NULL) {
     // If first level cache missed: try second level cache.
     $placement_map = state_get('captcha_placement_map_cache');
-
     if ($placement_map === NULL) {
       // If second level cache missed: initialize the placement map
       // and let other modules hook into this with the hook_captcha_placement_map hook.
@@ -452,6 +432,7 @@ function _captcha_insert_captcha_element(&$form, $placement, $captcha_element) {
 
   // If no target is available: just append the CAPTCHA element to the container.
   if ($target_key == NULL || !array_key_exists($target_key, $form_stepper)) {
+
     // Optionally, set weight of CAPTCHA element.
     if ($target_weight != NULL) {
       $captcha_element['#weight'] = $target_weight;
