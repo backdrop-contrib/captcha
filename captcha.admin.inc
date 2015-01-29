@@ -433,7 +433,7 @@ function captcha_point_admin_form_submit($form, $form_state) {
 }
 
 /**
- * Confirm dialog for deleting a CAPTCHA point.
+ * Confirm dialog for disabling/deleting a CAPTCHA point.
  */
 function captcha_point_disable_confirm($form, &$form_state, $captcha_point_form_id, $delete) {
   $form = array();
@@ -448,6 +448,10 @@ function captcha_point_disable_confirm($form, &$form_state, $captcha_point_form_
   if ($delete) {
     $message = t('Are you sure you want to delete the CAPTCHA for form_id %form_id?', array('%form_id' => $captcha_point_form_id));
     $yes = t('Delete');
+  }
+  else {
+    $message = t('Are you sure you want to disable the CAPTCHA for form_id %form_id?', array('%form_id' => $captcha_point_form_id));
+    $yes = t('Disable');
   }
   return confirm_form($form, $message, 'admin/config/people/captcha/captcha', '', $yes);
 }

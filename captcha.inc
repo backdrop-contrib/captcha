@@ -24,12 +24,17 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
   $captcha_points = $config->get('captcha_points');
 
   if (is_string($captcha_type) || ($captcha_type == NULL)) {
-    // Handle 'default'.
+    // Set as 'none'.
+    if ($captcha_type == 'none') {
+
+      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => NULL);
+    }
+    // Set as 'default'.
     if ($captcha_type == 'default') {
 
       $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => 'default');
     }
-    // Handle NULL.
+    // Handle NULL -- delete.
     elseif ($captcha_type == NULL) {
 
       unset($captcha_points[$form_id]);
@@ -41,7 +46,7 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
       $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => $module, 'captcha_type' => $type);
     }
 
-    $config->set('captcha_points',$captcha_points);
+    $config->set('captcha_points', $captcha_points);
     $config->save();
   }
   else {
