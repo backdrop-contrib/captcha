@@ -349,7 +349,7 @@ function captcha_clear_captcha_placement_cache_submit($form, &$form_state) {
 }
 
 /**
- * Central handler for CAPTCHA point deleting.
+ * Central handler for CAPTCHA point administration (adding, disabling, deleting).
  */
 function captcha_point_admin($captcha_point_form_id = NULL, $op = NULL) {
   module_load_include('inc', 'captcha');
@@ -360,10 +360,10 @@ function captcha_point_admin($captcha_point_form_id = NULL, $op = NULL) {
       return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, TRUE);
     }
     // Return edit form for CAPTCHA point.
-    //return backdrop_get_form('captcha_point_admin_form', $captcha_point_form_id);
+    return backdrop_get_form('captcha_point_admin_form', $captcha_point_form_id);
   }
   // Return add form for CAPTCHA point.
-  //return backdrop_get_form('captcha_point_admin_form');
+  return backdrop_get_form('captcha_point_admin_form');
 }
 
 /**

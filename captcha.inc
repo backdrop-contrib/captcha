@@ -1,6 +1,10 @@
 <?php
 
 /**
+ * @file
+ * General CAPTCHA functionality and helper functions.
+
+/**
  * Helper function for adding/updating a CAPTCHA point.
  *
  * @param string $form_id
