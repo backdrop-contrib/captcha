@@ -169,6 +169,21 @@ function captcha_update_1000() {
 }
 
 /**
+ * Add captcha points as an empty array to config if it doesn't exist.
+ */
+function captcha_update_1001() {
+  $config = config('captcha.settings');
+  $captcha_points = $config->get('captcha_points');
+  if (!$captcha_points) {
+    $config->set('captcha_points', array(
+    ));
+    $config->save();
+  }
+}
+
+/**
  * @} End of "defgroup updates-7.x-to-1.x"
  * The next series of updates should start at 2000.
  */
+
+

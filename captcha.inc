@@ -132,7 +132,6 @@ function captcha_get_captcha_points() {
   backdrop_sort($captcha_points, array(
     'form_id' => SORT_STRING,
   ));
-
   return $captcha_points;
 }
 
