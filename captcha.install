@@ -169,6 +169,25 @@ function captcha_update_1000() {
 }
 
 /**
+ * Add a default captcha point.
+ */
+function captcha_update_1001() {
+  $config = config('captcha.settings');
+  if (!isset($config->get('captcha_points'))) {
+    $config->set('captcha_points', array(
+      'user_register_form' => array(
+        'form_id' => 'user_register_form',
+        'module' => 'captcha',
+        'captcha_type' => 'captcha/Math'
+      )
+    ));
+    $config->save();
+  }
+}
+
+/**
  * @} End of "defgroup updates-7.x-to-1.x"
  * The next series of updates should start at 2000.
  */
+
+
