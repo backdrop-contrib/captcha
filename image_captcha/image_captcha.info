@@ -1,5 +1,5 @@
 name = "Image CAPTCHA"
-description = "Provides an image based CAPTCHA."
+description = "Provides an image based CAPTCHA challenge."
 package = "Spam control"
 dependencies[] = captcha
 core = 7.x
