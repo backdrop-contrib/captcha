@@ -560,7 +560,8 @@ function captcha_validate_case_insensitive_ignore_spaces($solution, $response) {
 }
 
 /**
- * Helper function for getting the posted CAPTCHA info (posted form_id and CAPTCHA sessions ID) from a form in case it is posted.
+ * Helper function for getting the posted CAPTCHA info (posted form_id and
+ * CAPTCHA sessions ID) from a form in case it is posted.
  *
  * This function hides the form processing mess for several use cases an
  * browser bug workarounds.
@@ -619,11 +620,13 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
           "SELECT token FROM {captcha_sessions} WHERE csid = :csid",
           array(':csid' => $posted_captcha_sid)
         )->fetchField();
+
         if ($expected_captcha_token !== $posted_captcha_token) {
           drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
           // Invalidate the CAPTCHA session.
           $posted_captcha_sid = NULL;
         }
+
         // Invalidate CAPTCHA token to avoid reuse.
         db_update('captcha_sessions')
           ->fields(array('token' => NULL))
