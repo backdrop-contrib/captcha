@@ -486,8 +486,11 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
     $form['caching']['captcha'] = array(
       '#type' => 'item',
       '#title' => t('CAPTCHA'),
-      '#markup' => t('!icon The CAPTCHA module will disable the caching of pages that contain a CAPTCHA element.', array(
-        '!icon' => '<span class="icon">' . $icon . '</span>')
+      '#markup' => t(
+        '!icon The CAPTCHA module will disable the caching of pages that contain a CAPTCHA element.',
+        array(
+          '!icon' => '<span class="icon">' . $icon . '</span>'
+        )
       ),
       '#attributes' => array('class' => array('warning')),
     );
