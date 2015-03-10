@@ -627,7 +627,8 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
         // Invalidate CAPTCHA token to avoid reuse.
         db_update('captcha_sessions')
           ->fields(array('token' => NULL))
-          ->condition('csid', $posted_captcha_sid);
+          ->condition('csid', $posted_captcha_sid)
+          ->execute();
       }
     }
     else {
