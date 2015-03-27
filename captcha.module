@@ -655,6 +655,10 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
  * files).
  */
 function captcha_validate($element, &$form_state) {
+  // If disable captcha mode is enabled, bypass captcha validation.
+  if (variable_get('disable_captcha', FALSE)) {
+    return;
+  }
 
   $captcha_info = $form_state['captcha_info'];
   $form_id = $captcha_info['this_form_id'];
