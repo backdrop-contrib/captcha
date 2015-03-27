@@ -2,3 +2,4 @@
 *.diff
 .idea/
 .idea/*
+.DS_Store
