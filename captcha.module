@@ -608,7 +608,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
     // we should be extra cautious and filter this data.
     $posted_form_id = isset($form_state['input']['form_id']) ? preg_replace("/[^a-z0-9_]/", "", (string) $form_state['input']['form_id']) : NULL;
     $posted_captcha_sid = isset($form_state['input']['captcha_sid']) ? (int) $form_state['input']['captcha_sid'] : NULL;
-    $posted_captcha_token = isset($form_state['input']['captcha_token']) ? preg_replace("/[^a-zA-Z0-9]/", "", (string) $form_state['input']['captcha_token']) : NULL;
+    $posted_captcha_token = !empty($form_state['input']['captcha_token']) ? preg_replace("/[^a-zA-Z0-9]/", "", (string) $form_state['input']['captcha_token']) : NULL;
 
     if ($posted_form_id == $this_form_id) {
       // Check if the posted CAPTCHA token is valid for the posted CAPTCHA
