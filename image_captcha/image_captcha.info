@@ -3,6 +3,7 @@ description = "Provides an image based CAPTCHA."
 package = "Spam control"
 dependencies[] = captcha
 backdrop = 1.x
+type = module
 configure = admin/config/people/captcha/image_captcha
 
 files[] = image_captcha.install
