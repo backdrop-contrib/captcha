@@ -9,3 +9,4 @@ files[] = image_captcha.install
 files[] = image_captcha.module
 files[] = image_captcha.admin.inc
 files[] = image_captcha.user.inc
+files[] = image_captcha.test

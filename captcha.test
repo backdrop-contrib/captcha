@@ -60,7 +60,11 @@ abstract class CaptchaBaseWebTestCase extends DrupalWebTestCase {
 
   function setUp() {
     // Load two modules: the captcha module itself and the comment module for testing anonymous comments.
-    parent::setUp('captcha', 'comment');
+    $modules = func_get_args();
+    if (isset($modules[0]) && is_array($modules[0])) {
+      $modules = $modules[0];
+    }
+    parent::setUp(array_merge(array('captcha', 'comment'), $modules));
     module_load_include('inc', 'captcha');
 
     // Create a normal user.
