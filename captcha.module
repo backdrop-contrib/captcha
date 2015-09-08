@@ -188,8 +188,7 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   // This needs to be done even if the CAPTCHA will be ommitted later:
   // other untrusted users should not get a cached page when
   // the current untrusted user can skip the current CAPTCHA.
-  global $conf;
-  $conf['cache'] = FALSE;
+  drupal_page_is_cacheable(FALSE);
 
   // Get the form ID of the form we are currently processing (which is not
   // necessary the same form that is submitted (if any).
