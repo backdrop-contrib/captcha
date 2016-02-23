@@ -156,7 +156,7 @@ function captcha_admin_settings() {
   );
   // Textfield(s) for the CAPTCHA description.
   if (module_exists('locale')) {
-    $langs = locale_language_list();
+    $langs = language_list(FALSE, TRUE);
     $form['captcha_descriptions'] = array(
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA description'),
@@ -287,7 +287,7 @@ function captcha_admin_settings_submit($form, &$form_state) {
   $config->set('add_captcha_description', $form_state['values']['captcha_add_captcha_description']);
   // Save (or reset) the CAPTCHA descriptions.
   if (module_exists('locale')) {
-    $langs = locale_language_list();
+    $langs = language_list(FALSE, TRUE);
     foreach ($langs as $lang_code => $lang_name) {
       $description = $form_state['values']["captcha_description_$lang_code"];
       if ($description) {
