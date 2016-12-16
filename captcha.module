@@ -488,7 +488,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
     $icon = theme(
       'image',
       array(
-        'path' => 'misc/watchdog-warning.png',
+        'uri' => 'core/misc/watchdog-warning.png',
         'width' => 18,
         'height' => 18,
         'alt' => t('warning'),
