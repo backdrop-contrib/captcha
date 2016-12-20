@@ -181,7 +181,7 @@ function captcha_element_process($element, &$form_state, $complete_form) {
 
   module_load_include('inc', 'captcha');
 
-  // Add Javascript for general CAPTCHA functionality.
+  // Add JavaScript for general CAPTCHA functionality.
   drupal_add_js(drupal_get_path('module', 'captcha') . '/captcha.js');
 
   // Prevent caching of the page with CAPTCHA elements.
