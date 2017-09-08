@@ -43,7 +43,7 @@ function captcha_admin_settings() {
 
   $config = config('captcha.settings');
 
-  // Use javascript for some added usability on admin form.
+  // Use JavaScript for some added usability on admin form.
   backdrop_add_js(backdrop_get_path('module', 'captcha') . '/captcha.js');
 
   // Configuration of which forms to protect, with what challenge.

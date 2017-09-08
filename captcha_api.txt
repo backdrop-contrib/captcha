@@ -68,7 +68,8 @@ name = "Foo CAPTCHA"
 description = "The foo CAPTCHA requires the user to enter the word 'foo'."
 package = "Spam control"
 dependencies[] = captcha
-core = 6.x
+core = 1.x
+type = module
 """
 
 
@@ -91,7 +92,7 @@ function foo_captcha_menu($may_cache) {
   if ($may_cache) {
     $items['admin/config/people/captcha/foo_captcha'] = array(
       'title' => t('Foo CAPTCHA'),
-      'page callback' => 'drupal_get_form',
+      'page callback' => 'backdrop_get_form',
       'page arguments' => array('foo_captcha_settings_form'),
       'type' => MENU_LOCAL_TASK,
     );
@@ -215,4 +216,3 @@ This will place the CAPTCHA element
   - in the 'my_fancy_form' form inside the container $form['items']['buttons'],
     just before the element $form['items']['buttons']['sacebutton'].
   - in the 'another_form' form at the toplevel of the form, with a weight 34.
-

@@ -23,31 +23,26 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
   $config = config('captcha.settings');
   $captcha_points = $config->get('captcha_points');
 
-  if (is_string($captcha_type) || ($captcha_type == NULL)) {
-    // Set as 'none'.
-    if ($captcha_type == 'none') {
-
-      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => NULL);
-    }
-    // Set as 'default'.
-    if ($captcha_type == 'default') {
-
-      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => 'default');
-    }
-    // Handle NULL -- delete.
-    elseif ($captcha_type == NULL) {
-
-      unset($captcha_points[$form_id]);
-    }
-    // Handle a captcha_type string.
-    elseif (is_string($captcha_type) && substr_count($captcha_type, '/') == 1) {
-      list($module, $type) = explode('/', $captcha_type);
-
-      $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => $module, 'captcha_type' => $type);
-    }
-
-    $config->set('captcha_points', $captcha_points);
-    $config->save();
+  // Handle 'none'.
+  if ($captcha_type == 'none') {
+    $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => NULL);
+  }
+  // Handle 'default'.
+  elseif ($captcha_type == 'default') {
+    $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => NULL, 'captcha_type' => 'default');
+  }
+  // Handle NULL.
+  elseif ($captcha_type == NULL) {
+    unset($captcha_points[$form_id]);
+  }
+  // Handle a captcha_type object.
+  elseif (is_object($captcha_type) && !empty($captcha_type->module) && !empty($captcha_type->captcha_type)) {
+    $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => $captcha_type->module, 'captcha_type' => $captcha_type->captcha_type);
+  }
+  // Handle a captcha_type string.
+  elseif (is_string($captcha_type) && substr_count($captcha_type, '/') == 1) {
+    list($module, $type) = explode('/', $captcha_type);
+    $captcha_points[$form_id] = array('form_id' => $form_id, 'module' => $module, 'captcha_type' => $type);
   }
   else {
     backdrop_set_message(
@@ -60,6 +55,8 @@ function captcha_set_form_id_setting($form_id, $captcha_type) {
       'warning'
     );
   }
+  $config->set('captcha_points', $captcha_points);
+  $config->save();
 }
 
 /**
@@ -97,7 +94,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
   if (!$captcha_point) {
     $captcha_point = NULL;
   }
-  elseif ($captcha_point['captcha_type'] == 'default') {
+  elseif (!empty($captcha_point->captcha_type) && $captcha_point->captcha_type == 'default') {
     if (!$symbolic) {
       list($module, $type) = explode('/', config_get('captcha.settings', 'default_challenge'));
       $captcha_point['module'] = $module;
@@ -107,7 +104,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
       $captcha_point = 'default';
     }
   }
-  elseif ($captcha_point['module'] == NULL && $captcha_point['captcha_type'] == NULL && $symbolic) {
+  elseif (empty($captcha_point->module) && empty($captcha_point->captcha_type) && $symbolic) {
     $captcha_point = 'none';
   }
   elseif ($symbolic) {
