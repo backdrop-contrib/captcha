@@ -15,7 +15,7 @@ function image_captcha_settings_form() {
 
   // Add CSS for theming of admin form.
   $form['#attached']['css'] = array(backdrop_get_path('module', 'image_captcha') . '/image_captcha.css');
-  // Use javascript for some added usability on admin form.
+  // Use JavaScript for some added usability on admin form.
   $form['#attached']['js'] = array(backdrop_get_path('module', 'image_captcha') . '/image_captcha.js');
 
   // First some error checking.
@@ -252,7 +252,7 @@ function _image_captcha_settings_form_font_section() {
       '#default_value' => $default_fonts,
       '#description' => t('Select the fonts to use for the text in the image CAPTCHA. Apart from the provided defaults, you can also use your own TrueType fonts (filename extension .ttf) by putting them in %fonts_library_general or %fonts_library_specific.',
         array(
-          '%fonts_library_general' => 'sites/all/libraries/fonts',
+          '%fonts_library_general' => 'libraries/fonts',
           '%fonts_library_specific' => conf_path() . '/libraries/fonts',
         )
       ),
@@ -319,7 +319,7 @@ function _image_captcha_get_available_fonts_from_directories($directories = NULL
   if ($directories === NULL) {
     $directories = array(
       backdrop_get_path('module', 'image_captcha') . '/fonts',
-      'sites/all/libraries/fonts',
+      'libraries/fonts',
       conf_path() . '/libraries/fonts',
     );
   }

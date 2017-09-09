@@ -1,5 +1,5 @@
 name = "Image CAPTCHA"
-description = "Provides an image based CAPTCHA."
+description = "Provides an image based CAPTCHA challenge."
 package = "Spam control"
 dependencies[] = captcha
 backdrop = 1.x
@@ -10,3 +10,4 @@ files[] = image_captcha.install
 files[] = image_captcha.module
 files[] = image_captcha.admin.inc
 files[] = image_captcha.user.inc
+files[] = image_captcha.test

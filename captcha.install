@@ -90,7 +90,7 @@ function captcha_schema() {
 function captcha_requirements($phase) {
   $requirements = array();
   $t = get_t();
-  if ($phase == 'runtime' && variable_get('captcha_enable_stats', FALSE)) {
+  if ($phase == 'runtime' && config_get('captcha.settings', 'enable_stats')) {
     // Show the wrong response counter in the status report.
     $requirements['captcha_wrong_response_counter'] = array(
       'title' => $t('CAPTCHA'),
@@ -201,6 +201,13 @@ function captcha_update_1002() {
     'not null' => TRUE,
     'default' => '',
   ));
+}
+
+/**
+ * Add disable_catpcha setting.
+ */
+function captcha_update_1003() {
+  config_set('captcha.settings', 'disable_captcha', FALSE);
 }
 
 /**

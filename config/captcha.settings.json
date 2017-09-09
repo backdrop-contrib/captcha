@@ -1,5 +1,6 @@
 {
     "_config_name": "captcha.settings",
+    "disable_catpcha": false,
     "administration_mode": 0,
     "allow_on_admin_pages": 0,
     "default_challenge": "captcha/Math",
