@@ -94,7 +94,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
   if (!$captcha_point) {
     $captcha_point = NULL;
   }
-  elseif (!empty($captcha_point->captcha_type) && $captcha_point->captcha_type == 'default') {
+  elseif (!empty($captcha_point['captcha_type']) && $captcha_point['captcha_type'] == 'default') {
     if (!$symbolic) {
       list($module, $type) = explode('/', config_get('captcha.settings', 'default_challenge'));
       $captcha_point['module'] = $module;
@@ -104,7 +104,7 @@ function captcha_get_form_id_setting($form_id, $symbolic = FALSE) {
       $captcha_point = 'default';
     }
   }
-  elseif (empty($captcha_point->module) && empty($captcha_point->captcha_type) && $symbolic) {
+  elseif (empty($captcha_point['module']) && empty($captcha_point['captcha_type']) && $symbolic) {
     $captcha_point = 'none';
   }
   elseif ($symbolic) {

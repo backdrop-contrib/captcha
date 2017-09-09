@@ -356,8 +356,11 @@ function captcha_point_admin($captcha_point_form_id = NULL, $op = NULL) {
 
   // If $captcha_point_form_id and action $op given: do the action.
   if ($captcha_point_form_id) {
-    if($op == 'delete') {
+    if ($op == 'delete') {
       return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, TRUE);
+    }
+    elseif ($op == 'disable') {
+      return backdrop_get_form('captcha_point_disable_confirm', $captcha_point_form_id, FALSE);
     }
     // Return edit form for CAPTCHA point.
     return backdrop_get_form('captcha_point_admin_form', $captcha_point_form_id);
@@ -465,6 +468,9 @@ function captcha_point_disable_confirm_submit($form, &$form_state) {
   if ($delete) {
     captcha_set_form_id_setting($captcha_point_form_id, NULL);
     backdrop_set_message(t('Deleted CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)));
+  } else {
+    captcha_set_form_id_setting($captcha_point_form_id, 'none');
+    backdrop_set_message(t('Disabled CAPTCHA for form %form_id.', array('%form_id' => $captcha_point_form_id)));
   }
   $form_state['redirect'] = 'admin/config/people/captcha/captcha';
 }

@@ -5,15 +5,9 @@
  * Tests for the Image CAPTCHA module.
  */
 
-class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
+module_load_include('test', 'captcha', 'tests/captcha');
 
-  public static function getInfo() {
-    return array(
-      'name' => 'General Image CAPTCHA functionality',
-      'description' => 'Testing of the basic Image CAPTCHA functions.',
-      'group' => 'CAPTCHA',
-    );
-  }
+class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
 
   public function setUp() {
     parent::setUp('image_captcha');
@@ -35,7 +29,7 @@ class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
     captcha_set_form_id_setting($form_id, 'image_captcha/Image');
 
     // Fetch the page and make sure that we got a CAPTCHA.
-    $this->drupalGet($page);
+    $this->backdropGet($page);
     $this->assertCaptchaPresence(TRUE);
   }
 
@@ -46,8 +40,8 @@ class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
     $img = $this->getCaptchaImageFromForm();
 
     // Try to fetch the image.
-    $this->drupalGet($this->getAbsoluteUrl($img['src']));
-    $this->assertTrue($this->drupalGetHeader('Content-Length') > 0,
+    $this->backdropGet($this->getAbsoluteUrl($img['src']));
+    $this->assertTrue($this->backdropGetHeader('Content-Length') > 0,
                       'Image CAPTCHA image is not empty.');
   }
 
@@ -55,7 +49,7 @@ class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
    * Tests if the image URL actually returns an image with clean URLs enabled.
    */
   public function testNonEmptyImageCleanURLs() {
-    variable_set('clean_url', 1);
+    config_set('system.core', 'clean_url', 1);
     $this->getImageCaptchaForm();
     $this->assertNonEmptyImage();
   }
@@ -64,7 +58,7 @@ class ImageCaptchaWebTestCase extends CaptchaBaseWebTestCase {
    * Tests if the image URL actually returns an image with clean URLs disabled.
    */
   public function testNonEmptyImageDirtyURLs() {
-    variable_set('clean_url', 0);
+    config_set('system.core', 'clean_url', 0);
     $this->getImageCaptchaForm();
     $this->assertNonEmptyImage();
   }

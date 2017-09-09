@@ -1,0 +1,23 @@
+[CaptchaTestCase]
+name = General CAPTCHA functionality
+description = Tests the basic CAPTCHA functionality.
+group = CAPTCHA
+file = captcha.test
+
+[CaptchaAdminTestCase]
+name = CAPTCHA administration functionality
+description = Testing of the CAPTCHA administration interface and functionality.
+group = CAPTCHA
+file = captcha.test
+
+[CaptchaPersistenceTestCase]
+name = CAPTCHA persistence functionality
+description = Testing of the CAPTCHA persistence functionality.
+group = CAPTCHA
+file = captcha.test
+
+[CaptchaSessionReuseAttackTestCase]
+name = CAPTCHA session reuse attack tests
+description = Testing of the protection against CAPTCHA session reuse attacks.
+group = CAPTCHA
+file = captcha.test

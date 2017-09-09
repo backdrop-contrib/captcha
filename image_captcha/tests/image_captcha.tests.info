@@ -1,0 +1,5 @@
+[ImageCaptchaWebTestCase]
+name = General Image CAPTCHA functionality
+description = Testing of the basic Image CAPTCHA functions.
+group = CAPTCHA
+file = image_captcha.test
