@@ -290,6 +290,19 @@ function captcha_element_process($element, &$form_state, $complete_form) {
     // Store the solution in the #captcha_info array.
     $element['#captcha_info']['solution'] = $captcha['solution'];
 
+    // Store if this captcha type is cacheable:
+    // A cacheable captcha must not depend on the sid or solution, but be
+    // independent - like for example recaptcha.
+    $element['#captcha_info']['cacheable'] = !empty($captcha['cacheable']);
+
+    if (!empty($element['#captcha_info']['cacheable']) && drupal_page_is_cacheable()) {
+      // This is only used to avoid the re-use message.
+      $element['captcha_cacheable'] = array(
+        '#type' => 'hidden',
+        '#value' => TRUE,
+      );
+    }
+
     // Make sure we can use a top level form value $form_state['values']['captcha_response'], even if the form has #tree=true.
     $element['#tree'] = FALSE;
 
@@ -632,6 +645,9 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
 
         if ($expected_captcha_token !== $posted_captcha_token) {
           drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+          if (empty($form_state['input']['captcha_cacheable'])) {
+            drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+          }
           // Invalidate the CAPTCHA session.
           $posted_captcha_sid = NULL;
         }
@@ -780,7 +796,10 @@ function captcha_pre_render_process($element) {
     // For a SID to be solved already, it must be a POST request as else
     // a new unsolved SID is generated.
     // Therefore it is fine to disable the cache at this late stage here.
-    drupal_page_is_cacheable(FALSE);
+    if (empty($captcha_info['cacheable'])) {
+      // The cache is only disabled if the captcha itself is not cacheable.
+      drupal_page_is_cacheable(FALSE);
+    }
 
     // Update captcha_sessions table: store the solution of the generated CAPTCHA.
     _captcha_update_captcha_session($captcha_sid, $captcha_info['solution']);
