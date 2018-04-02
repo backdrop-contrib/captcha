@@ -644,7 +644,6 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
         )->fetchField();
 
         if ($expected_captcha_token !== $posted_captcha_token) {
-          drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
           if (empty($form_state['input']['captcha_cacheable'])) {
             drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
           }
