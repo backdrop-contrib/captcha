@@ -184,12 +184,6 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   // Add JavaScript for general CAPTCHA functionality.
   drupal_add_js(drupal_get_path('module', 'captcha') . '/captcha.js');
 
-  // Prevent caching of the page with CAPTCHA elements.
-  // This needs to be done even if the CAPTCHA will be ommitted later:
-  // other untrusted users should not get a cached page when
-  // the current untrusted user can skip the current CAPTCHA.
-  drupal_page_is_cacheable(FALSE);
-
   // Get the form ID of the form we are currently processing (which is not
   // necessary the same form that is submitted (if any).
   $this_form_id = $complete_form['form_id']['#value'];
@@ -295,6 +289,19 @@ function captcha_element_process($element, &$form_state, $complete_form) {
 
     // Store the solution in the #captcha_info array.
     $element['#captcha_info']['solution'] = $captcha['solution'];
+
+    // Store if this captcha type is cacheable:
+    // A cacheable captcha must not depend on the sid or solution, but be
+    // independent - like for example recaptcha.
+    $element['#captcha_info']['cacheable'] = !empty($captcha['cacheable']);
+
+    if (!empty($element['#captcha_info']['cacheable']) && drupal_page_is_cacheable()) {
+      // This is only used to avoid the re-use message.
+      $element['captcha_cacheable'] = array(
+        '#type' => 'hidden',
+        '#value' => TRUE,
+      );
+    }
 
     // Make sure we can use a top level form value $form_state['values']['captcha_response'], even if the form has #tree=true.
     $element['#tree'] = FALSE;
@@ -637,7 +644,9 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
         )->fetchField();
 
         if ($expected_captcha_token !== $posted_captcha_token) {
-          drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+          if (empty($form_state['input']['captcha_cacheable'])) {
+            drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+          }
           // Invalidate the CAPTCHA session.
           $posted_captcha_sid = NULL;
         }
@@ -777,6 +786,20 @@ function captcha_pre_render_process($element) {
   // when the challenge is solved correctely on preview, the form is still
   // not completely submitted, but the CAPTCHA can be skipped.
   if (_captcha_required_for_user($captcha_sid, $form_id) || $element['#captcha_admin_mode'] || $element['#captcha_always']) {
+    // Prevent caching of the page with CAPTCHA elements.
+    // This needs to be done only if the captcha is actually displayed.
+    // The captcha display will be skipped only in 2 cases:
+    //   - The captcha sid has a solution already.
+    //   - The user has a SESSION.
+    // For a page to be cacheable, the user MUST not have a SESSION.
+    // For a SID to be solved already, it must be a POST request as else
+    // a new unsolved SID is generated.
+    // Therefore it is fine to disable the cache at this late stage here.
+    if (empty($captcha_info['cacheable'])) {
+      // The cache is only disabled if the captcha itself is not cacheable.
+      drupal_page_is_cacheable(FALSE);
+    }
+
     // Update captcha_sessions table: store the solution of the generated CAPTCHA.
     _captcha_update_captcha_session($captcha_sid, $captcha_info['solution']);
 
