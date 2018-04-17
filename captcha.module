@@ -390,6 +390,7 @@ function theme_captcha($variables) {
  */
 function captcha_form_alter(&$form, &$form_state, $form_id) {
 
+  // If user has skip CAPTCHA permission, doesn't do anything.
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip CAPTCHAs.
     module_load_include('inc', 'captcha');
@@ -413,7 +414,11 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
       _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
     }
   }
-  elseif (
+
+  // If user has access to administer CAPTCHA settings and
+  // 'Add CAPTCHA administration links to forms' is enabled, display the
+  // helper widget.
+  if (
     variable_get('captcha_administration_mode', FALSE)
     && user_access('administer CAPTCHA settings')
     && (arg(0) != 'admin' || variable_get('captcha_allow_on_admin_pages', FALSE))
@@ -430,6 +435,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
       '#collapsed' => TRUE,
       '#attributes' => array('class' => array('captcha-admin-links')),
     );
+
     if ($captcha_point !== NULL && $captcha_point->captcha_type) {
       $captcha_element['#title'] = t('CAPTCHA: challenge "@type" enabled', array('@type' => $captcha_point->captcha_type));
       $captcha_element['#description'] = t('Untrusted users will see a CAPTCHA here (<a href="@settings">general CAPTCHA settings</a>).',
@@ -445,6 +451,7 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
           '@disable' => url("admin/config/people/captcha/captcha/captcha_point/$form_id/disable", array('query' => drupal_get_destination())),
         )),
       );
+
       // Add an example challenge with solution.
       // This does not work with the reCAPTCHA and Egglue challenges as
       // discussed in http://drupal.org/node/487032 and
@@ -471,12 +478,11 @@ function captcha_form_alter(&$form, &$form_state, $form_id) {
       $captcha_element['add_captcha'] = array(
         '#markup' => l(t('Place a CAPTCHA here for untrusted users.'), "admin/config/people/captcha/captcha/captcha_point/$form_id", array('query' => drupal_get_destination()))
       );
-
     }
+
     // Get placement in form and insert in form.
     $captcha_placement = _captcha_get_captcha_placement($form_id, $form);
     _captcha_insert_captcha_element($form, $captcha_placement, $captcha_element);
-
   }
 
   // Add a warning about caching on the Perfomance settings page.
