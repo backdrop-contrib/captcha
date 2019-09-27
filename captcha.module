@@ -752,7 +752,7 @@ function captcha_validate($element, &$form_state) {
         ->expression('attempts', 'attempts + 1')
         ->execute();
       // Set form error.
-      form_set_error('captcha_response', t('The answer you entered for the CAPTCHA was not correct.'));
+      form_set_error('captcha_response', _captcha_get_error_message());
       // Update wrong response counter.
       if (variable_get('captcha_enable_stats', FALSE)) {
         variable_set('captcha_wrong_response_counter', variable_get('captcha_wrong_response_counter', 0) + 1);
