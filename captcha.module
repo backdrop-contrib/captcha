@@ -367,6 +367,12 @@ function captcha_captcha_default_points_alter(&$items) {
  */
 function theme_captcha($variables) {
   $element = $variables['element'];
+
+  if (empty($element['#description']) && !empty($element['#attributes']['title'])) {
+    // Fix for Bootstrap-based themes.
+    $element['#description'] = $element['#attributes']['title'];
+  }
+
   if (!empty($element['#description']) && isset($element['captcha_widgets'])) {
     $fieldset = array(
       '#type' => 'fieldset',
