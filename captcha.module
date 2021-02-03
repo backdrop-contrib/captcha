@@ -61,8 +61,8 @@ function captcha_help($path, $arg) {
 */
 function captcha_config_info() {
   $prefixes['captcha.settings'] = array(
-    'label' => t('Settings'),
-    'group' => t('Captcha'),
+    'label' => t('Captcha'),
+    'group' => t('Configuration'),
   );
   return $prefixes;
 }
