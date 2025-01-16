@@ -364,6 +364,7 @@ function theme_captcha($variables) {
       '#type' => 'fieldset',
       '#title' => t('CAPTCHA'),
       '#description' => $element['#description'],
+      '#description_display' => 'after',
       '#children' => backdrop_render_children($element),
       '#attributes' => array('class' => array('captcha')),
     );
