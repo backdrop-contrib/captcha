@@ -383,6 +383,10 @@ function theme_captcha($variables) {
  */
 function captcha_form_alter(&$form, &$form_state, $form_id) {
 
+  if (config_get('captcha.settings', 'disable_captcha')) {
+    return;
+  }
+
   // If user has skip CAPTCHA permission, doesn't do anything.
   if (!user_access('skip CAPTCHA')) {
     // Visitor does not have permission to skip CAPTCHAs.
