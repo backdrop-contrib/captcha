@@ -36,13 +36,13 @@ abstract class CaptchaBaseWebTestCase extends BackdropWebTestCase {
 
   /**
    * User with various administrative permissions.
-   * @var Backdrop user
+   * @var User
    */
   protected $admin_user;
 
   /**
    * Normal visitor with limited permissions
-   * @var Backdrop user;
+   * @var User
    */
   protected $normal_user;
 
@@ -81,11 +81,13 @@ abstract class CaptchaBaseWebTestCase extends BackdropWebTestCase {
     $permissions[] = 'administer content types';
     $this->admin_user = $this->backdropCreateUser($permissions);
 
-    // Put comments on page nodes on a separate page (default in Backdrop: below post).
-    config_set('node.type.page', 'settings.comment_form_location', COMMENT_FORM_SEPARATE_PAGE);
-
-    // Enable comment subject.
-    config_set('node.type.page', 'settings.comment_subject_field', TRUE);
+    $page_config = config('node.type.page');
+    $page_config->set('settings.comment_enabled', 1);
+    $page_config->set('settings.comment_form_location', COMMENT_FORM_SEPARATE_PAGE);
+    $page_config->set('settings.comment_mode', 1);
+    $page_config->set('settings.comment_title_options', 'custom');
+    $page_config->set('settings.comment_preview', 1);
+    $page_config->save();
 
     config_set('system.core', 'user_register', 'visitors');
   }
@@ -220,14 +222,6 @@ abstract class CaptchaBaseWebTestCase extends BackdropWebTestCase {
 
 
 class CaptchaTestCase extends CaptchaBaseWebTestCase {
-
-  public static function getInfo() {
-    return array(
-      'name' => t('General CAPTCHA functionality'),
-      'description' => t('Testing of the basic CAPTCHA functionality.'),
-      'group' => t('CAPTCHA'),
-    );
-  }
 
   /**
    * Testing the protection of the user log in form.
