@@ -21,3 +21,9 @@ name = CAPTCHA session reuse attack tests
 description = Testing of the protection against CAPTCHA session reuse attacks.
 group = CAPTCHA
 file = captcha.test
+
+[CaptchaTokenInvalidationTestCase]
+name = CAPTCHA token invalidation tests
+description = Testing of the protection against CAPTCHA session reuse attacks.
+group = CAPTCHA
+file = captcha.test
