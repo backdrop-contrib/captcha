@@ -729,7 +729,7 @@ function captcha_validate($element, &$form_state) {
     // Unknown challenge_id.
     // TODO: this probably never happens anymore now that there is detection
     // for CAPTCHA session reuse attacks in _captcha_get_posted_captcha_info().
-    form_set_error('captcha', t('CAPTCHA validation error: unknown CAPTCHA session ID. Contact the site administrator if this problem persists.'));
+    captcha_set_exclusive_form_error('captcha', t('CAPTCHA validation error: unknown CAPTCHA session ID. Contact the site administrator if this problem persists.'), $form_state);
     watchdog('CAPTCHA',
       'CAPTCHA validation error: unknown CAPTCHA session ID (%csid).',
       array('%csid' => var_export($csid, TRUE)),
@@ -770,7 +770,7 @@ function captcha_validate($element, &$form_state) {
         ->expression('attempts', 'attempts + 1')
         ->execute();
       // Set form error.
-      form_set_error('captcha_response', _captcha_get_error_message());
+      captcha_set_exclusive_form_error('captcha_response', _captcha_get_error_message(), $form_state);
       // Update wrong response counter.
       if (config_get('captcha.settings', 'enable_stats')) {
         state_set('captcha_wrong_response_counter', state_get('captcha_wrong_response_counter') + 1);
@@ -788,6 +788,44 @@ function captcha_validate($element, &$form_state) {
       }
     }
   }
+}
+
+/**
+ * Sets a validation error on a form element and suppresses all other errors.
+ *
+ * This function should be used for setting error messages for incorrect
+ * CAPTCHA responses.
+ *
+ * Since a CAPTCHA can be used to prevent brute force attacks, a form which is
+ * submitted with an incorrect CAPTCHA response should not display any other
+ * validation errors. Those errors could give the submitter a way to probe
+ * other fields (for example, a password field) to find the correct values to
+ * submit.
+ *
+ * @param string $name
+ *   The name of the form element to set the error on. See form_set_error().
+ * @param string $message
+ *   The error message to display.
+ * @param array $form_state
+ *   The form state.
+ *
+ * @see form_set_error()
+ */
+function captcha_set_exclusive_form_error($name, $message, &$form_state): void {
+  // Clear any form errors that were already set, and their associated
+  // messages.
+  form_clear_error();
+  drupal_get_messages('error');
+
+  // Set the new form error.
+  form_set_error($name, $message);
+
+  // Prevent any later form errors from being set. The triggering element must
+  // have a #submit property for this to work, so ensure it is set here (its
+  // value won't matter anyway, especially since the form isn't being
+  // successfully submitted). See _form_validate().
+  $form_state['triggering_element']['#limit_validation_errors'] = array();
+  $form_state['triggering_element'] += array('#submit' => array());
 }
 
 /**
