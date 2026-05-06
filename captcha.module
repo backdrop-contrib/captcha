@@ -177,7 +177,7 @@ function captcha_element_process($element, &$form_state, $complete_form) {
   // Get the CAPTCHA session ID.
   // If there is a submitted form: try to retrieve and reuse the
   // CAPTCHA session ID from the posted data.
-  list($posted_form_id, $posted_captcha_sid) = _captcha_get_posted_captcha_info($element, $form_state, $this_form_id);
+  list($posted_form_id, $posted_captcha_sid, $reuse_attack) = _captcha_get_posted_captcha_info($element, $form_state, $this_form_id);
   if ($this_form_id == $posted_form_id && isset($posted_captcha_sid)) {
     $captcha_sid = $posted_captcha_sid;
   }
@@ -229,6 +229,7 @@ function captcha_element_process($element, &$form_state, $complete_form) {
     'captcha_sid' => $captcha_sid,
     'module' => $captcha_type_module,
     'captcha_type' => $captcha_type_challenge,
+    'reuse_attack' => $reuse_attack,
   );
   $element['#captcha_info'] = array(
     'form_id' => $this_form_id,
@@ -655,9 +656,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
         )->fetchField();
 
         if ($expected_captcha_token !== $posted_captcha_token) {
-          if (empty($form_state['input']['captcha_cacheable'])) {
-            backdrop_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
-          }
+          $reuse_attack = empty($form_state['input']['captcha_cacheable']);
           // Invalidate the CAPTCHA session.
           $posted_captcha_sid = NULL;
         }
@@ -675,7 +674,7 @@ function _captcha_get_posted_captcha_info($element, $form_state, $this_form_id) 
       $posted_captcha_sid = NULL;
     }
   }
-  return array($posted_form_id, $posted_captcha_sid);
+  return array($posted_form_id, $posted_captcha_sid, !empty($reuse_attack));
 }
 
 /**
@@ -730,6 +729,9 @@ function captcha_validate($element, &$form_state) {
     // TODO: this probably never happens anymore now that there is detection
     // for CAPTCHA session reuse attacks in _captcha_get_posted_captcha_info().
     captcha_set_exclusive_form_error('captcha', t('CAPTCHA validation error: unknown CAPTCHA session ID. Contact the site administrator if this problem persists.'), $form_state);
+    if (!empty($captcha_info['reuse_attack'])) {
+      drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+    }
     watchdog('CAPTCHA',
       'CAPTCHA validation error: unknown CAPTCHA session ID (%csid).',
       array('%csid' => var_export($csid, TRUE)),
@@ -771,6 +773,10 @@ function captcha_validate($element, &$form_state) {
         ->execute();
       // Set form error.
       captcha_set_exclusive_form_error('captcha_response', _captcha_get_error_message(), $form_state);
+      // Re-add the reuse attack message after exclusive form error cleared it.
+      if (!empty($captcha_info['reuse_attack'])) {
+        drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+      }
       // Update wrong response counter.
       if (config_get('captcha.settings', 'enable_stats')) {
         state_set('captcha_wrong_response_counter', state_get('captcha_wrong_response_counter') + 1);

@@ -178,7 +178,7 @@ abstract class CaptchaBaseWebTestCase extends BackdropWebTestCase {
    */
   protected function getCaptchaTokenFromForm() {
     $elements = $this->xpath('//input[@name="captcha_token"]');
-    $captcha_token = (int) $elements[0]['value'];
+    $captcha_token = (string) $elements[0]['value'];
     return $captcha_token;
   }
 
