@@ -1248,13 +1248,6 @@ class CaptchaTokenInvalidationTestCase extends CaptchaBaseWebTestCase {
 }
 
 class CaptchaSecurityTestCase extends CaptchaBaseWebTestCase {
-  public static function getInfo() {
-    return array(
-      'name' => t('CAPTCHA Security tests'),
-      'description' => t('Testing of the protection against CAPTCHA attacks.'),
-      'group' => t('CAPTCHA'),
-    );
-  }
 
   /**
    * Testing the protection of the user log in form.
