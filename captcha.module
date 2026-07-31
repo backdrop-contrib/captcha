@@ -730,7 +730,7 @@ function captcha_validate($element, &$form_state) {
     // for CAPTCHA session reuse attacks in _captcha_get_posted_captcha_info().
     captcha_set_exclusive_form_error('captcha', t('CAPTCHA validation error: unknown CAPTCHA session ID. Contact the site administrator if this problem persists.'), $form_state);
     if (!empty($captcha_info['reuse_attack'])) {
-      drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+      backdrop_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
     }
     watchdog('CAPTCHA',
       'CAPTCHA validation error: unknown CAPTCHA session ID (%csid).',
@@ -775,7 +775,7 @@ function captcha_validate($element, &$form_state) {
       captcha_set_exclusive_form_error('captcha_response', _captcha_get_error_message(), $form_state);
       // Re-add the reuse attack message after exclusive form error cleared it.
       if (!empty($captcha_info['reuse_attack'])) {
-        drupal_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
+        backdrop_set_message(t('CAPTCHA session reuse attack detected.'), 'error');
       }
       // Update wrong response counter.
       if (config_get('captcha.settings', 'enable_stats')) {
@@ -821,7 +821,7 @@ function captcha_set_exclusive_form_error($name, $message, &$form_state): void {
   // Clear any form errors that were already set, and their associated
   // messages.
   form_clear_error();
-  drupal_get_messages('error');
+  backdrop_get_messages('error');
 
   // Set the new form error.
   form_set_error($name, $message);
