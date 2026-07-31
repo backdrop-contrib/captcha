@@ -1270,8 +1270,11 @@ class CaptchaSecurityTestCase extends CaptchaBaseWebTestCase {
     // Check for error message.
     $this->assertText(t(CAPTCHA_WRONG_RESPONSE_ERROR_MESSAGE),
       'CAPTCHA should block user login form', 'CAPTCHA');
-    $this->assertNoText(t('Sorry, unrecognized username or password. Have you forgotten your password?'),
+    $this->assertNoText(t('Sorry, unrecognized username.'),
       'CAPTCHA should supress thirty-party validators for login form', 'CAPTCHA');
+    $this->assertNoText(t('Sorry, incorrect password.'),
+      'CAPTCHA should supress thirty-party validators for login form', 'CAPTCHA'
+    );
   }
 }
 
